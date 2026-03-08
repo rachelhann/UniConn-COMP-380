@@ -14,8 +14,8 @@ import java.util.Date;
 public class User implements UserDetails {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Integer id;
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 	
 	 @Column(unique = true, length = 30, nullable = false)
 	 private String username;
@@ -29,8 +29,8 @@ public class User implements UserDetails {
 	 @Column(nullable = false)
 	 private String password;
 	 
-	 @Column(length = 150)
-	 private String bio;
+	 @Column(name= "user_bio", length = 150)
+	 private String userBio;
 	 
 	 @Column(name = "profile_picture_path", length = 255)
 	 private String profilePicture;
@@ -42,6 +42,18 @@ public class User implements UserDetails {
 	 @UpdateTimestamp
 	 @Column(name = "updated_at")
 	 private Date updatedAt;
+
+	 @Column(name = "follower_count")
+	 private int followerCount;
+	 
+	 @Column(name = "following_count")
+	 private int followingCount;
+	 
+	 @Column(name = "community_count")
+	 private int communityCount;
+	 
+	 @Column(name = "is_active", columnDefinition = "boolean default false")
+	 private Boolean isActive;
 
 	 public String getUsernameMain() {
 		 return username;
@@ -75,12 +87,12 @@ public class User implements UserDetails {
 		 this.password = password;
 	 }
 
-	 public String getBio() {
-		 return bio;
+	 public String getUserBio() {
+		 return userBio;
 	 }
 
-	 public void setBio(String bio) {
-		 this.bio = bio;
+	 public void setUserBio(String userBio) {
+		 this.userBio = userBio;
 	 }
 
 	 public String getProfilePicture() {
@@ -91,8 +103,8 @@ public class User implements UserDetails {
 		 this.profilePicture = profilePicture;
 	 }
 
-	 public Integer getId() {
-		 return id;
+	 public Integer getUserId() {
+		 return userId;
 	 }
 
 	 public Date getCreatedAt() {
@@ -103,6 +115,36 @@ public class User implements UserDetails {
 		 return updatedAt;
 	 }
 
+	 public void setFollowerCount(int followerCount) {
+		 this.followerCount = followerCount;
+	 }
+
+	 public int getFollowingCount() {
+		 return followingCount;
+	 }
+
+	 public void setFollowingCount(int followingCount) {
+		 this.followingCount = followingCount;
+	 }
+
+	 public int getCommunityCount() {
+		 return communityCount;
+	 }
+
+	 public void setCommunityCount(int communityCount) {
+		 this.communityCount = communityCount;
+	 }
+	 
+	 	 
+	 public Boolean getIsActive() {
+		return isActive;
+	}
+
+	 public void setIsActive(Boolean isActive) {
+		 this.isActive = isActive;
+	 }
+
+	 // most likely not needed
 	 @Override
 	 public Collection<? extends GrantedAuthority> getAuthorities() {
 		// TODO Auto-generated method stub
