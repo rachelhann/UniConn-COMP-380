@@ -2,22 +2,21 @@ package com.uniconn.backend.services;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import com.uniconn.backend.entities.Community;
-import com.uniconn.backend.entities.User;
-import com.uniconn.backend.entities.CommunityMember;
-import com.uniconn.backend.repositories.CommunityRepository;
-import com.uniconn.backend.repositories.CommunityMemberRepository;
+import com.uniconn.backend.entities.*;
+import com.uniconn.backend.repositories.*;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
 
 @Service
 public class CommunityMemberService {
 	private final CommunityMemberRepository communityMemberRepository;
 	private final CommunityRepository communityRepository;
+	private final UserRepository userRepository;
 	
 	public CommunityMemberService(CommunityMemberRepository communityMemberRepository, 
-			CommunityRepository communityRepository) {
+			CommunityRepository communityRepository, UserRepository userRepository) {
 		this.communityMemberRepository = communityMemberRepository;
 		this.communityRepository = communityRepository;
+		this.userRepository = userRepository;
 	}
 	
 	public String joinCommunity(Integer communityId) {
@@ -43,6 +42,9 @@ public class CommunityMemberService {
 		community.setMemberCount(community.getMemberCount() + 1);
 		communityRepository.save(community);
 		
+		currentUser.setCommunityCount(currentUser.getCommunityCount() + 1);
+		userRepository.save(currentUser);
+				
 		return "Joined community successfully!";
 	}
 	
@@ -63,6 +65,9 @@ public class CommunityMemberService {
 				.orElseThrow(() -> new RuntimeException("Community not found"));
 		community.setMemberCount(Math.max(0, community.getMemberCount() - 1));
 		communityRepository.save(community);
+		
+		currentUser.setCommunityCount(Math.max(0, currentUser.getCommunityCount() - 1));
+		userRepository.save(currentUser);
 		
 		return "Left community successfully";
 	}
