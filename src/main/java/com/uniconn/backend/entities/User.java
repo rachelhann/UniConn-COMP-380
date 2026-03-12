@@ -56,8 +56,8 @@ public class User {
 	 private int communityCount = 0;
 	 
 	 @Column(nullable = false)
-	 @ColumnDefault("false")
-	 private boolean isActive = false;
+	 @ColumnDefault("true")
+	 private boolean isActive = true;
 	 
 	//getters&setters
 	 public Integer getUserId() {
