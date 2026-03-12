@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface CommunityRepository extends JpaRepository<Community, Integer> {
 	boolean existsByCommunityName(String communityName);
 
     Optional<Community> findByCommunityName(String communityName);
-
 }

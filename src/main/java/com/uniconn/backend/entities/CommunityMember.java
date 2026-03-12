@@ -2,7 +2,7 @@ package com.uniconn.backend.entities;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
 
 @Table(name = "community_member")
@@ -22,8 +22,8 @@ public class CommunityMember {
 	private User user;
 	
 	@CreationTimestamp
-	@Column(name = "joined_at")
-	private Date joinedAt;
+	@Column(updatable = false)
+	private LocalDateTime joinedAt;
 	
 	public CommunityMember() {}
 	
@@ -52,7 +52,7 @@ public class CommunityMember {
 		this.user = user;
 	}
 
-	public Date getJoinedAt() {
+	public LocalDateTime getJoinedAt() {
 		return joinedAt;
 	}
 	
