@@ -2,7 +2,6 @@ package com.uniconn.backend.composite_keys;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import jakarta.persistence.Embeddable;
 
 @Embeddable

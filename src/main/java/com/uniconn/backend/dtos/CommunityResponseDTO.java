@@ -1,6 +1,6 @@
 package com.uniconn.backend.dtos;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class CommunityResponseDTO {
 	
@@ -8,12 +8,12 @@ public class CommunityResponseDTO {
     private String communityName;
     private String description;
     private int memberCount;
-    private Date createdAt;
+    private LocalDateTime createdAt;
     private Integer createdById;
     private String createdByUsername;
     
     public CommunityResponseDTO(Integer communityId, String communityName, String description,
-            	int memberCount, Date createdAt, Integer createdById, String createdByUsername) {
+            	int memberCount, LocalDateTime createdAt, Integer createdById, String createdByUsername) {
     	this.communityId = communityId;
     	this.communityName = communityName;
     	this.description = description;
@@ -39,7 +39,7 @@ public class CommunityResponseDTO {
 		return memberCount;
 	}
 
-	public Date getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 

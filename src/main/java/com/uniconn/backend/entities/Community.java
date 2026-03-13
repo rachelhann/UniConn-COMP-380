@@ -1,22 +1,23 @@
 package com.uniconn.backend.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Table(name = "community")
 @Entity
 public class Community {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "community_id", nullable = false)
+    @Column(name = "community_id",nullable = false)
     private Integer communityId;
 	
 	// NO spaces in communityName
-	 @Column(name = "community_name", unique = true, length = 50, nullable = false)
+	 @Column(unique = true, length = 50, nullable = false)
 	 private String communityName;
 	 
-	 @Column(name = "description", length = 500, nullable = false)
+	 @Column(length = 500, nullable = false)
 	 private String description;
 	 
 	 /*@Column(name = "category", length = 50)
@@ -26,12 +27,13 @@ public class Community {
 	 @JoinColumn(name = "created_by", referencedColumnName = "user_id", nullable = false)
 	 private User createdBy;
 	 
-	 @Column(name = "member_count")
-	 private int memberCount;
+	 @Column(nullable = false)
+	 @ColumnDefault("0")
+	 private int memberCount = 0;
 	 
 	 @CreationTimestamp
-	 @Column(name = "created_at", updatable = false)
-	 private Date createdAt;
+	 @Column(updatable = false)
+	 private LocalDateTime createdAt;
 	 
 	//getters&setters
 	 public String getCommunityName() {
@@ -71,7 +73,7 @@ public class Community {
 		 return communityId;
 	 }
 
-	 public Date getCreatedAt() {
+	 public LocalDateTime getCreatedAt() {
 		 return createdAt;
 	 }	 	 
 

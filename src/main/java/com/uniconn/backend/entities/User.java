@@ -1,17 +1,17 @@
 package com.uniconn.backend.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.Date;
 
 @Table(name = "users")
 @Entity
-public class User implements UserDetails {
+public class User {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id", nullable = false)
@@ -29,37 +29,46 @@ public class User implements UserDetails {
 	 @Column(nullable = false)
 	 private String password;
 	 
-	 @Column(name= "user_bio", length = 150)
+	 @Column(length = 150)
 	 private String userBio;
 	 
 	 @Column(name = "profile_picture_path", length = 255)
 	 private String profilePicture;
 	 
 	 @CreationTimestamp
-	 @Column(updatable = false, name = "created_at")
-	 private Date createdAt;
+	 @Column(updatable = false)
+	 private LocalDateTime createdAt;
 	 
 	 @UpdateTimestamp
-	 @Column(name = "updated_at")
-	 private Date updatedAt;
+	 @Column
+	 private LocalDateTime updatedAt;
 
-	 @Column(name = "follower_count")
-	 private int followerCount;
+	 @Column(nullable = false)
+	 @ColumnDefault("0")
+	 private int followerCount = 0;
 	 
-	 @Column(name = "following_count")
-	 private int followingCount;
+	 @Column(nullable = false)
+	 @ColumnDefault("0")
+	 private int followingCount = 0;
 	 
-	 @Column(name = "community_count")
-	 private int communityCount;
+	 @Column(nullable = false)
+	 @ColumnDefault("0")
+	 private int communityCount = 0;
 	 
-	 @Column(name = "is_active", columnDefinition = "boolean default false")
-	 private Boolean isActive;
-
-	 public String getUsernameMain() {
+	 @Column(nullable = false)
+	 @ColumnDefault("true")
+	 private boolean isActive = true;
+	 
+	//getters&setters
+	 public Integer getUserId() {
+		 return userId;
+	 }
+	 
+	 public String getUsername() {
 		 return username;
 	 }
 
-	 public void setUsernameMain(String username) {
+	 public void setUsername(String username) {
 		 this.username = username;
 	 }
 
@@ -103,16 +112,16 @@ public class User implements UserDetails {
 		 this.profilePicture = profilePicture;
 	 }
 
-	 public Integer getUserId() {
-		 return userId;
-	 }
-
-	 public Date getCreatedAt() {
+	 public LocalDateTime getCreatedAt() {
 		 return createdAt;
 	 }
 
-	 public Date getUpdatedAt() {
+	 public LocalDateTime getUpdatedAt() {
 		 return updatedAt;
+	 }
+	 
+	 public int getFollowerCount() {
+		 return followerCount;
 	 }
 
 	 public void setFollowerCount(int followerCount) {
@@ -134,46 +143,13 @@ public class User implements UserDetails {
 	 public void setCommunityCount(int communityCount) {
 		 this.communityCount = communityCount;
 	 }
-	 
-	 	 
-	 public Boolean getIsActive() {
-		return isActive;
-	}
 
-	 public void setIsActive(Boolean isActive) {
+	 public boolean isActive() {
+		 return isActive;
+	 }
+
+	 public void setActive(boolean isActive) {
 		 this.isActive = isActive;
 	 }
 
-	 // most likely not needed
-	 @Override
-	 public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
-	 }
-
-	 @Override
-	 public String getUsername() {
-		// TODO Auto-generated method stub
-		return email;
-	 }
-	 
-	 @Override
-	 public boolean isAccountNonExpired() {
-	    return true;
-	 }
-
-	 @Override
-	 public boolean isAccountNonLocked() {
-	    return true;
-	 }
-
-	 @Override
-	 public boolean isCredentialsNonExpired() {
-	    return true;
-	 }
-
-	 @Override
-	 public boolean isEnabled() {
-	    return true;
-	 }
 }

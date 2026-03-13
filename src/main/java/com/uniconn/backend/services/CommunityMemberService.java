@@ -4,10 +4,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.uniconn.backend.entities.*;
 import com.uniconn.backend.repositories.*;
+import jakarta.transaction.Transactional;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
 
 @Service
-public class CommunityMemberService {
+public class CommunityMemberService extends BaseService {
 	private final CommunityMemberRepository communityMemberRepository;
 	private final CommunityRepository communityRepository;
 	private final UserRepository userRepository;
@@ -19,10 +20,9 @@ public class CommunityMemberService {
 		this.userRepository = userRepository;
 	}
 	
+	@Transactional
 	public String joinCommunity(Integer communityId) {
-		User currentUser = (User) SecurityContextHolder.getContext()
-				.getAuthentication()
-				.getPrincipal();
+		User currentUser = getAuthenticatedUser();
 		
 		Community community = communityRepository.findById(communityId)
 				.orElseThrow(() -> new RuntimeException("Community not found"));
@@ -48,10 +48,9 @@ public class CommunityMemberService {
 		return "Joined community successfully!";
 	}
 	
+	@Transactional
 	public String leaveCommunity(Integer communityId) {
-		User currentUser = (User) SecurityContextHolder.getContext()
-				.getAuthentication()
-				.getPrincipal();
+		User currentUser = getAuthenticatedUser();
 		
 		CommunityMemberId memberId = new CommunityMemberId(communityId, currentUser.getUserId());
 		
