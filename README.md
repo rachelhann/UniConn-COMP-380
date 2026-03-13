@@ -114,5 +114,7 @@ You should see 20 users and 10 communities.
 
 - All student emails must end with `@my.csun.edu`
 - Passwords are stored as BCrypt hashes
-- `spring.jpa.hibernate.ddl-auto` is set to `validate` — Hibernate will check entity/schema alignment on startup but will not modify the database
-- If tables don't get created in db(refresh it after running app) set `spring.jpa.hibernate.ddl-auto` to `update`. And switch back if all works well. 
+- `spring.jpa.hibernate.ddl-auto` is set to `update` — Hibernate will run entities and create tables in database
+- After first run:
+   - Verify all tables were created in databse properly and test data was populated
+   - Switch `spring.jpa.hibernate.ddl-auto` to `validate` — Hibernate will be checking entity/schema alignment on startup but will not modify the database
