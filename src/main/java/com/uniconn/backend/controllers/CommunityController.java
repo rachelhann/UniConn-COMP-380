@@ -3,6 +3,7 @@ package com.uniconn.backend.controllers;
 import com.uniconn.backend.dtos.CommunityDTO;
 import com.uniconn.backend.dtos.CommunityResponseDTO;
 import com.uniconn.backend.services.CommunityService;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,5 +24,16 @@ public class CommunityController {
 		} catch(RuntimeException e) {
 			return ResponseEntity.badRequest().body(e.getMessage());
 		}
+	}
+	
+	//test
+	@GetMapping("/all")
+	public ResponseEntity<?> getAllCommunities() {
+	    try {
+	        List<CommunityResponseDTO> communities = communityService.getAllCommunities();
+	        return ResponseEntity.ok(communities);
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.badRequest().body(e.getMessage());
+	    }
 	}
 }

@@ -5,6 +5,10 @@ import com.uniconn.backend.entities.*;
 import com.uniconn.backend.repositories.*;
 import jakarta.transaction.Transactional;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -64,5 +68,21 @@ public class CommunityService extends BaseService {
                 community.getCreatedBy().getUserId(),
                 community.getCreatedBy().getUsername()
 			);
+	}
+	
+	// test
+	@Transactional
+	public List<CommunityResponseDTO> getAllCommunities() {
+	    return communityRepository.findAll()
+	        .stream()
+	        .map(community -> new CommunityResponseDTO(community.getCommunityId(),
+	                community.getCommunityName(),
+	                community.getDescription(),
+	                community.getMemberCount(),
+	                community.getCreatedAt(),
+	                community.getCreatedBy().getUserId(),
+	                community.getCreatedBy().getUsername()
+	                ))
+	        .collect(Collectors.toList());
 	}
 }

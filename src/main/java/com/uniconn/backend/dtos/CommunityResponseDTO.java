@@ -11,7 +11,7 @@ public class CommunityResponseDTO {
     private LocalDateTime createdAt;
     private Integer createdById;
     private String createdByUsername;
-    
+        
     public CommunityResponseDTO(Integer communityId, String communityName, String description,
             	int memberCount, LocalDateTime createdAt, Integer createdById, String createdByUsername) {
     	this.communityId = communityId;
