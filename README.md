@@ -65,16 +65,17 @@ The API will start at `http://localhost:8080`. I've had issues, so in applicatio
 src/
 ├── main/
 │   ├── java/com/uniconn/backend/
-│   │   ├── composite-keys/
-│   │   ├── config/         # Security disabled for now
-│   │   ├── dtos/
-│   │   ├── entities/       # JPA entities (User, Community, ...)
-│   │   ├── repositories/   # Spring Data repositories
-│   │   ├── services/       # Business logic
-│   │   └── controllers/    # REST controllers
+│   │   ├── composite-keys/         # For join tables (UserFollow, CommunityMember, ...)
+│   │   ├── config/                 # Security configurations
+│   │   ├── dtos/                   # (LoginResponseDTO, CommunityDTO, ...)
+│   │   ├── entities/               # JPA entities (User, Community, ...)
+│   │   ├── repositories/           # Spring Data repositories
+│   │   ├── services/               # Business logic
+│   │   └── controllers/            # REST controllers
 │   └── resources/
-│       ├── application.properties
-│       └── db/             # SQL seed scripts (run manually in Workbench)
+│       ├── static/                 # HTML, CSS, JavaScript
+│       ├── application.properties  # (DB connection, methods' properties, ...)
+│       └── db/                     # SQL seed scripts (run manually in Workbench)
 ```
  
 ## :arrows_clockwise: Loading Test Data
