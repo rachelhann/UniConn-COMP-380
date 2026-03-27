@@ -9,18 +9,21 @@
 * {
   box-sizing: border-box;
 }
+
 html {
   align-items: center;
   overflow-y: scroll;
   scrollbar-color: #242424;
-  scrollbar-width: thin;
+  scrollbar-width: thin; 
 }
+
 .main {
   font-size: 30px;
   font-weight: 900;
   align-self: flex-start;
   margin-top: 60px;
 }
+
 body {
   min-height: 100vh;
   margin: 0;
@@ -61,34 +64,51 @@ body {
 .input-box label {
   position: absolute;
   top: 50%;
-  left: 5px;
+  left: 35px;
   transform: translateY(-50%);
   font-size: 1em;
   pointer-events: none;
   color: #373737;
 }
 
+.header {
+    height:30px;
+    width: 699px;
+    overflow:hidden;
+    position: absolute;
+    margin-top: -140px;
+    margin-left: -191px;
+    background: #91c5e8;
+    border: 2px solid black;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    z-index: 999;
+}
+h3 {
+  margin: -1px auto 0 10px;
+}
+
 .input-box input {
   width: 100%;
+  padding-left: 32px;
   height: 30px;
   background: transparent;
   font-size: 1em;
   border-radius: 10px;
 }
-.input-box:focus-within label {
+.input-box input:focus + label,
+.input-box input:not(:placeholder-shown) + label {
   opacity: 0;
   visibility: hidden;
 }
-.input-box input:focus~label,
-.input-box input:valid~label {
-  top: -5px;
-}
-.input_box .icon {
+
+.input-box .icon{
   position: absolute;
-  right: 8px;
-  color: #fff;
-  font-size: 1.2em;
-  color: #fff;
+  width: 20px;
+  height: 20px;
+  border: none;
 }
 
 .forgot-password {
@@ -98,9 +118,11 @@ body {
   color: #fff;
   display: flex;
 }
+
 .forgot-password label input {
   margin-right: 3px;
 }
+
 a {
   color: #000;
   text-decoration: none;
@@ -108,18 +130,21 @@ a {
 a:hover {
   color: #65adc9;
 }
+
 img {
-  margin: 10px;
+  margin-top: 5px;
+  margin-left: 8px;
   border: 1px solid #3d3d3d;
-  box-shadow: 5px 5px #3d3d3d;
   display: block;
   width: 88%;
 }
+
 hr {
   border: none;
   border-bottom: 1px solid #3d3d3d;
   width: 100%;
 }
+
 button {
   width: 100%;
   height: 40px;
@@ -136,6 +161,7 @@ button:hover {
   background: #91c5e8;
   border: 1px solid #91c5e8;
 }
+
 .register-link {
   font-size: 0.9em;
   color: #000;

@@ -5,42 +5,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="login.css">
-  <title>Sign In</title>
+  <title>Register - UniConn</title>
 </head>
 
-<body>f
+<body>
       <script type="module" src="/Vector Logos/unicornLogo.svg"></script>
       <a href="index.html" class="main">UniConn</a><br>
     <hr><br><br>
     <div class="login-container">
-      <form action="">
-        <center>
-          <h1>Welcome!</h1>
-        </center>
-        <div class="input-box">
-          <label>Email</label>
-          <span class="icon" alt="mail"></span>
-          <input type="email" required>
+      <form action="http://localhost:9090/auth/register" method="POST">
 
-        </div>
-        <div class="input-box">
-          <label>Password</label>
-          <span class="icon" alt="password"></span>
-          <input type="password" required>
-        </div>
-        <div class="forgot-password">
-          <a href="#">Forgot Password?</a>
-        </div>
-        <button type="submit">Login</button>
-        <div class="register-link">
-          <p>Don't have an account?<a href="#"> Register!</a>
-      </form>
+    <div class="header">
+      <h3>Login</h3>
     </div>
 
+      <div class="input-box">
+        <img class="icon" src="/Vector Logos/usernameSignIn.svg">
+        <input type="username" required placeholder=" ">               
+               <label>Username</label>
+      </div>
 
-  <script type="module" src="/Vector Logos/usernameSignIn.svg"></script>
-  <script type="module" src="/Vector Logos/passwordSignIn.svg"></script>
+        <div class="input-box">
+          <img class="icon" src="/Vector Logos/passwordSignIn.svg">
+          <input type="password" required placeholder=" ">
+          <label>Password</label>
+        </div>
+
+        <div class="forgot-password">
+          <a href="forgotPassword.html">Forgot Password?</a>
+        </div>
+        
+        <button type="submit">Login</button>
+        <div class="register-link">
+          <p>Don't have an account?<a href="register.html"> Register!</a>
+      </form>
+        </div>
+
 </body>
-
 
 </html>
