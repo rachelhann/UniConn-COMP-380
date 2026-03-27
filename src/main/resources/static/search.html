@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="search.css">
+  <title>Search - UniConn</title>
+</head>
+<body>
+  <a href="index.html" class="main">UniConn</a>
+  <hr><br>
+
+  <div class="search-container">
+    <h1>Search</h1>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search users, communities, posts..." />
+      <button onclick="doSearch()">Search</button>
+    </div>
+  </div>
+
+  <div id="results">
+
+    <div class="result-section" id="usersSection">
+      <h2>Users</h2>
+      <div id="usersResults" class="cards"></div>
+    </div>
+
+    <div class="result-section" id="communitiesSection">
+      <h2>Communities</h2>
+      <div id="communitiesResults" class="cards"></div>
+    </div>
+
+    <div class="result-section" id="postsSection">
+      <h2>Posts</h2>
+      <div id="postsResults" class="cards"></div>
+    </div>
+
+    <div id="noResults" class="no-results" style="display:none;">
+      No results found.
+    </div>
+
+  </div>
+
+  <script>
+    // Allow pressing Enter to search
+    document.getElementById('searchInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doSearch();
+    });
+
+    async function doSearch() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return;
+
+      // Clear previous results
+      document.getElementById('usersResults').innerHTML = '';
+      document.getElementById('communitiesResults').innerHTML = '';
+      document.getElementById('postsResults').innerHTML = '';
+      document.getElementById('noResults').style.display = 'none';
+      document.getElementById('usersSection').style.display = 'none';
+      document.getElementById('communitiesSection').style.display = 'none';
+      document.getElementById('postsSection').style.display = 'none';
+
+      try {
+        const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+        if (!response.ok) {
+          document.getElementById('noResults').style.display = 'block';
+          document.getElementById('noResults').textContent = 'Something went wrong. Please try again.';
+          return;
+        }
+
+        const data = await response.json();
+        let hasAnyResults = false;
+
+        // Render Users
+        if (data.users && data.users.length > 0) {
+          hasAnyResults = true;
+          document.getElementById('usersSection').style.display = 'block';
+          data.users.forEach(user => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <div class="card-title">@${user.username}</div>
+              ${user.name ? `<div class="card-sub">${user.name}</div>` : ''}
+              ${user.userBio ? `<div class="card-body">${user.userBio}</div>` : ''}
+              <div class="card-meta">${user.followerCount} followers</div>
+            `;
+            document.getElementById('usersResults').appendChild(card);
+          });
+        }
+
+        // Render Communities
+        if (data.communities && data.communities.length > 0) {
+          hasAnyResults = true;
+          document.getElementById('communitiesSection').style.display = 'block';
+          data.communities.forEach(community => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <div class="card-title">${community.communityName}</div>
+              <div class="card-body">${community.description}</div>
+              <div class="card-meta">${community.memberCount} members</div>
+            `;
+            document.getElementById('communitiesResults').appendChild(card);
+          });
+        }
+
+        // Render Posts
+        if (data.posts && data.posts.length > 0) {
+          hasAnyResults = true;
+          document.getElementById('postsSection').style.display = 'block';
+          data.posts.forEach(post => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              ${post.title ? `<div class="card-title">${post.title}</div>` : ''}
+              <div class="card-body">${post.contentText}</div>
+              <div class="card-meta">By @${post.authorUsername} &bull; ${post.likeCount} likes &bull; ${post.commentCount} comments</div>
+            `;
+            document.getElementById('postsResults').appendChild(card);
+          });
+        }
+
+        if (!hasAnyResults) {
+          document.getElementById('noResults').style.display = 'block';
+          document.getElementById('noResults').textContent = `No results found for "${query}".`;
+        }
+
+      } catch (err) {
+        document.getElementById('noResults').style.display = 'block';
+        document.getElementById('noResults').textContent = 'Could not connect to server.';
+      }
+    }
+  </script>
+</body>
+</html>
