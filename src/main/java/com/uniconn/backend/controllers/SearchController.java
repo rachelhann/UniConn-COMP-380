@@ -14,10 +14,63 @@ public class SearchController {
         this.searchService = searchService;
     }
 
+    // --- General Search ---
     @GetMapping
     public ResponseEntity<?> search(@RequestParam String q) {
         try {
             return ResponseEntity.ok(searchService.search(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- Explore Communities Search ---
+    @GetMapping("/communities")
+    public ResponseEntity<?> searchCommunities(@RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchCommunitiesForExplore(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- My Communities Search ---
+    @GetMapping("/my-communities")
+    public ResponseEntity<?> searchMyCommunities(@RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchMyCommunities(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- Following Search ---
+    @GetMapping("/following")
+    public ResponseEntity<?> searchFollowing(@RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchFollowing(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- Followers Search ---
+    @GetMapping("/followers")
+    public ResponseEntity<?> searchFollowers(@RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchFollowers(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- Community Members Search ---
+    @GetMapping("/community/{communityId}/members")
+    public ResponseEntity<?> searchCommunityMembers(
+            @PathVariable Integer communityId,
+            @RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchCommunityMembers(communityId, q));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

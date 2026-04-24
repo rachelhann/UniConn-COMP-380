@@ -24,20 +24,33 @@ document.getElementById('search-input').addEventListener('keydown', async functi
     const data = await response.json();
     results.innerHTML = '';
 
-    const allResults = [
-      ...data.users.map(u => ({ label: `👤 @${u.username}`, sub: u.userBio || '' })),
-      ...data.communities.map(c => ({ label: `🏘️ ${c.communityName}`, sub: c.description || '' })),
-      ...data.posts.map(p => ({ label: `📝 ${p.title || p.contentText}`, sub: `by @${p.authorUsername}` }))
-    ];
+    const hasResults = data.users.length > 0 || data.communities.length > 0 || data.posts.length > 0;
 
-    if (allResults.length === 0) {
-      results.innerHTML = `<li>No results for "${query}"</li>`;
+    if (!hasResults) {
+      results.innerHTML = `<li>No results found for "${query}"</li>`;
       return;
     }
 
-    allResults.forEach(item => {
+    data.users.forEach(u => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>${item.label}</strong>${item.sub ? `<br><small>${item.sub}</small>` : ''}`;
+      li.innerHTML = `<strong>👤 @${u.username}</strong>${u.userBio ? `<br><small>${u.userBio}</small>` : ''}`;
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => window.location.href = '/profile?user=' + u.username);
+      results.appendChild(li);
+    });
+
+    data.communities.forEach(c => {
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>🏘️ ${c.communityName}</strong>${c.description ? `<br><small>${c.description}</small>` : ''}`;
+      li.style.cursor = 'pointer';
+      li.addEventListener('click', () => window.location.href = '/community/' + c.communityId);
+      results.appendChild(li);
+    });
+
+    data.posts.forEach(p => {
+      const li = document.createElement('li');
+      li.innerHTML = `<strong>📝 ${p.title || p.contentText}</strong><br><small>by @${p.authorUsername}</small>`;
+      li.style.cursor = 'pointer';
       results.appendChild(li);
     });
 
