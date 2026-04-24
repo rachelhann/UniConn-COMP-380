@@ -4,7 +4,6 @@
 
 package com.uniconn.backend.config;
 
-import com.uniconn.backend.utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,12 +33,14 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/search/**").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/forgot-password", "/feed", "/profile", "/post/**", "/search.html").permitAll()
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/feed", "/profile", "/post/**").permitAll()
                         .requestMatchers("/css/**", "/js/**", "/*.css", "/*.js", "/vector-logos/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
+ 
         return http.build();
     }
 
