@@ -138,10 +138,15 @@
 
   <div class="wrap">
 
-    <!-- LEFT CONTAINER: community list -->
-    <div class="left-container">
-      <div class="header-left"><h3>Communities</h3></div>
+  <!-- LEFT CONTAINER: community list TEMP -->    
+  <div class="left-container">
+    <div class="header-left"><h3>Communities</h3></div>
+    <div class="search-box">
+      <input type="text" id="community-search-input" placeholder="Search communities..." />
+      <button onclick="searchCommunities()">Search</button>
     </div>
+    <div id="community-search-results"></div>
+  </div>
 
     <!-- RIGHT CONTAINER -->
     <div class="right-wrap">
@@ -183,6 +188,63 @@
 <script th:src="@{/js/communityFunction.js}" defer></script>
 <script th:src="@{/js/searchFunction.js}" defer></script>
 <script th:src="@{/js/notificationFunction.js}" defer></script>
+
+
+
+  <script>
+  async function searchCommunities() {
+    const query = document.getElementById('community-search-input').value.trim();
+    if (!query) return;
+
+    const results = document.getElementById('community-search-results');
+    results.innerHTML = '<p>Searching...</p>';
+
+    try {
+      const res = await fetch(`/api/search/communities?q=${encodeURIComponent(query)}`);
+      const data = await res.json();
+      results.innerHTML = '';
+
+      if (data.length === 0) {
+        results.innerHTML = '<p>No communities found.</p>';
+        return;
+      }
+
+
+
+      data.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'mc-card';
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', () => {
+          sessionStorage.setItem('communityDetail', JSON.stringify(c));
+          window.location.href = '/community/' + c.communityId;
+        });
+        card.innerHTML = `
+          <div class="mc-card-body">
+            <div class="mc-card-header">
+              <span class="mc-card-name">c/${c.communityName}</span>
+            </div>
+            <span class="mc-card-members">${c.memberCount} members</span>
+            <p class="mc-card-desc">${c.description}</p>
+          </div>
+        `;
+        results.appendChild(card);
+      });
+
+
+
+
+      });
+    } catch (err) {
+      results.innerHTML = '<p>Could not connect to server.</p>';
+    }
+  }
+
+  document.getElementById('community-search-input')
+    .addEventListener('keydown', e => { if (e.key === 'Enter') searchCommunities(); });
+  </script>
+
+
 </body>
 
 </html>
