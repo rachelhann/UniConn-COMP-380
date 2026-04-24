@@ -1,0 +1,25 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="18 5 242 200" width="242" height="200">
+	<style>
+		.s0 { fill: #ffffff;stroke: #ffffff;stroke-miterlimit:10;stroke-width: 50 } 
+		.s1 { fill: #ffffff;stroke: #79afd2;stroke-miterlimit:10;stroke-width: 30 } 
+		.s2 { fill: none;stroke: #030303;stroke-miterlimit:10;stroke-width: 10 } 
+		.s3 { fill: none;stroke: #030303;stroke-linecap: round;stroke-linejoin: round;stroke-width: 10 } 
+		.s4 { fill: none;stroke: #030303;stroke-linejoin: round;stroke-width: 10 } 
+	</style>
+	<g id="Layer 1">
+		<path id="Layer copy" fill-rule="evenodd" class="s0" d="m96.03 200l0.59-141.07zm87 0l0.58-141.06zm-37.97-49l0.52-124z"/>
+		<path id="Layer copy 4" fill-rule="evenodd" class="s1" d="m247.08 124.93l-110.93-103.64z"/>
+		<path id="Layer copy 5" fill-rule="evenodd" class="s1" d="m32.15 124.93l110.93-103.64z"/>
+		<path id="Layer copy 6" fill-rule="evenodd" class="s1" d="m117 54.76l30.15-28.17z"/>
+		<path id="Layer copy 7" fill-rule="evenodd" class="s1" d="m76.7 61.3l0.74-41.25z"/>
+		<path id="Shape 1" fill-rule="evenodd" class="s2" d="m29.28 104.08l94.84-84.59z"/>
+		<path id="Shape 4" fill-rule="evenodd" class="s3" d="m67.07 114.34l-1.39 88.34 56.15-0.11 0.37-53.08 35.45-0.17m54.35-35.3l1.81 88.27h-56.16l0.32-52.97"/>
+		<path id="Shape 1 copy" fill-rule="evenodd" class="s4" d="m51.3 124.85l87.55-73.04z"/>
+		<path id="Shape 3" fill-rule="evenodd" class="s2" d="m121.12 22.25c0 0 20.02-21.27 38.04 1.75"/>
+		<path id="Shape 2" fill-rule="evenodd" class="s2" d="m53.3 122.85c0 0-12.5 16.02-25.52 4.01-13.01-12.01 2.75-23.78 2.75-23.78"/>
+		<path id="Shape 1 copy 2" fill-rule="evenodd" class="s4" d="m249.52 104.08l-94.85-84.59z"/>
+		<path id="Shape 1 copy 3" fill-rule="evenodd" class="s4" d="m227.5 124.85l-87.43-72.94z"/>
+		<path id="Shape 2 copy" fill-rule="evenodd" class="s2" d="m225.49 122.85c0 0 12.51 16.02 25.53 4.01 13.01-12.01-2.75-23.78-2.75-23.78"/>
+		<path id="Shape 5" fill-rule="evenodd" class="s2" d="m66.05 70.78v-55.17h21.89v35.43"/>
+	</g>
+</svg>

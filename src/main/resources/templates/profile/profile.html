@@ -5,14 +5,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" th:href="@{/css/profile.css}">
-  <title>Register - UniConn</title>
+  <title>Profile - UniConn</title>
 </head>
 
 <body>
   <nav class="navbar">
     <div class="navbar-left">
       <img class="logo-icon" th:src="@{/vector-logos/unicornLogo.png}" alt="UniConn Logo" width="100" height="100">
-      <a href="/" class="main">UniConn</a><hr><br>
+      <a href="/feed" class="main">UniConn</a><hr><br>
     </div>
 
     <div class="navbar-right">
@@ -20,17 +20,15 @@
         <img th:src="@{/vector-logos/magnifyGlass.svg}" alt="Search" width="36" height="36">
       </a>
 
-      <a href="#" class="nav-icon" title="Add">
-        <img th:src="@{/vector-logos/addPost.svg}" alt="Add Post" id="add-post-toggle" width="36" height="36">
+      <a href="#" class="nav-icon" title="Notifications" id="notification-toggle">
+        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="34" height="34">
+      </a>
 
-      <a href="#" class="nav-icon" title="Notifications">
-        <img th:src="@{/vector-logos/emailLogo.svg}" alt="Notifications" width="34" height="34">
-      
-      <a href="#" class="nav-icon" title="Profile">
+      <a th:href="@{/profile}" class="nav-icon" title="Profile">
         <img th:src="@{/vector-logos/usernameSignIn.svg}" alt="Profile" width="26" height="36">
       </a>
       <span class="signout-divider">|</span>
-      <a href="/login" class="signout-link">Sign Out</a>
+      <a href="#" class="signout-link" onclick="['jwt','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
   </nav><hr><br>
 
@@ -46,116 +44,206 @@
     </div>
   </div>
 
+<!-- NOTIFICATIONS MODAL -->
+<div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
+  <div class="search-modal">
+    <div class="header-right">
+      <h3 class="search-modal-title">Notifications</h3>
+    </div>
+    <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
+    <ul id="notification-list" class="notification-list">
+      <li class="notification-empty">No notifications yet.</li>
+    </ul>
+  </div>
+</div>
+
+<!--CREATE COMMUNITY MODAL-->
+<div id="create-community-modal" class="search-modal-overlay" aria-hidden="true">
+  <div class="search-modal create-post-modal">
+    <div class="header-right">
+      <h3 class="search-modal-title">Create Community</h3>
+    </div>
+    <button class="search-modal-close" id="create-community-close" aria-label="Close">&times;</button>
+    <div class="create-post-title-wrap">
+      <input type="text" id="community-name-input" class="create-post-title-input" placeholder="Community name*" required>
+      <span class="community-name-hint">Lowercase letters, numbers, dots, and underscores only (e.g. my_community)</span>
+    </div>
+    <div class="create-post-field">
+      <textarea id="community-desc-input" class="create-post-body" placeholder="Description*" required></textarea>
+    </div>
+    <div class="create-post-title-wrap">
+      <select id="community-category-input" class="create-post-title-input community-category-select">
+        <option value="" disabled selected>Category*</option>
+        <option value="ACADEMICS">Academics</option>
+        <option value="CAREER">Career</option>
+        <option value="SOCIAL">Social</option>
+        <option value="CAMPUS_AND_EVENTS">Campus &amp; Events</option>
+        <option value="OTHER">Other</option>
+      </select>
+    </div>
+    <div class="create-post-title-wrap">
+      <input type="text" id="community-tags-input" class="create-post-title-input" placeholder="Tags (comma-separated, optional)">
+    </div>
+    <div class="create-post-action">
+      <button type="button" class="create-post-btn-post" id="create-community-submit">Create</button>
+    </div>
+  </div>
+</div>
+
 <!--CREATE POST MODAL-->
 <div id="create-post-modal" class="search-modal-overlay" aria-hidden="true">
   <div class="search-modal create-post-modal">
     <div class="header-right">
-      <h3 class="search-modal-title">Create post</h3>
-    </div> <!--end of header-right-->
-
+      <h3 class="search-modal-title">Create Post</h3>
+    </div>
     <button class="search-modal-close" id="create-post-close" aria-label="Close">&times;</button>
-
-    <!--select community-->
     <div class="create-post-community-wrap">
+      <button type="button" class="create-post-community-btn" id="create-post-destination-btn">
+        Post in... <span class="create-post-arrow">&#9662;</span>
+      </button>
+      <ul class="create-post-community-list" id="create-post-destination-list">
+        <li class="create-post-community-item" id="destination-profile">My Profile</li>
+        <li class="create-post-community-item" id="destination-community">Community</li>
+      </ul>
+    </div>
+    <div id="create-post-community-section" class="create-post-community-wrap" style="display:none">
       <button type="button" class="create-post-community-btn" id="create-post-community-btn">
-          Select Community <span class="create-post-arrow">&#9662;</span></button>
-            <ul class="create-post-community-list" id="create-post-community-list">
-              <li class="create-post-community-empty">No communities available</li> <!--placeholder dropdown-->
-            </ul>
+        Select Community <span class="create-post-arrow">&#9662;</span>
+      </button>
+      <ul class="create-post-community-list" id="create-post-community-list">
+        <li class="create-post-community-empty">No communities available</li>
+      </ul>
     </div>
-
-    <!--input title-->
     <div class="create-post-title-wrap">
-      <input type="text" id="create-post-title-input" class="create-post-title-input" placeholder="Title*" maxlength="100" required>
-      <span class="create-post-char-count"><span id="create-post-title-count">0</span>/100</span>
+      <input type="text" id="create-post-title-input" class="create-post-title-input" placeholder="Title*" required>
     </div>
-
-    <!--body text input-->
     <div class="create-post-field">
-      <textarea id="create-post-body-input" class="create-post-body" placeholder="Body text" maxlength="1000"></textarea>
-      <span class="create-post-char-count"><span id="create-post-body-count">0</span>/1000</span>
+      <textarea id="create-post-body-input" class="create-post-body" placeholder="Body text*" required></textarea>
+    </div>
+    <div class="create-post-action">
+      <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
+    </div>
+  </div>
+</div>
+
+<!--POST VIEW MODAL-->
+<div id="post-view-modal" class="search-modal-overlay" aria-hidden="true">
+  <div class="search-modal create-post-modal">
+    <div class="header-right">
+      <h3 class="search-modal-title">Post</h3>
+    </div>
+    <button class="search-modal-close" id="post-view-close" aria-label="Close">&times;</button>
+    <p id="post-view-body" class="post-view-body"></p>
+    <span id="post-view-date" class="post-view-date"></span>
+  </div>
+</div>
+
+<!--EDIT PROFILE MODAL-->
+<div id="edit-profile-modal" class="search-modal-overlay" aria-hidden="true">
+  <div class="search-modal create-post-modal">
+    <div class="header-right">
+      <h3 class="search-modal-title">Edit Profile</h3>
+    </div>
+    <button class="search-modal-close" id="edit-profile-close" aria-label="Close">&times;</button>
+
+    <div class="create-post-title-wrap">
+      <input type="text" id="edit-name-input" class="create-post-title-input" placeholder="Display name">
     </div>
 
-    <!--post button-->
-    <div class="create-post-action">
-      <button type="button" class="create-post-btn-post">Post</button>
+    <div class="create-post-field">
+      <textarea id="edit-bio-input" class="create-post-body edit-bio" placeholder="Bio"></textarea>
     </div>
-  </div> <!--end of search-modal create-post-modal-->
-</div> <!--end of create post modal-->
+
+    <p id="edit-profile-message" class="profile-message" style="display:none"></p>
+
+    <div class="create-post-action">
+      <button type="button" class="create-post-btn-post" id="edit-profile-submit">Save</button>
+    </div>
+  </div>
+</div>
+
 
   <div class="wrap">
-    <form action="http://localhost:9090/auth/register" method="POST"></form>
-  
-<!-- LEFT CONTAINER: profile stats-->
+
+<!-- LEFT CONTAINER: profile sidebar -->
     <div class="left-container">
-        <div class="header-left"><h3>Profile</h3></div>
-        
+      <div class="header-left"><h3>Profile</h3></div>
+
       <div class="profile-content">
-        
+
+        <!-- profile picture and username -->
         <div class="profile-top">
-          <div class="profile-wrap"><br>
-          <!-- profile img -->
-            <img th:src="${avatarUrl}" alt="User Avatar" width="72" height="72" class="avatar-img">
-          </div>
-          <!-- follower/friend count -->
-          <div class="profile-stats">
-            <div class="stat">
-              <span class="stat-num" th:text="${followerCount}">0</span>
-              <span class="stat-label">followers</span>
+          <img id="profile-picture-img" src="/vector-logos/usernameSignIn.svg" alt="User Avatar" class="avatar-img">
+          <div class="profile-right">
+            <span class="profile-username" id="profile-username">u/</span>
+            <div class="profile-stats">
+              <div class="stat">
+                <span class="stat-num" id="follower-count">0</span>
+                <span class="stat-label">followers</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num" id="following-count">0</span>
+                <span class="stat-label">following</span>
+              </div>
+              <div class="stat">
+                <span class="stat-num" id="community-count">0</span>
+                <span class="stat-label">communities</span>
+              </div>
             </div>
-            <div class="stat">
-              <span class="stat-num" th:text="${friendCount}">0</span>
-              <span class="stat-label">friends</span>
-            </div>
           </div>
-        </div><hr id="left-container-break">
-
-        <!-- biography -->
-        <div class="info-section">
-          <p class="info-label">Biography:</p>
-          <p class="info-value" th:text="${biography}">biography</p>
+          <button type="button" id="edit-profile-toggle" class="profile-action-btn edit-profile-btn">
+            <img th:src="@{/vector-logos/addPost.svg}" alt="" class="action-btn-icon"> Edit Profile
+          </button>
         </div>
 
-        <!-- major information -->
-        <div class="info-section">
-          <p class="info-label">Major:</p>
-          <p class="info-value" th:text="${major}">major</p>
+        <!-- bio section -->
+        <div class="profile-bio-section" id="profile-bio-section">
+          <p class="profile-bio-empty">No bio yet.</p>
         </div>
 
-        <!-- year information -->
-        <div class="info-section">
-          <p class="info-label">Year:</p>
-          <p class="info-value" th:text="${year}">year</p>
-        </div>
+        <hr id="left-container-break">
 
-        <!--hobbies information -->
-        <div class="info-section">
-          <p class="info-label">Hobbies:</p>
-          <p class="info-value" th:text="${hobbies}">hobbies</p>
-        </div>
-    </div><hr id="left-container-break">
+        <div id="profile-posts-container" class="profile-posts-container"></div>
 
-    <!--communities section-->
-      <div class="club-row">
-        <img th:src="@{/vector-logos/clubLogo.svg}" alt="Community" width="38" height="38" class="club-icon">
-        <span class="community-name" th:text="${clubName}">club name</span>
       </div>
-  </div><div>
-</div> <!--end of left-container-->
+    </div> <!--end of left-container-->
     
 
-<!--RIGHT CONTAINER: post history -->
+  <!-- RIGHT CONTAINER: sidenav -->
+  <div class="right-wrap">
     <div class="right-container">
-        <div class="header-right"><h3></h3></div>
-    </div> <!--end of right-container-->
+      <div class="right-upper-container">
+        <div class="explore-actions">
+          <button type="button" class="explore-btn" onclick="window.location.href='/feed'">
+            <span class="explore-btn-inner"><img th:src="@{/vector-logos/feedLogo.svg}" alt="" class="explore-btn-icon"> Feed</span>
+          </button>
+          <button type="button" class="explore-btn" onclick="window.location.href='/communities'">
+            <span class="explore-btn-inner"><img th:src="@{/vector-logos/sparkleLogo.svg}" alt="" class="explore-btn-icon"> Explore Communities</span>
+          </button>
+          <button type="button" class="explore-btn" id="my-communities-btn" onclick="window.location.href='/my-communities'">
+            <span class="explore-btn-inner"><img th:src="@{/vector-logos/clubLogo.svg}" alt="" class="explore-btn-icon"> My Communities</span>
+          </button>
+          <button type="button" class="explore-btn" id="create-community-toggle">
+            <span class="explore-btn-inner"><img th:src="@{/vector-logos/addPostWhite.svg}" alt="" class="explore-btn-icon"> Create Community</span>
+          </button>
+          <button type="button" class="explore-btn" id="add-post-toggle">
+            <span class="explore-btn-inner"><img th:src="@{/vector-logos/addPost.svg}" alt="" class="explore-btn-icon"> Create Post</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   </div>
 
-</form>
-
+<script th:src="@{/js/profileLoad.js}" defer></script>
+<script th:src="@{/js/profilePostsLoad.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
-<script th:src="@{/js/createPostFunction.js}" defer></script>
+<script th:src="@{/js/notificationFunction.js}" defer></script>
 <script th:src="@{/js/searchFunction.js}" defer></script>
+<script th:src="@{/js/editProfileFunction.js}" defer></script>
+<script th:src="@{/js/communityFunction.js}" defer></script>
+<script th:src="@{/js/createPostFunction.js}" defer></script>
 </body>
 
 </html>

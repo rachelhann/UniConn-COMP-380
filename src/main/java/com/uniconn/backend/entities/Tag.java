@@ -10,8 +10,9 @@ public class Tag {
     @Column(name = "tag_id",nullable = false)
     private Integer tagId;
 	
-	@Column(length = 30, unique = true, nullable = false)
-	private String name; // stored lowercase, no spaces e.g. "computerscience"
+	// length = 20
+	@Column(length = 20, unique = true, nullable = false)
+	private String name; // stored lowercase, no spaces/special chars, nums allowed e.g. "computerscience"
 	
 	public Tag() {}
 	

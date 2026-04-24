@@ -60,7 +60,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String username = jwtUtil.extractUsername(token);
 
             // Look up the user in the database by username
-            userRepository.findByUsername(username).ifPresent(user -> {
+            userRepository.findByEmail(username).ifPresent(user -> {
 
                 // Create an authentication object for Spring Security
                 UsernamePasswordAuthenticationToken authentication =

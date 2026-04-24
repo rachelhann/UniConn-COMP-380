@@ -16,7 +16,7 @@
   </nav><hr><br><br>
 
     <div class="login-container">
-      <form action="http://localhost:9090/auth/register" method="POST">
+      <form id="register-form">
 
       <div class="header">
         <h3>Sign Up</h3>
@@ -24,26 +24,28 @@
 
       <div class="input-box">
         <img class="icon" th:src="@{/vector-logos/usernameSignIn.svg}">
-        <input type="username" required placeholder=" ">
-               <label>Username</label>
+        <input type="text" name="username" required placeholder=" ">
+        <label>Username</label>
       </div>
 
-        <div class="input-box">
-          <img class="icon" th:src="@{/vector-logos/emailLogo.svg}">
-          <input type="email" required placeholder=" ">
-            <label>Email</label>
-        </div>
+      <div class="input-box">
+        <img class="icon" th:src="@{/vector-logos/emailLogo.svg}">
+        <input type="email" name="email" required placeholder=" ">
+        <label>Email</label>
+      </div>
 
-        <div class="input-box">
-          <img class="icon" th:src="@{/vector-logos/passwordSignIn.svg}">
-          <input type="password" required placeholder=" ">
-          <label>Password</label>
-        </div>
+      <div class="input-box">
+        <img class="icon" th:src="@{/vector-logos/passwordSignIn.svg}">
+        <input type="password" name="password" required placeholder=" ">
+        <label>Password</label>
+      </div>
 
+        <p id="register-error" style="color:#e05c5c;font-size:0.9em;display:none"></p>
         <button type="submit">Register</button>
         <div class="login-link">
           <p>Already have an account?<a href="/login"> Sign In</a>
       </form>
+      <script th:src="@{/js/register.js}" defer></script>
         </div>
 </body>
 

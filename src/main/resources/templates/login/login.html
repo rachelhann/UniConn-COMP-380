@@ -16,7 +16,7 @@
   </nav><hr><br><br>
 
     <div class="login-container">
-      <form action="http://localhost:9090/auth/register" method="POST">
+      <form id="login-form">
 
     <div class="header">
       <h3>Login</h3>
@@ -24,15 +24,17 @@
 
       <div class="input-box">
         <img class="icon" th:src="@{/vector-logos/usernameSignIn.svg}">
-        <input type="username" required placeholder=" ">
-               <label>Username</label>
+        <input type="email" name="email" required placeholder=" ">
+        <label>Email</label>
       </div>
 
-        <div class="input-box">
-          <img class="icon" th:src="@{/vector-logos/passwordSignIn.svg}">
-          <input type="password" required placeholder=" ">
-          <label>Password</label>
-        </div>
+      <div class="input-box">
+        <img class="icon" th:src="@{/vector-logos/passwordSignIn.svg}">
+        <input type="password" name="password" required placeholder=" ">
+        <label>Password</label>
+      </div>
+
+      <p id="login-error" style="color:#e05c5c;font-size:0.9em;display:none">Invalid email or password.</p>
 
         <div class="forgot-password">
           <a href="/forgot-password">Forgot Password?</a>
@@ -44,6 +46,7 @@
       </form>
         </div>
 
+<script th:src="@{/js/login.js}" defer></script>
 </body>
 
 </html>

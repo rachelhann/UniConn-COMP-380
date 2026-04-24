@@ -2,6 +2,7 @@ package com.uniconn.backend.services;
 
 import com.uniconn.backend.dtos.*;
 import com.uniconn.backend.entities.*;
+import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
 import jakarta.transaction.Transactional;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
@@ -27,66 +28,63 @@ public class CommunityService extends BaseService {
 	
 	@Transactional
 	public CommunityResponseDTO createCommunity(CommunityDTO communityDTO) {
-		User currentUser = getAuthenticatedUser();
-		
-		if (communityRepository.existsByCommunityName(communityDTO.getCommunityName())) {
-			throw new RuntimeException("Community name already taken: " + communityDTO.getCommunityName());
-		}
-		
-		if (communityDTO.getCommunityName().contains(" ")) {
-			throw new RuntimeException("Community name must not contain spaces");
-		}
-		
-		Community community = new Community();
-		// add case sensitivity test/resolution
-		community.setCommunityName(communityDTO.getCommunityName());
-		community.setDescription(communityDTO.getDescription());
-		community.setCreatedBy(currentUser);
-		community.setCategory(communityDTO.getCategory());
-		community.setCommunityPicture(communityDTO.getCommunityPicture());
-		Community saved = communityRepository.save(community);
-		communityTagService.saveTags(saved, communityDTO.getTags());
-		
-		CommunityMember member = new CommunityMember(saved, currentUser, CommunityMemberRole.ADMIN);
-		communityMemberRepository.save(member);
-		
-		currentUser.setCommunityCount(currentUser.getCommunityCount() + 1);
-		userRepository.save(currentUser);
-		
-		saved.setMemberCount(1);
-		communityRepository.save(saved);
-		
-		return mapToResponseDTO(saved);
+	    User currentUser = getAuthenticatedUser();
+	    String normalizedName = communityDTO.getCommunityName().toLowerCase();
+
+	    if (communityRepository.existsByCommunityNameIgnoreCase(normalizedName)) {
+	        throw new ResourceAlreadyExistsException("Community name already taken: " + normalizedName);
+	    }
+
+	    Community community = new Community();
+	    community.setCommunityName(normalizedName);
+	    community.setDescription(communityDTO.getDescription());
+	    community.setCreatedBy(currentUser);
+	    community.setCategory(communityDTO.getCategory());
+	    community.setCommunityPicture(communityDTO.getCommunityPicture());
+	    community.setMemberCount(1);
+
+	    Community saved = communityRepository.save(community);
+
+	    List<String> tagNames = communityTagService.saveTags(saved, communityDTO.getTags());
+
+	    communityMemberRepository.save(
+	        new CommunityMember(saved, currentUser, CommunityMemberRole.ADMIN)
+	    );
+
+	    currentUser.setCommunityCount(currentUser.getCommunityCount() + 1);
+	    userRepository.save(currentUser);
+
+	    return mapToResponseDTO(saved, tagNames);
 	}
 	
-	private CommunityResponseDTO mapToResponseDTO(Community community) {
-		Community fresh = communityRepository.findById(community.getCommunityId())
-				.orElseThrow(() -> new RuntimeException("Community not found"));
-		List<String> tagNames = fresh.getTags()
-                .stream()
-                .map(ct -> ct.getTag().getName())
-                .toList();
-		
-		return new CommunityResponseDTO(
-				community.getCommunityId(),
-                community.getCommunityName(),
-                community.getDescription(),
-                community.getMemberCount(),
-                community.getCreatedAt(),
-                community.getCreatedBy().getUserId(),
-                community.getCreatedBy().getUsername(),
-                community.getCategory(),
-                community.getCommunityPicture(),
-                tagNames
-			);
-	}
-	
-	// test
 	@Transactional
-	public List<CommunityResponseDTO> getAllCommunities() {
-	    return communityRepository.findAll()
-	        .stream()
-	        .map(this::mapToResponseDTO)
-	        .collect(Collectors.toList());
+	public List<CommunityResponseDTO> getMyCommunities() {
+		User currentUser = getAuthenticatedUser();
+		return communityMemberRepository.findByUser_UserId(currentUser.getUserId())
+			.stream()
+			.map(member -> {
+				Community c = member.getCommunity();
+				List<String> tagNames = c.getTags().stream()
+					.map(ct -> ct.getTag().getName())
+					.collect(Collectors.toList());
+				return mapToResponseDTO(c, tagNames);
+			})
+			.collect(Collectors.toList());
 	}
+
+	private CommunityResponseDTO mapToResponseDTO(Community community, List<String> tagNames) {
+	    return new CommunityResponseDTO(
+	        community.getCommunityId(),
+	        community.getCommunityName(),
+	        community.getDescription(),
+	        community.getMemberCount(),
+	        community.getCreatedAt(),
+	        community.getCreatedBy().getUserId(),
+	        community.getCreatedBy().getUsername(),
+	        community.getCategory(),
+	        community.getCommunityPicture(),
+	        tagNames
+	    );
+	}
+	
 }

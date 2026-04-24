@@ -3,6 +3,9 @@ package com.uniconn.backend.controllers;
 import com.uniconn.backend.dtos.CommunityDTO;
 import com.uniconn.backend.dtos.CommunityResponseDTO;
 import com.uniconn.backend.services.CommunityService;
+
+import jakarta.validation.Valid;
+
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,28 +15,19 @@ import org.springframework.web.bind.annotation.*;
 public class CommunityController {
 	private final CommunityService communityService;
 	
-	private CommunityController(CommunityService communityService){
+	public CommunityController(CommunityService communityService){
 		this.communityService = communityService;
 	}
-	
+
 	@PostMapping("/create")
-	public ResponseEntity<?> createCommunity(@RequestBody CommunityDTO communityDTO){
-		try {
-			CommunityResponseDTO response = communityService.createCommunity(communityDTO);
-			return ResponseEntity.ok(response);
-		} catch(RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
+    public ResponseEntity<CommunityResponseDTO> createCommunity(
+            @Valid @RequestBody CommunityDTO communityDTO) {
+        return ResponseEntity.status(201).body(communityService.createCommunity(communityDTO));
+    }
+
+	@GetMapping("/my-communities")
+	public ResponseEntity<List<CommunityResponseDTO>> getMyCommunities() {
+		return ResponseEntity.ok(communityService.getMyCommunities());
 	}
-	
-	//test
-	@GetMapping("/all")
-	public ResponseEntity<?> getAllCommunities() {
-	    try {
-	        List<CommunityResponseDTO> communities = communityService.getAllCommunities();
-	        return ResponseEntity.ok(communities);
-	    } catch (RuntimeException e) {
-	        return ResponseEntity.badRequest().body(e.getMessage());
-	    }
-	}
+
 }

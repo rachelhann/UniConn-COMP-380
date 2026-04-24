@@ -15,4 +15,6 @@ public interface CommunityRepository extends JpaRepository<Community, Integer> {
     Optional<Community> findByCommunityName(String communityName);
     
     List<Community> findByCategory(CommunityCategory category);
+
+    boolean existsByCommunityNameIgnoreCase(String communityName);
 }

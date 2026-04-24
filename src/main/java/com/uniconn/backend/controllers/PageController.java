@@ -1,7 +1,6 @@
 package com.uniconn.backend.controllers;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
@@ -9,7 +8,7 @@ public class PageController {
 
     @GetMapping("/")
     public String home() {
-        return "userFeed/userFeed";
+        return "login/login";
     }
 
     @GetMapping("/login")
@@ -32,22 +31,28 @@ public class PageController {
         return "userFeed/userFeed";
     }
 
+    @GetMapping("/communities")
+    public String communitiesPage() {
+        return "communities/communities";
+    }
+
+    @GetMapping("/my-communities")
+    public String myCommunitiesPage() {
+        return "communities/myCommunities";
+    }
+
     @GetMapping("/post/createPost")
-    public String createPostPage(Model model) {
-        model.addAttribute("avatarUrl", "/vector-logos/usernameSignIn.svg");
+    public String createPostPage() {
         return "post/createPost";
     }
 
+    @GetMapping("/community/{id}")
+    public String communityDetailPage() {
+        return "communities/communityDetail";
+    }
+
     @GetMapping("/profile")
-    public String profilePage(Model model) {
-        model.addAttribute("avatarUrl", "/vector-logos/usernameSignIn.svg");
-        model.addAttribute("followerCount", 0);
-        model.addAttribute("friendCount", 0);
-        model.addAttribute("biography", "");
-        model.addAttribute("major", "");
-        model.addAttribute("year", "");
-        model.addAttribute("hobbies", "");
-        model.addAttribute("clubName", "");
+    public String profilePage() {
         return "profile/profile";
     }
 

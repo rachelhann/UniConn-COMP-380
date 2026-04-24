@@ -15,11 +15,12 @@ public class Community {
     @Column(name = "community_id",nullable = false)
     private Integer communityId;
 	
-	// NO spaces in communityName
-	 @Column(unique = true, length = 50, nullable = false)
+	// length = 30, no special chars/spaces (nums, "." and "_" allowed)
+	 @Column(unique = true, length = 30, nullable = false)
 	 private String communityName;
 	 
-	 @Column(length = 500, nullable = false)
+	 // length = 300 
+	 @Column(length = 300, nullable = false)
 	 private String description;	 
 	 
 	 @ManyToOne(fetch = FetchType.LAZY)
@@ -33,8 +34,9 @@ public class Community {
 	 @Column(updatable = false)
 	 private LocalDateTime createdAt;
 	 
+	 // required
 	 @Enumerated(EnumType.STRING)
-	 @Column(name = "category", length = 50, nullable = false) // nullable false
+	 @Column(name = "category", length = 50, nullable = false)
 	 private CommunityCategory category;
 	 
 	 @UpdateTimestamp
@@ -44,6 +46,7 @@ public class Community {
 	 @Column(name = "community_picture_path", length = 255)
 	 private String communityPicture;
 	 
+	 // optional
 	 @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, orphanRemoval = true)
 	 private List<CommunityTag> tags = new ArrayList<>();
 	 

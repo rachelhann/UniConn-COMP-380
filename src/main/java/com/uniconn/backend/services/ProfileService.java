@@ -6,7 +6,9 @@
 package com.uniconn.backend.services;
 
 import com.uniconn.backend.dtos.ProfileData;
+import com.uniconn.backend.dtos.ProfileUpdateRequest;
 import com.uniconn.backend.entities.User;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +23,14 @@ public class ProfileService extends BaseService {
 
         // Map the user's fields into a ProfileData object to send back
         return mapToProfileData(user);
+    }
+
+    @Transactional
+    public void updateProfile(ProfileUpdateRequest request) {
+        User user = getAuthenticatedUser();
+        user.setName(request.getName());
+        user.setUserBio(request.getUserBio());
+        userRepository.save(user);
     }
 
     // Helper method — copies fields from User entity into ProfileData DTO

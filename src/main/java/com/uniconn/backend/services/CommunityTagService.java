@@ -1,5 +1,6 @@
 package com.uniconn.backend.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import com.uniconn.backend.entities.*;
@@ -17,14 +18,19 @@ public class CommunityTagService {
 	}
 	
 	@Transactional
-	public void saveTags(Community community, List<String> rawTags) {
-		if (rawTags == null || rawTags.isEmpty()) return;
-		
-		List<String> limited = rawTags.stream().limit(5).toList();
-		for (String raw : limited) {
-			Tag tag = tagService.findOrCreate(raw);
-			communityTagRepository.save(new CommunityTag(community, tag));
-		}
+	public List<String> saveTags(Community community, List<String> rawTags) {
+	    if (rawTags == null || rawTags.isEmpty()) return List.of();
+
+	    List<String> limited = rawTags.stream().limit(5).toList();
+	    List<String> savedNames = new ArrayList<>();
+
+	    for (String raw : limited) {
+	        Tag tag = tagService.findOrCreate(raw);
+	        communityTagRepository.save(new CommunityTag(community, tag));
+	        savedNames.add(tag.getName());
+	    }
+
+	    return savedNames;
 	}
 	
 	@Transactional

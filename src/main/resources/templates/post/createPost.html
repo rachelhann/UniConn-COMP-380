@@ -12,24 +12,21 @@
   <nav class="navbar">
     <div class="navbar-left">
       <img class="logo-icon" th:src="@{/vector-logos/unicornLogo.png}" alt="UniConn Logo" width="100" height="100">
-      <a href="/" class="main">UniConn</a><hr><br>
+      <a href="/feed" class="main">UniConn</a><hr><br>
     </div>
 
     <div class="navbar-right">
       <a href="#" class="nav-icon" title="Search" id="search-toggle">
         <img th:src="@{/vector-logos/magnifyGlass.svg}" alt="Search" width="36" height="36">
       </a>
-      <a href="#" class="nav-icon" title="Add">
-        <img th:src="@{/vector-logos/addPost.svg}" alt="Add Post" id="add-post-toggle" width="36" height="36">
-      </a>
-      <a href="#" class="nav-icon" title="Notifications">
-        <img th:src="@{/vector-logos/emailLogo.svg}" alt="Notifications" width="34" height="34">
+      <a href="#" class="nav-icon" title="Notifications" id="notification-toggle">
+        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="34" height="34">
       </a>
       <a th:href="@{/profile}" class="nav-icon" title="Profile">
         <img th:src="@{/vector-logos/usernameSignIn.svg}" alt="Profile" width="26" height="36">
       </a>
       <span class="signout-divider">|</span>
-      <a href="/login" class="signout-link">Sign Out</a>
+      <a href="#" class="signout-link" onclick="['jwt','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
   </nav><hr><br>
 
@@ -45,43 +42,19 @@
     </div>
   </div>
 
-<!--CREATE POST MODAL-->
-<div id="create-post-modal" class="search-modal-overlay" aria-hidden="true">
-  <div class="search-modal create-post-modal">
+<!-- NOTIFICATIONS MODAL -->
+<div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
+  <div class="search-modal">
     <div class="header-right">
-      <h3 class="search-modal-title">Create post</h3>
+      <h3 class="search-modal-title">Notifications</h3>
     </div>
-
-    <button class="search-modal-close" id="create-post-close" aria-label="Close">&times;</button>
-
-    <!--select community-->
-    <div class="create-post-community-wrap">
-      <button type="button" class="create-post-community-btn" id="create-post-community-btn">
-        Select Community <span class="create-post-arrow">&#9662;</span>
-      </button>
-      <ul class="create-post-community-list" id="create-post-community-list">
-        <li class="create-post-community-empty">No communities available</li>
-      </ul>
-    </div>
-
-    <!--input title-->
-    <div class="create-post-title-wrap">
-      <input type="text" id="create-post-title-input" class="create-post-title-input" placeholder="Title*" maxlength="100" required>
-      <span class="create-post-char-count"><span id="create-post-title-count">0</span>/100</span>
-    </div>
-
-    <!--body text input-->
-    <div class="create-post-field">
-      <textarea id="create-post-body-input" class="create-post-body" placeholder="Body text" maxlength="1000"></textarea>
-      <span class="create-post-char-count"><span id="create-post-body-count">0</span>/1000</span>
-    </div>
-
-    <!--post button-->
-    <div class="create-post-action">
-      <button type="button" class="create-post-btn-post">Post</button>
-    </div>
+    <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
+    <ul id="notification-list" class="notification-list">
+      <li class="notification-empty">No notifications yet.</li>
+    </ul>
   </div>
 </div>
+
 
   <div class="wrap">
 
@@ -93,7 +66,7 @@
   </div> <!--end of wrap-->
 
 <script th:src="@{/js/modalManager.js}" defer></script>
-<script th:src="@{/js/createPostFunction.js}" defer></script>
+<script th:src="@{/js/notificationFunction.js}" defer></script>
 <script th:src="@{/js/searchFunction.js}" defer></script>
 </body>
 

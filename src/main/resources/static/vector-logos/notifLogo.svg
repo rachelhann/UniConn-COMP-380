@@ -1,0 +1,22 @@
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="42.999999999999986 0 171 200" width="172" height="200">
+	<style>
+		.s0 { fill: #83b5d6;stroke: #030303;stroke-miterlimit:10;stroke-width: 10 } 
+		.s1 { fill: #83b5d6;stroke: #83b5d6;stroke-miterlimit:10;stroke-width: 100 } 
+		.s2 { fill: #83b5d6;stroke: #83b5d6;stroke-miterlimit:10;stroke-width: 20 } 
+	</style>
+	<g id="Layer 1">
+		<path id="Layer copy" fill-rule="evenodd" class="s0" d="m218.69 195.22"/>
+		<path id="Shape 1" fill-rule="evenodd" class="s0" d="m50.75 140.98z"/>
+		<path id="Shape 7" fill-rule="evenodd" class="s1" d="m130.07 50.67l-1.26 107.39z"/>
+		<path id="Shape 7 copy" fill-rule="evenodd" class="s1" d="m63.82 119.33l127.67 0.07z"/>
+		<path id="Shape 7 copy 2" fill-rule="evenodd" class="s2" d="m128.63 7.52l1.08 186.13z"/>
+		<path id="Shape 7 copy 3" fill-rule="evenodd" class="s2" d="m50.35 156.86l154.28-0.5z"/>
+		<path id="Shape 7 copy 4" fill-rule="evenodd" class="s2" d="m110.44 175.25l34.46-1.32z"/>
+		<path id="Shape 2" fill-rule="evenodd" class="s0" d="m54.71 171.05c-5.81-0.02-7.78-5.42-6.17-10.41 1.97-6.06 3.88-9.58 15.13-22.48 11.24-12.91-25.2-115.56 67.66-109.94"/>
+		<path id="Shape 2 copy" fill-rule="evenodd" class="s0" d="m202.07 171.05c5.82-0.02 7.79-5.42 6.17-10.41-1.96-6.06-3.88-9.58-15.12-22.48-11.24-12.91 25.19-115.56-67.67-109.94"/>
+		<path fill-rule="evenodd" class="s0" d="m53.67 170.84h152.15z"/>
+		<path id="Shape 6" fill-rule="evenodd" class="s0" d="m119.06 26.52c0 0-3-24.57 10.94-21.73m7.73 21.73c0 0 3-24.57-10.94-21.73"/>
+		<path id="Shape 4" fill-rule="evenodd" class="s0" d="m109.07 173.3c0 0-9.35 25.46 21.59 22.89m18.02-22.89c0 0 9.34 25.46-21.6 22.89"/>
+		<path id="Shape 5" fill-rule="evenodd" class="s0" d="m256.75 131.48"/>
+	</g>
+</svg>

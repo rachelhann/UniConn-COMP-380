@@ -42,7 +42,7 @@
   </div>
 
   <script>
-    // Allow pressing Enter to search
+    // hit enter to search
     document.getElementById('searchInput').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') doSearch();
     });
@@ -51,7 +51,7 @@
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
 
-      // Clear previous results
+      // clear previous results
       document.getElementById('usersResults').innerHTML = '';
       document.getElementById('communitiesResults').innerHTML = '';
       document.getElementById('postsResults').innerHTML = '';
@@ -71,7 +71,7 @@
         const data = await response.json();
         let hasAnyResults = false;
 
-        // Render Users
+        // render users
         if (data.users && data.users.length > 0) {
           hasAnyResults = true;
           document.getElementById('usersSection').style.display = 'block';
@@ -88,7 +88,7 @@
           });
         }
 
-        // Render Communities
+        // communities
         if (data.communities && data.communities.length > 0) {
           hasAnyResults = true;
           document.getElementById('communitiesSection').style.display = 'block';
@@ -104,7 +104,7 @@
           });
         }
 
-        // Render Posts
+        // posts
         if (data.posts && data.posts.length > 0) {
           hasAnyResults = true;
           document.getElementById('postsSection').style.display = 'block';

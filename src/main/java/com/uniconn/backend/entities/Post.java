@@ -43,8 +43,9 @@ public class Post {
 	@ColumnDefault("false")
 	private boolean isDeleted = false;
 	
+	// optional, tag length = 20 chars, max num of tags = 5
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-	 private List<PostTag> tags = new ArrayList<>();
+	private List<PostTag> tags = new ArrayList<>();
 	
 	//getters&setters
 	public User getAuthor() {
@@ -111,4 +112,11 @@ public class Post {
 		return createdAt;
 	}
 	
+	public List<PostTag> getTags() {
+	    return tags;
+	}
+	
+	public void setTags(List<PostTag> tags) {
+	    this.tags = tags;
+	}
 }
