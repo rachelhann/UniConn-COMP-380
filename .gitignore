@@ -174,3 +174,4 @@ docker-compose.override.yml
 # !pom.xml
 # !application.properties.template
 # !**/application.properties.template
+src/main/resources/static/uploads/
