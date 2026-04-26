@@ -167,3 +167,4 @@ button:hover {
   text-align: center;
   margin: 25px 0 10px;
 }
+img[alt='UniConn Logo'] { width: 120px; height: auto; }

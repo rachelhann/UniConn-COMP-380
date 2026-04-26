@@ -5,12 +5,10 @@ import com.uniconn.backend.entities.*;
 import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
 import jakarta.transaction.Transactional;
-import com.uniconn.backend.composite_keys.CommunityMemberId;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,7 +25,7 @@ public class CommunityService extends BaseService {
 	}
 	
 	// ---------------------------------------------------------------
-    // CREATE
+    // CREATE COMMUNITY
     // ---------------------------------------------------------------
 	@Transactional
 	public CommunityResponseDTO createCommunity(CommunityDTO communityDTO) {
@@ -51,7 +49,7 @@ public class CommunityService extends BaseService {
 	    List<String> tagNames = communityTagService.saveTags(saved, communityDTO.getTags());
 
 	    communityMemberRepository.save(
-	        new CommunityMember(saved, currentUser, CommunityMemberRole.ADMIN)
+	        new CommunityMember(saved, currentUser, CommunityMemberRole.ADMIN) // automatically is assigned as admin
 	    );
 
 	    currentUser.setCommunityCount(currentUser.getCommunityCount() + 1);
@@ -61,7 +59,60 @@ public class CommunityService extends BaseService {
 	}
 	
 	// ---------------------------------------------------------------
-    // EXPLORE — all communities (no auth required)
+    // UPDATE COMMUNITY - admin only
+    // ---------------------------------------------------------------
+	@Transactional
+	public CommunityResponseDTO updateCommunity(Integer communityId, CommunityUpdateDTO dto) {
+	    User currentUser = getAuthenticatedUser();
+
+	    Community community = communityRepository.findById(communityId)
+	        .orElseThrow(() -> new ResourceNotFoundException("Community not found: " + communityId));
+
+	    boolean isAdmin = communityMemberRepository
+	        .existsById_CommunityIdAndId_UserIdAndRole(
+	            communityId, currentUser.getUserId(), CommunityMemberRole.ADMIN);
+
+	    if (!isAdmin) {
+	        throw new UnauthorizedException("Only the community admin can update this community");
+	    }
+
+	    if (dto.getCommunityName() != null) {
+	        String normalizedName = dto.getCommunityName().toLowerCase();
+	        if (!normalizedName.equals(community.getCommunityName())
+	                && communityRepository.existsByCommunityNameIgnoreCase(normalizedName)) {
+	            throw new ResourceAlreadyExistsException("Community name already taken: " + normalizedName);
+	        }
+	        community.setCommunityName(normalizedName);
+	    }
+
+	    if (dto.getDescription() != null) {
+	        community.setDescription(dto.getDescription());
+	    }
+	    
+	    if (dto.getCategory() != null) {
+	        community.setCategory(dto.getCategory());
+	    }
+
+	    if (dto.getCommunityPicture() != null) {
+	        community.setCommunityPicture(dto.getCommunityPicture());
+	    }
+
+	    Community saved = communityRepository.save(community);
+
+	    List<String> tagNames;
+	    if (dto.getTags() != null) {
+	        tagNames = communityTagService.updateTags(saved, dto.getTags());
+	    } else {
+	        tagNames = saved.getTags().stream()
+	            .map(ct -> ct.getTag().getName())
+	            .collect(Collectors.toList());
+	    }
+
+	    return mapToResponseDTO(saved, tagNames);
+	}
+	
+	// ---------------------------------------------------------------
+    // EXPLORE - all communities (no auth required)
     // ---------------------------------------------------------------
     @Transactional
     public List<CommunityResponseDTO> getAllCommunities() {
@@ -71,7 +122,7 @@ public class CommunityService extends BaseService {
                 .collect(Collectors.toList());
     }
  
-    // Explore filtered by category — e.g. /explore-communities/academics
+    // Explore filtered by category - e.g. /explore-communities/academics
     @Transactional
     public List<CommunityResponseDTO> getCommunitiesByCategory(String categoryParam) {
         CommunityCategory category = parseCategoryOrThrow(categoryParam);
@@ -82,7 +133,7 @@ public class CommunityService extends BaseService {
     }
  
     // ---------------------------------------------------------------
-    // MY COMMUNITIES — requires auth
+    // MY COMMUNITIES - requires auth
     // ---------------------------------------------------------------
  
     // All communities the user has any membership in
@@ -118,6 +169,32 @@ public class CommunityService extends BaseService {
     }
  
     // ---------------------------------------------------------------
+    // TRENDING TAGS
+    // ---------------------------------------------------------------
+    public List<String> getTrendingTags() {
+        return communityTagService.getTrendingTags();
+    }
+
+    // ---------------------------------------------------------------
+    // UPDATE
+    // ---------------------------------------------------------------
+    @Transactional
+    public CommunityResponseDTO updateCommunity(Integer communityId, CommunityUpdateRequest request) {
+        User currentUser = getAuthenticatedUser();
+        Community community = communityRepository.findById(communityId)
+                .orElseThrow(() -> new ResourceNotFoundException("Community not found"));
+        if (!community.getCreatedBy().getUserId().equals(currentUser.getUserId())) {
+            throw new UnauthorizedException("Only the community creator can update it");
+        }
+        if (request.getDescription() != null && !request.getDescription().isBlank()) {
+            community.setDescription(request.getDescription());
+        }
+        communityRepository.save(community);
+        List<String> tagNames = communityTagService.updateTags(community, request.getTags());
+        return mapToResponseDTO(community, tagNames);
+    }
+
+    // ---------------------------------------------------------------
     // HELPERS
     // ---------------------------------------------------------------
     private CommunityCategory parseCategoryOrThrow(String param) {
@@ -130,7 +207,7 @@ public class CommunityService extends BaseService {
         }
     }
  
-    // Overload — when tag names need to be passed in explicitly (create flow)
+    // Overload - when tag names need to be passed in explicitly (create flow)
     private CommunityResponseDTO mapToResponseDTO(Community community, List<String> tagNames) {
         return new CommunityResponseDTO(
             community.getCommunityId(),
@@ -146,7 +223,7 @@ public class CommunityService extends BaseService {
         );
     }
  
-    // Overload — reads tags directly from the entity (all other flows)
+    // Overload - reads tags directly from the entity (all other flows)
     private CommunityResponseDTO mapToResponseDTO(Community community) {
         List<String> tagNames = community.getTags().stream()
             .map(ct -> ct.getTag().getName())

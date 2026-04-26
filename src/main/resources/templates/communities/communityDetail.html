@@ -5,6 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" th:href="@{/css/communities.css}">
+  <link rel="stylesheet" th:href="@{/css/followButton.css}">
+  <link rel="stylesheet" th:href="@{/css/tagInput.css}">
   <title>Community - UniConn</title>
 </head>
 
@@ -54,6 +56,28 @@
     </div>
   </div>
 
+  <!-- EDIT COMMUNITY MODAL -->
+  <div id="edit-community-modal" class="search-modal-overlay" aria-hidden="true">
+    <div class="search-modal create-post-modal">
+      <div class="header-right">
+        <h3 class="search-modal-title">Edit Community</h3>
+      </div>
+      <button class="search-modal-close" id="edit-community-close" aria-label="Close">&times;</button>
+      <div class="create-post-field">
+        <textarea id="edit-community-desc-input" class="create-post-body" placeholder="Description"></textarea>
+      </div>
+      <div class="create-post-title-wrap">
+        <div class="tag-input-container" id="edit-community-tags-container">
+        <input type="text" id="edit-community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+      </div>
+      </div>
+      <p id="edit-community-message" class="profile-message" style="display:none"></p>
+      <div class="create-post-action">
+        <button type="button" class="create-post-btn-post" id="edit-community-submit">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- CREATE COMMUNITY MODAL -->
   <div id="create-community-modal" class="search-modal-overlay" aria-hidden="true">
     <div class="search-modal create-post-modal">
@@ -79,7 +103,9 @@
         </select>
       </div>
       <div class="create-post-title-wrap">
-        <input type="text" id="community-tags-input" class="create-post-title-input" placeholder="Tags (comma-separated, optional)">
+        <div class="tag-input-container" id="community-tags-container">
+          <input type="text" id="community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+        </div>
       </div>
       <div class="create-post-action">
         <button type="button" class="create-post-btn-post" id="create-community-submit">Create</button>
@@ -135,6 +161,7 @@
           <div class="community-detail-meta">
             <span class="community-detail-category" id="community-category"></span>
             <span class="community-detail-members"><span id="community-member-count">0</span> members</span>
+            <button id="community-join-leave-btn" class="join-leave-btn join-btn">Join</button>
           </div>
           <p class="community-detail-desc" id="community-description"></p>
           <div class="community-detail-tags" id="community-tags"></div>
@@ -181,6 +208,7 @@
 
   </div>
 
+<script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityDetailLoad.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>

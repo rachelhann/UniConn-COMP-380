@@ -1,5 +1,6 @@
 package com.uniconn.backend.controllers;
 
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.uniconn.backend.services.UserFollowService;
@@ -13,6 +14,11 @@ public class UserFollowController {
 		this.userFollowService = userFollowService;
 	}
 	
+	@GetMapping("/following/ids")
+	public ResponseEntity<List<Integer>> getFollowingIds() {
+		return ResponseEntity.ok(userFollowService.getFollowingIds());
+	}
+
 	@PostMapping("/{userId}/follow")
 	public ResponseEntity<?> followUser(@PathVariable Integer userId){
 		try {

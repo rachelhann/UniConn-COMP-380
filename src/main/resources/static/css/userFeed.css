@@ -430,7 +430,6 @@ button:hover {
 .input-error {
   border-color: #e05c5c !important;
 }
-
 .create-post-action {
   display: flex;
   justify-content: flex-end;

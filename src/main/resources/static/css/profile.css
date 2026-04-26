@@ -176,27 +176,28 @@ body {
   flex: 1;
   height: 36px;
   background: #fff;
-  border: 1.5px solid #000;
+  border: 2px solid #7e7e7e;
   border-radius: 20px;
   font-size: 0.9em;
-  color: #000;
+  color: #8b8b8b;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 700;
   white-space: nowrap;
+  text-align: center;
 }
 .edit-profile-btn {
   flex: none;
   width: auto;
   height: 30px;
   padding: 0 10px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   align-self: flex-start;
   margin-left: auto;
   flex-shrink: 0;
 }
 .profile-action-btn:hover {
-  background: #d6ecf7;
-  border-color: #000;
+  background: #e7e7e7;
+  border: 2px solid #8b8b8b;
 }
 .action-btn-icon {
   width: 18px !important;
@@ -211,15 +212,24 @@ body {
   flex-direction: column;
   flex: 0 0 calc(30% - 12px);
   gap: 12px;
+  align-self: stretch;
 }
 .right-container {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  height: 100%;
 }
 .right-upper-container {
   position: relative;
   height: 270px;
+  background-color: white;
+  border-radius: 12px;
+  border: 2px solid black;
+}
+.right-lower-container {
+  position: relative;
+  flex: 1;
   background-color: white;
   border-radius: 12px;
   border: 2px solid black;
@@ -271,7 +281,7 @@ body {
     width: 100%;
     overflow: hidden;
     position: absolute;
-    top: 0;
+    top: -1px;
     left: 0;
     margin: 0;
     background: #91c5e8;
@@ -414,7 +424,6 @@ button:hover {
   margin: 12px 0 0 0;
   padding: 0;
   max-height: 600px;
-  border: 1px solid #000;
   overflow-y: auto;
 }
 .search-result-item {

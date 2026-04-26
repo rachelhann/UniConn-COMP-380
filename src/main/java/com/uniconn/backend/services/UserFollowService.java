@@ -1,5 +1,6 @@
 package com.uniconn.backend.services;
 
+import java.util.List;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.uniconn.backend.composite_keys.UserFollowId;
@@ -18,6 +19,14 @@ public class UserFollowService extends BaseService {
 		this.userFollowRepository = userFollowRepository;
 	}
 	
+	public List<Integer> getFollowingIds() {
+		User currentUser = getAuthenticatedUser();
+		return userFollowRepository.findByFollower_UserId(currentUser.getUserId())
+				.stream()
+				.map(f -> f.getFollowing().getUserId())
+				.collect(java.util.stream.Collectors.toList());
+	}
+
 	@Transactional
 	public String followUser(Integer userId) {
 		User currentUser = getAuthenticatedUser();

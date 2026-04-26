@@ -5,6 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" th:href="@{/css/userFeed.css}">
+  <link rel="stylesheet" th:href="@{/css/followButton.css}">
+  <link rel="stylesheet" th:href="@{/css/tagInput.css}">
   <title>My Feed</title>
 </head>
 
@@ -87,7 +89,9 @@
     </div>
 
     <div class="create-post-title-wrap">
-      <input type="text" id="community-tags-input" class="create-post-title-input" placeholder="Tags (comma-separated, optional)">
+      <div class="tag-input-container" id="community-tags-container">
+        <input type="text" id="community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+      </div>
     </div>
 
     <div class="create-post-action">
@@ -189,6 +193,7 @@
 <script th:src="@{/js/modalManager.js}" defer></script>
 <script th:src="@{/js/notificationFunction.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>
+<script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
 <script th:src="@{/js/searchFunction.js}" defer></script>
 </body>

@@ -5,6 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" th:href="@{/css/profile.css}">
+  <link rel="stylesheet" th:href="@{/css/followButton.css}">
+  <link rel="stylesheet" th:href="@{/css/tagInput.css}">
   <title>Profile - UniConn</title>
 </head>
 
@@ -82,7 +84,9 @@
       </select>
     </div>
     <div class="create-post-title-wrap">
-      <input type="text" id="community-tags-input" class="create-post-title-input" placeholder="Tags (comma-separated, optional)">
+      <div class="tag-input-container" id="community-tags-container">
+        <input type="text" id="community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+      </div>
     </div>
     <div class="create-post-action">
       <button type="button" class="create-post-btn-post" id="create-community-submit">Create</button>
@@ -231,6 +235,12 @@
           </button>
         </div>
       </div>
+
+      <!-- Communities box -->
+      <div class="right-lower-container">
+        <div class="header-right"><h3>Communities</h3></div>
+      </div>
+
     </div>
   </div>
 
@@ -242,6 +252,7 @@
 <script th:src="@{/js/notificationFunction.js}" defer></script>
 <script th:src="@{/js/searchFunction.js}" defer></script>
 <script th:src="@{/js/editProfileFunction.js}" defer></script>
+<script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>
 </body>
