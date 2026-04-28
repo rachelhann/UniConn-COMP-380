@@ -33,15 +33,15 @@ document.getElementById('search-input').addEventListener('keydown', async functi
 
     data.users.forEach(u => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>👤 @${u.username}</strong>${u.userBio ? `<br><small>${u.userBio}</small>` : ''}`;
+      li.innerHTML = `<strong>User: @${u.username}</strong>${u.userBio ? `<br><small>${u.userBio}</small>` : ''}`;
       li.style.cursor = 'pointer';
-      li.addEventListener('click', () => window.location.href = '/profile?user=' + u.username);
+      li.addEventListener('click', () => window.location.href = '/user-profile?user=' + u.username);
       results.appendChild(li);
     });
 
     data.communities.forEach(c => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>🏘️ ${c.communityName}</strong>${c.description ? `<br><small>${c.description}</small>` : ''}`;
+      li.innerHTML = `<strong>Community: ${c.communityName}</strong>${c.description ? `<br><small>${c.description}</small>` : ''}`;
       li.style.cursor = 'pointer';
       li.addEventListener('click', () => window.location.href = '/community/' + c.communityId);
       results.appendChild(li);
@@ -49,7 +49,7 @@ document.getElementById('search-input').addEventListener('keydown', async functi
 
     data.posts.forEach(p => {
       const li = document.createElement('li');
-      li.innerHTML = `<strong>📝 ${p.title || p.contentText}</strong><br><small>by @${p.authorUsername}</small>`;
+      li.innerHTML = `<strong>Post: ${p.title || p.contentText}</strong><br><small>by @${p.authorUsername}</small>`;
       li.style.cursor = 'pointer';
       results.appendChild(li);
     });
