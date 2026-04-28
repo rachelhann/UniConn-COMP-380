@@ -34,7 +34,7 @@ class CommunityMemberServiceTest {
 
         // Manually construct service so all constructor args are injected
         communityMemberService = new CommunityMemberService(
-            communityMemberRepository, communityRepository, userRepository
+            communityMemberRepository, communityRepository
         );
 
         // Inject userRepository into BaseService parent field (not reached by constructor)

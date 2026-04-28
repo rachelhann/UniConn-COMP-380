@@ -20,7 +20,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 
     if (response.ok) {
       const data = await response.json();
-      localStorage.setItem('jwt', data.token);
+      localStorage.setItem('token', data.token);
       // fetch username immediately so it's available across all pages
       try {
         const profileRes = await fetch('/api/profile/me', {

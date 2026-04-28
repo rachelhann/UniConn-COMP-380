@@ -25,9 +25,45 @@ public class CommunityController {
         return ResponseEntity.status(201).body(communityService.createCommunity(communityDTO));
     }
 
-	@GetMapping("/my-communities")
-	public ResponseEntity<List<CommunityResponseDTO>> getMyCommunities() {
-		return ResponseEntity.ok(communityService.getMyCommunities());
-	}
-
+	// ---------------------------------------------------------------
+    // EXPLORE — no auth required
+    // GET /api/community/all
+    // GET /api/community/category/academics
+    // ---------------------------------------------------------------
+    @GetMapping("/all")
+    public ResponseEntity<List<CommunityResponseDTO>> getAllCommunities() {
+        return ResponseEntity.ok(communityService.getAllCommunities());
+    }
+ 
+    @GetMapping("/category/{category}")
+    public ResponseEntity<List<CommunityResponseDTO>> getByCategory(
+            @PathVariable String category) {
+        return ResponseEntity.ok(communityService.getCommunitiesByCategory(category));
+    }
+ 
+    // ---------------------------------------------------------------
+    // MY COMMUNITIES — auth required
+    // GET /api/community/my-communities          → all joined
+    // GET /api/community/my-communities/created  → created by me
+    // GET /api/community/my-communities/joined   → member of (not creator)
+    // ---------------------------------------------------------------
+    @GetMapping("/my-communities")
+    public ResponseEntity<List<CommunityResponseDTO>> getMyCommunities() {
+        return ResponseEntity.ok(communityService.getMyCommunities());
+    }
+ 
+    @GetMapping("/my-communities/created")
+    public ResponseEntity<List<CommunityResponseDTO>> getCommunitiesCreatedByMe() {
+        return ResponseEntity.ok(communityService.getCommunitiesCreatedByMe());
+    }
+ 
+    @GetMapping("/my-communities/joined")
+    public ResponseEntity<List<CommunityResponseDTO>> getCommunitiesIJoined() {
+        return ResponseEntity.ok(communityService.getCommunitiesIJoined());
+    }
+    
+    @GetMapping("/{communityName}")
+    public ResponseEntity<CommunityResponseDTO> getCommunityByName(@PathVariable String communityName) {
+        return ResponseEntity.ok(communityService.getCommunityByName(communityName));
+    }
 }

@@ -1,5 +1,5 @@
 (function () {
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('token');
   if (!token) return;
 
   fetch('/api/profile/me', {

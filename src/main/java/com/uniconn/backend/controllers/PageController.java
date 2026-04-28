@@ -30,7 +30,20 @@ public class PageController {
     public String feedPage() {
         return "userFeed/userFeed";
     }
-
+    
+    @GetMapping("/profile")
+    public String profilePage() {
+        return "profile/profile";
+    }
+    
+    @GetMapping("/post/createPost")
+    public String createPostPage() {
+        return "post/createPost";
+    }
+    
+    
+    
+ // Explore page — all communities (category filter handled by same template)
     @GetMapping("/communities")
     public String communitiesPage() {
         return "communities/communities";
@@ -41,19 +54,9 @@ public class PageController {
         return "communities/myCommunities";
     }
 
-    @GetMapping("/post/createPost")
-    public String createPostPage() {
-        return "post/createPost";
-    }
-
-    @GetMapping("/community/{id}")
+    @GetMapping("/community/{communityName}")
     public String communityDetailPage() {
         return "communities/communityDetail";
-    }
-
-    @GetMapping("/profile")
-    public String profilePage() {
-        return "profile/profile";
     }
 
 }

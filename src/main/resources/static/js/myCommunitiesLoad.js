@@ -2,7 +2,7 @@
   const list = document.getElementById('my-communities-list');
   if (!list) return;
 
-  const token = localStorage.getItem('jwt');
+  const token = localStorage.getItem('token');
   const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
 
   const fmt = s => s ? s.toLowerCase().replace(/_/g, ' ') : '';
@@ -18,7 +18,7 @@
       card.className = 'mc-card';
       card.addEventListener('click', () => {
         sessionStorage.setItem('communityDetail', JSON.stringify(c));
-        window.location.href = '/community/' + c.communityId;
+        window.location.href = '/community/' + c.communityName;
       });
 
       const tags = Array.isArray(c.tags) && c.tags.length > 0

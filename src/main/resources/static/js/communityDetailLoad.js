@@ -1,6 +1,6 @@
 (function () {
-  const id = window.location.pathname.split('/').pop();
-  const token = localStorage.getItem('jwt');
+  const communityName = window.location.pathname.split('/').pop();
+  const token = localStorage.getItem('token');
 
   const fmt = s => s ? s.toLowerCase().replace(/_/g, ' ') : '';
 
@@ -30,7 +30,7 @@
 
   // Try API first, fall back to sessionStorage (used right after creation)
   const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
-  fetch('/api/community/' + id, { headers })
+  fetch('/api/community/' + communityName, { headers })
     .then(res => {
       if (!res.ok) throw new Error('not found');
       return res.json();

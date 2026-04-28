@@ -3,6 +3,7 @@ package com.uniconn.backend.services;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.uniconn.backend.entities.*;
+import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
 import jakarta.transaction.Transactional;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
@@ -11,65 +12,57 @@ import com.uniconn.backend.composite_keys.CommunityMemberId;
 public class CommunityMemberService extends BaseService {
 	private final CommunityMemberRepository communityMemberRepository;
 	private final CommunityRepository communityRepository;
-	private final UserRepository userRepository;
 	
-	public CommunityMemberService(CommunityMemberRepository communityMemberRepository, 
-			CommunityRepository communityRepository, UserRepository userRepository) {
-		this.communityMemberRepository = communityMemberRepository;
-		this.communityRepository = communityRepository;
-		this.userRepository = userRepository;
-	}
+	public CommunityMemberService(CommunityMemberRepository communityMemberRepository,
+            CommunityRepository communityRepository) {
+        this.communityMemberRepository = communityMemberRepository;
+        this.communityRepository = communityRepository;
+    }
 	
 	@Transactional
 	public String joinCommunity(Integer communityId) {
 	    User currentUser = getAuthenticatedUser();
 
 	    Community community = communityRepository.findById(communityId)
-	            .orElseThrow(() -> new RuntimeException("Community not found"));
+	            .orElseThrow(() -> new ResourceNotFoundException("Community with id " + communityId + " not found"));
 
 	    CommunityMemberId memberId = new CommunityMemberId(communityId, currentUser.getUserId());
 
 	    if (communityMemberRepository.existsById(memberId)) {
-	        throw new RuntimeException("Already a member of this community");
+	        throw new ResourceAlreadyExistsException("You are already a member of this community");
 	    }
 
-	    CommunityMember member = new CommunityMember();
-	    member.setId(memberId);
-	    member.setCommunity(community);
-	    member.setUser(currentUser);
-	    communityMemberRepository.save(member);
+	    communityMemberRepository.save(new CommunityMember(community, currentUser, CommunityMemberRole.REGULAR_MEMBER));
+        adjustMembershipCounts(community, currentUser, +1);
 
-	    adjustMembershipCounts(community, currentUser, +1);
-
-	    return "Joined community successfully!";
+        return "Joined community successfully";
 	}
 
 	@Transactional
-	public String leaveCommunity(Integer communityId) {
-	    User currentUser = getAuthenticatedUser();
+    public String leaveCommunity(Integer communityId) {
+        User currentUser = getAuthenticatedUser();
 
-	    CommunityMemberId memberId = new CommunityMemberId(communityId, currentUser.getUserId());
+        CommunityMemberId memberId = new CommunityMemberId(communityId, currentUser.getUserId());
 
-	    if (!communityMemberRepository.existsById(memberId)) {
-	        throw new RuntimeException("You are not a member of this community");
-	    }
+        CommunityMember member = communityMemberRepository.findById(memberId)
+                .orElseThrow(() -> new ResourceNotFoundException("You are not a member of this community"));
 
-	    communityMemberRepository.deleteById(memberId);
+        if (member.getRole() == CommunityMemberRole.ADMIN) {
+            throw new UnauthorizedException("Admins cannot leave their own community");
+        }
 
-	    Community community = communityRepository.findById(communityId)
-	            .orElseThrow(() -> new RuntimeException("Community not found"));
+        Community community = member.getCommunity();
+        communityMemberRepository.delete(member);
+        adjustMembershipCounts(community, currentUser, -1);
 
-	    adjustMembershipCounts(community, currentUser, -1);
+        return "Left community successfully";
+    }
 
-	    return "Left community successfully";
-	}
+    private void adjustMembershipCounts(Community community, User user, int delta) {
+        community.setMemberCount(Math.max(0, community.getMemberCount() + delta));
+        communityRepository.save(community);
 
-	// Extracted helper — single place to maintain count logic
-	private void adjustMembershipCounts(Community community, User user, int delta) {
-	    community.setMemberCount(Math.max(0, community.getMemberCount() + delta));
-	    communityRepository.save(community);
-
-	    user.setCommunityCount(Math.max(0, user.getCommunityCount() + delta));
-	    userRepository.save(user);
-	}
+        user.setCommunityCount(Math.max(0, user.getCommunityCount() + delta));
+        userRepository.save(user); // inherited from BaseService
+    }
 }

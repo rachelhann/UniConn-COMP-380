@@ -29,7 +29,7 @@ document.getElementById('edit-profile-submit').addEventListener('click', async (
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('jwt') // JWT required
+        'Authorization': 'Bearer ' + localStorage.getItem('token') // JWT required
       },
       body: JSON.stringify(body)
     });

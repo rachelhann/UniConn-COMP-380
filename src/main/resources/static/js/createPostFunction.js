@@ -16,7 +16,7 @@ async function loadCommunities() {
   communityList.innerHTML = '<li class="create-post-community-empty">Loading...</li>';
   try {
     const res = await fetch('/api/community/my-communities', {
-      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('jwt') }
+      headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
     });
     if (!res.ok) throw new Error();
     const communities = await res.json();

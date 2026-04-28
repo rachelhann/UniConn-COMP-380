@@ -10,11 +10,15 @@ import java.util.Optional;
 
 @Repository
 public interface CommunityRepository extends JpaRepository<Community, Integer> {
+
 	boolean existsByCommunityName(String communityName);
-
-    Optional<Community> findByCommunityName(String communityName);
-    
-    List<Community> findByCategory(CommunityCategory category);
-
     boolean existsByCommunityNameIgnoreCase(String communityName);
+    Optional<Community> findByCommunityName(String communityName);
+ 
+    // Explore: all communities filtered by category
+    List<Community> findByCategory(CommunityCategory category);
+ 
+    // My communities: communities created by this user
+    List<Community> findByCreatedBy_UserId(Integer userId);
+    
 }

@@ -21,7 +21,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
 
     if (response.ok) {
       const data = await response.json();
-      localStorage.setItem('jwt', data.token); // save JWT for future API calls
+      localStorage.setItem('token', data.token); // save JWT for future API calls
       window.location.href = '/feed';
     } else {
       const msg = await response.text();

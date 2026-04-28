@@ -8,26 +8,18 @@ import com.uniconn.backend.services.CommunityMemberService;
 @RequestMapping("/api/community")
 public class CommunityMemberController {
 	private final CommunityMemberService communityMemberService;
-	
+
 	public CommunityMemberController(CommunityMemberService communityMemberService) {
 		this.communityMemberService = communityMemberService;
 	}
-	
+
 	@PostMapping("/{communityId}/join")
-	public ResponseEntity<?> joinCommunity(@PathVariable Integer communityId){
-		try {
-			return ResponseEntity.ok(communityMemberService.joinCommunity(communityId));
-		} catch(RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
+	public ResponseEntity<String> joinCommunity(@PathVariable Integer communityId) {
+		return ResponseEntity.ok(communityMemberService.joinCommunity(communityId));
 	}
-	
+
 	@DeleteMapping("/{communityId}/leave")
-	public ResponseEntity<?> leaveCommunity(@PathVariable Integer communityId){
-		try {
-			return ResponseEntity.ok(communityMemberService.leaveCommunity(communityId));
-		} catch(RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
+	public ResponseEntity<String> leaveCommunity(@PathVariable Integer communityId) {
+		return ResponseEntity.ok(communityMemberService.leaveCommunity(communityId));
 	}
 }
