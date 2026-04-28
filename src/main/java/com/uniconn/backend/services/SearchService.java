@@ -70,6 +70,31 @@ public class SearchService extends BaseService {
         );
     }
 
+        // --- Tag Search ---
+    public List<SearchResultDTO.TagResult> searchTags(String keyword) {
+        validateKeyword(keyword);
+        return searchRepository.searchTags(keyword.trim())
+                .stream()
+                .map(SearchResultDTO.TagResult::new)
+                .collect(Collectors.toList());
+    }
+
+    // --- Communities by Tag ---
+    public List<SearchResultDTO.CommunityResult> searchCommunitiesByTag(String keyword) {
+        validateKeyword(keyword);
+        return mapToCommunityResults(
+                searchRepository.searchCommunitiesByTag(keyword.trim())
+        );
+    }
+
+    // --- Posts by Tag ---
+    public List<SearchResultDTO.PostResult> searchPostsByTag(String keyword) {
+        validateKeyword(keyword);
+        return mapToPostResults(
+                searchRepository.searchPostsByTag(keyword.trim())
+        );
+    }
+
     // --- Private Helpers ---
     private void validateKeyword(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {

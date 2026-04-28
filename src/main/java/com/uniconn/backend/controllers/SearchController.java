@@ -75,4 +75,35 @@ public class SearchController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // --- Tag Search ---
+    @GetMapping("/tags")
+    public ResponseEntity<?> searchTags(@RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchTags(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- Communities by Tag ---
+    @GetMapping("/tags/communities")
+    public ResponseEntity<?> searchCommunitiesByTag(@RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchCommunitiesByTag(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    // --- Posts by Tag ---
+    @GetMapping("/tags/posts")
+    public ResponseEntity<?> searchPostsByTag(@RequestParam String q) {
+        try {
+            return ResponseEntity.ok(searchService.searchPostsByTag(q));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
 }

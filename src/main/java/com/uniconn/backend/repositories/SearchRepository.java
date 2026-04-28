@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import com.uniconn.backend.entities.Tag;
 
 @Repository
 public interface SearchRepository extends JpaRepository<User, Integer> {
@@ -72,4 +73,23 @@ public interface SearchRepository extends JpaRepository<User, Integer> {
            "LOWER(cm.user.name) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     List<User> searchCommunityMembers(@Param("communityId") Integer communityId,
                                       @Param("keyword") String keyword);
+
+       // --- Tag Search ---
+       @Query("SELECT t FROM Tag t WHERE " +
+              "LOWER(t.name) LIKE LOWER(CONCAT(:keyword, '%')) " +
+              "ORDER BY t.name ASC")
+       List<Tag> searchTags(@Param("keyword") String keyword);
+
+       // --- Communities by Tag ---
+       @Query("SELECT ct.community FROM CommunityTag ct WHERE " +
+              "LOWER(ct.tag.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+              "ORDER BY ct.community.memberCount DESC")
+       List<Community> searchCommunitiesByTag(@Param("keyword") String keyword);
+
+       // --- Posts by Tag ---
+       @Query("SELECT pt.post FROM PostTag pt WHERE " +
+              "pt.post.isDeleted = false AND " +
+              "LOWER(pt.tag.name) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+       List<Post> searchPostsByTag(@Param("keyword") String keyword);
+
 }
