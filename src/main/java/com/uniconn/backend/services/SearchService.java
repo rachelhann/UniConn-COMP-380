@@ -5,6 +5,7 @@ import com.uniconn.backend.entities.User;
 import com.uniconn.backend.repositories.SearchRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Collectors;
 
 @Service

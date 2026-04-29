@@ -1,6 +1,6 @@
-const editNameInput = document.getElementById('edit-name-input');
-const editBioInput  = document.getElementById('edit-bio-input');
-const editMsg       = document.getElementById('edit-profile-message');
+const editNameInput    = document.getElementById('edit-name-input');
+const editBioInput     = document.getElementById('edit-bio-input');
+const editMsg          = document.getElementById('edit-profile-message');
 
 initModal({
   modalId:  'edit-profile-modal',
@@ -14,11 +14,9 @@ initModal({
 });
 
 document.getElementById('edit-profile-submit').addEventListener('click', async () => {
-  // reset message before each save attempt
   editMsg.style.display = 'none';
   editMsg.className = 'profile-message';
 
-  // send only the editName and editBio
   const body = {
     name:    editNameInput.value.trim(),
     userBio: editBioInput.value.trim()
@@ -27,10 +25,7 @@ document.getElementById('edit-profile-submit').addEventListener('click', async (
   try {
     const res = await fetch('/api/profile/update', {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('token') // JWT required
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
       body: JSON.stringify(body)
     });
 
@@ -39,26 +34,21 @@ document.getElementById('edit-profile-submit').addEventListener('click', async (
       editMsg.classList.add('success');
       editMsg.style.display = 'block';
 
-      // update DOM directly — page reload loses JWT context so Thymeleaf renders empty
       const bioSection = document.querySelector('.profile-bio-section');
-      const newName = body.name;
-      const newBio  = body.userBio;
-
-      // rebuild bio section content in place
       bioSection.innerHTML = '';
-      if (newName) {
+      if (body.name) {
         const nameEl = document.createElement('span');
         nameEl.className = 'profile-name';
-        nameEl.textContent = newName;
+        nameEl.textContent = body.name;
         bioSection.appendChild(nameEl);
       }
-      if (newBio) {
+      if (body.userBio) {
         const bioEl = document.createElement('p');
         bioEl.className = 'profile-bio';
-        bioEl.textContent = newBio;
+        bioEl.textContent = body.userBio;
         bioSection.appendChild(bioEl);
       }
-      if (!newName && !newBio) {
+      if (!body.name && !body.userBio) {
         const emptyEl = document.createElement('p');
         emptyEl.className = 'profile-bio-empty';
         emptyEl.textContent = 'No bio yet.';

@@ -15,24 +15,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // constructor injection - same pattern as rest of the project
     public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    // Spring Security calls this when it needs to verify who is making a request
-    // we use email as the "username" for UniConn
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        // look up user by email in the database
         com.uniconn.backend.entities.User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("No user found with email: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "No user found with email: " + email
+                ));
 
-        // wrap in Spring Security's User object so it's compatible
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())
                 .authorities("ROLE_USER")
                 .build();
-    } }
+    }
+}

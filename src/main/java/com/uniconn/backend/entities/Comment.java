@@ -8,39 +8,33 @@ import jakarta.persistence.*;
 @Table(name = "comment")
 @Entity
 public class Comment {
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "comment_id",nullable = false)
+    @Column(name = "comment_id", nullable = false)
     private Integer commentId;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", referencedColumnName = "post_id", nullable = false)
-	private Post post;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "author_id", referencedColumnName = "user_id", nullable = false)
-	private User author;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parent_comment_id", referencedColumnName = "comment_id")
-	private Comment parentComment;
-	
-	@Column(length = 1000, nullable = false)
-	private String contentText;
-	
-	@Column(nullable = false)
-	@ColumnDefault("0")
-	private int likeCount = 0;
-	
-	@CreationTimestamp
-	@Column(updatable = false)
-	private LocalDateTime createdAt;
-	
-	@Column(nullable = false)
-	@ColumnDefault("false")
-	private boolean isDeleted = false;
-	
-	//getters&setters
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", referencedColumnName = "post_id", nullable = false)
+    private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", referencedColumnName = "user_id", nullable = false)
+    private User author;
+
+    @Column(length = 1000, nullable = false)
+    private String contentText;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean isDeleted = false;
+
+    public Comment() {}
+    
+    // getters & setters
 	public Integer getCommentId() {
 		return commentId;
 	}
@@ -65,28 +59,12 @@ public class Comment {
 		this.author = author;
 	}
 
-	public Comment getParentComment() {
-		return parentComment;
-	}
-
-	public void setParentComment(Comment parentComment) {
-		this.parentComment = parentComment;
-	}
-
 	public String getContentText() {
 		return contentText;
 	}
 
 	public void setContentText(String contentText) {
 		this.contentText = contentText;
-	}	
-
-	public int getLikeCount() {
-		return likeCount;
-	}
-
-	public void setLikeCount(int likeCount) {
-		this.likeCount = likeCount;
 	}
 
 	public boolean isDeleted() {
@@ -99,6 +77,6 @@ public class Comment {
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
-	}
+	}    
 
 }

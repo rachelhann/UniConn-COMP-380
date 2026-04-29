@@ -5,6 +5,9 @@ const destinationList      = document.getElementById('create-post-destination-li
 const communitySection     = document.getElementById('create-post-community-section');
 const communityList        = document.getElementById('create-post-community-list');
 const communityBtn         = document.getElementById('create-post-community-btn');
+const postTagSection       = document.getElementById('create-post-tags-section');
+
+let postTagsInitialized = false;
 
 // tracks whether post goes to profile or community
 let postDestination    = null;
@@ -67,6 +70,10 @@ initModal({
   toggleId: 'add-post-toggle',
   closeId:  'create-post-close',
   onOpen() {
+    if (!postTagsInitialized && postTagSection) {
+      initTagBubbles('create-post-tags-container', 'create-post-tags-input');
+      postTagsInitialized = true;
+    }
     titleInput.value = '';
     bodyInput.value  = '';
     postDestination  = null;
@@ -76,6 +83,7 @@ initModal({
     destinationList.classList.remove('open');
     communityList.classList.remove('open');
     communitySection.style.display = 'none';
+    if (postTagSection) { postTagSection.style.display = 'none'; clearTagBubbles('create-post-tags-container'); }
     destinationBtn.classList.remove('input-error');
     communityBtn.classList.remove('input-error');
     titleInput.classList.remove('input-error');
@@ -94,7 +102,7 @@ destinationBtn.addEventListener('click', () => {
   communityList.classList.remove('open'); // close community list if open
 });
 
-// post in user profile — title is hidden since profile posts don't need one
+// post in user profile — title and tags are hidden since profile posts don't need them
 document.getElementById('destination-profile').addEventListener('click', () => {
   postDestination     = 'profile';
   selectedCommunityId = null;
@@ -102,24 +110,26 @@ document.getElementById('destination-profile').addEventListener('click', () => {
   destinationBtn.classList.remove('input-error');
   destinationList.classList.remove('open');
   communitySection.style.display = 'none';
+  if (postTagSection) { postTagSection.style.display = 'none'; clearTagBubbles('create-post-tags-container'); }
   titleInput.value = '';
   titleInput.classList.remove('input-error');
   titleInput.closest('.create-post-title-wrap').style.display = 'none';
 });
 
-// post to community -> show community picker and restore title field
+// post to community -> show community picker, title, and tag input
 document.getElementById('destination-community').addEventListener('click', () => {
   postDestination = 'community';
   destinationBtn.innerHTML = 'Community <span class="create-post-arrow">&#9662;</span>';
   destinationBtn.classList.remove('input-error');
   destinationList.classList.remove('open');
   communitySection.style.display = 'block';
+  if (postTagSection) postTagSection.style.display = '';
   titleInput.closest('.create-post-title-wrap').style.display = '';
 });
 
 communityBtn.addEventListener('click', () => communityList.classList.toggle('open'));
 
-document.getElementById('create-post-submit').addEventListener('click', () => {
+document.getElementById('create-post-submit').addEventListener('click', async () => {
   if (postDestination === 'community' && titleInput.value.trim() === '') {
     titleInput.classList.add('input-error');
     titleInput.focus();
@@ -139,21 +149,35 @@ document.getElementById('create-post-submit').addEventListener('click', () => {
     return;
   }
 
-  if (postDestination === 'profile') {
-    const post = {
-      id: Date.now(),
-      username: localStorage.getItem('currentUsername') || '',
-      body: bodyInput.value.trim(),
-      createdAt: new Date().toISOString()
-    };
-    const existing = JSON.parse(localStorage.getItem('myProfilePosts') || '[]');
-    existing.unshift(post);
-    localStorage.setItem('myProfilePosts', JSON.stringify(existing));
-    window.location.href = '/profile';
-    return;
-  }
+  const body = {
+    contentText: bodyInput.value.trim(),
+    title:       postDestination === 'community' ? titleInput.value.trim() : null,
+    communityId: postDestination === 'community' ? selectedCommunityId   : null
+  };
 
-  window.location.href = '/post/createPost';
+  try {
+    const res = await fetch('/api/posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('token')
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+      const post = await res.json();
+      if (postDestination === 'profile') {
+        window.location.href = '/profile';
+      } else {
+        window.location.href = '/community/' + post.communityName;
+      }
+    } else {
+      alert('Failed to create post. Please try again.');
+    }
+  } catch {
+    alert('Something went wrong. Please try again.');
+  }
 });
 
 

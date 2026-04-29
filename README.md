@@ -102,6 +102,34 @@ Open `src/main/resources/db/community_test_data.sql` in Workbench and execute.
 
 :white_check_mark: **Verification is included in sql files so will run after data is populated.** 
 
+## :camera: Image Upload
+
+UniConn uses [Cloudinary](https://cloudinary.com/) for image storage and processing. Profile pictures for both users and communities are uploaded to Cloudinary and served via CDN.
+
+### How it works
+Image upload is a two-step process:
+
+1. Upload the image — send the file to the upload endpoint, receive a Cloudinary URL back
+2. Save the URL — include the returned URL in the profile or community update request
+
+This keeps file handling separate from business logic and ensures images are always served from a fast, reliable CDN rather than the application server.
+### Image requirements
+
+* Accepted formats: JPEG, PNG, WebP
+* Maximum file size: 2MB
+* All uploaded images are automatically cropped to a square and resized to 256×256 pixels
+
+### Endpoints
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/api/upload/user` | Upload a user profile picture |
+| `POST` | `/api/upload/community` | Upload a community profile picture |
+| `PATCH` | `/api/users/me/picture` | Save profile picture URL to user account |
+| `PATCH` | `/api/community/{communityId}/picture` | Save picture URL to community |
+
+All endpoints require authentication via `Authorization: Bearer <token>` header.
+
 ## :computer: Front-end (Hanna)
 
 ## :woman_technologist: User Management System (Lily)

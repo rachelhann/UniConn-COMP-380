@@ -4,7 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" th:href="@{/vector-logos/unicornLogo.png}" type="image/png">
+  <link rel="stylesheet" th:href="@{/css/base.css}">
+  <link rel="stylesheet" th:href="@{/css/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/modals.css}">
+  <link rel="stylesheet" th:href="@{/css/postCards.css}">
   <link rel="stylesheet" th:href="@{/css/communities.css}">
+  <link rel="stylesheet" th:href="@{/css/followButton.css}">
+  <link rel="stylesheet" th:href="@{/css/tagInput.css}">
   <title>Community - UniConn</title>
 </head>
 
@@ -27,7 +35,7 @@
       <span class="signout-divider">|</span>
       <a href="#" class="signout-link" onclick="['token','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
-  </nav><hr><br>
+  </nav><hr class="navbar-divider">
 
   <!-- SEARCH MODAL -->
   <div id="search-modal" class="search-modal-overlay" aria-hidden="true">
@@ -51,6 +59,28 @@
       <ul id="notification-list" class="notification-list">
         <li class="notification-empty">No notifications yet.</li>
       </ul>
+    </div>
+  </div>
+
+  <!-- EDIT COMMUNITY MODAL -->
+  <div id="edit-community-modal" class="search-modal-overlay" aria-hidden="true">
+    <div class="search-modal create-post-modal">
+      <div class="header-right">
+        <h3 class="search-modal-title">Edit Community</h3>
+      </div>
+      <button class="search-modal-close" id="edit-community-close" aria-label="Close">&times;</button>
+      <div class="create-post-field">
+        <textarea id="edit-community-desc-input" class="create-post-body" placeholder="Description"></textarea>
+      </div>
+      <div class="create-post-title-wrap">
+        <div class="tag-input-container" id="edit-community-tags-container">
+        <input type="text" id="edit-community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+      </div>
+      </div>
+      <p id="edit-community-message" class="profile-message" style="display:none"></p>
+      <div class="create-post-action">
+        <button type="button" class="create-post-btn-post" id="edit-community-submit">Save</button>
+      </div>
     </div>
   </div>
 
@@ -79,7 +109,9 @@
         </select>
       </div>
       <div class="create-post-title-wrap">
-        <input type="text" id="community-tags-input" class="create-post-title-input" placeholder="Tags (comma-separated, optional)">
+        <div class="tag-input-container" id="community-tags-container">
+          <input type="text" id="community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+        </div>
       </div>
       <div class="create-post-action">
         <button type="button" class="create-post-btn-post" id="create-community-submit">Create</button>
@@ -117,6 +149,11 @@
       <div class="create-post-field">
         <textarea id="create-post-body-input" class="create-post-body" placeholder="Body text*" required></textarea>
       </div>
+      <div id="create-post-tags-section" class="create-post-title-wrap" style="display:none">
+        <div class="tag-input-container" id="create-post-tags-container">
+          <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+        </div>
+      </div>
       <div class="create-post-action">
         <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
       </div>
@@ -132,7 +169,16 @@
       <div class="community-detail-content">
 
         <div class="community-detail-top">
+          <div class="community-detail-header-row">
+            <h2 class="community-detail-name" id="community-detail-name"></h2>
+            <button id="community-join-leave-btn" class="join-leave-btn join-btn">Join</button>
+          </div>
           <div class="community-detail-meta">
+            <div class="community-icon-wrap" id="community-icon-wrap">
+              <img id="community-icon-img" src="/vector-logos/clubLogo.svg" alt="Community icon" class="community-icon-img">
+              <div class="community-icon-overlay">Choose Photo</div>
+            </div>
+            <input type="file" id="community-picture-input" accept="image/jpeg,image/png,image/webp" style="display:none">
             <span class="community-detail-category" id="community-category"></span>
             <span class="community-detail-members"><span id="community-member-count">0</span> members</span>
           </div>
@@ -175,12 +221,14 @@
 
         <div class="right-lower-container">
           <div class="header-right"><h3>Trending Topics</h3></div>
+          <ul id="trending-tags-list" class="trending-tags-list"></ul>
         </div>
       </div>
     </div>
 
   </div>
 
+<script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityDetailLoad.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>

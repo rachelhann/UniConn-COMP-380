@@ -29,6 +29,7 @@ public class SearchResultDTO {
         private String name;
         private String userBio;
         private int followerCount;
+        private String profilePicture;
 
         public UserResult(User u) {
             this.userId = u.getUserId();
@@ -36,6 +37,7 @@ public class SearchResultDTO {
             this.name = u.getName();
             this.userBio = u.getUserBio();
             this.followerCount = u.getFollowerCount();
+            this.profilePicture = u.getProfilePicture();
         }
 
         public Integer getUserId() { return userId; }
@@ -43,6 +45,7 @@ public class SearchResultDTO {
         public String getName() { return name; }
         public String getUserBio() { return userBio; }
         public int getFollowerCount() { return followerCount; }
+        public String getProfilePicture() { return profilePicture; }
     }
 
     // Nested DTO for Community
@@ -51,18 +54,21 @@ public class SearchResultDTO {
         private String communityName;
         private String description;
         private int memberCount;
+        private String communityPicture;
 
         public CommunityResult(Community c) {
             this.communityId = c.getCommunityId();
             this.communityName = c.getCommunityName();
             this.description = c.getDescription();
             this.memberCount = c.getMemberCount();
+            this.communityPicture = c.getCommunityPicture();
         }
 
         public Integer getCommunityId() { return communityId; }
         public String getCommunityName() { return communityName; }
         public String getDescription() { return description; }
         public int getMemberCount() { return memberCount; }
+        public String getCommunityPicture() { return communityPicture; }
     }
 
     // Nested DTO for Post

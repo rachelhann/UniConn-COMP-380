@@ -2,10 +2,11 @@ package com.uniconn.backend.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import com.uniconn.backend.entities.*;
 import com.uniconn.backend.repositories.CommunityTagRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommunityTagService {
@@ -34,9 +35,14 @@ public class CommunityTagService {
 	}
 	
 	@Transactional
-	public void updateTags(Community community, List<String> newRawTags) {
+	public List<String> updateTags(Community community, List<String> newRawTags) {
 		communityTagRepository.deleteByCommunity_CommunityId(community.getCommunityId());
-		saveTags(community, newRawTags);
+		return saveTags(community, newRawTags);
+	}
+	
+	@Transactional(readOnly = true)
+	public List<String> getTrendingTags() {
+		return communityTagRepository.findTopTagNames(PageRequest.of(0, 5));
 	}
 
 }

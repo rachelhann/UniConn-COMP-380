@@ -24,6 +24,27 @@ public class ProfileController {
         }
     }
 
+    @PatchMapping("/me/picture")
+    public ResponseEntity<?> updateProfilePicture(@RequestBody java.util.Map<String, String> body) {
+        try {
+            String url = body.get("url");
+            if (url == null || url.isBlank()) return ResponseEntity.badRequest().body("URL is required");
+            profileService.updateProfilePicture(url);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getProfileByUsername(@PathVariable String username) {
+        try {
+            return ResponseEntity.ok(profileService.getProfileDataByUsername(username));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PutMapping("/update")
     public ResponseEntity<?> updateProfile(@RequestBody ProfileUpdateRequest request) {
         try {

@@ -24,7 +24,7 @@ public class Post {
 	private Community community;
 	
 	@Column(length = 200)
-	private String title;
+	private String title; // required - community; optional - profile
 	
 	@Column(length = 2000, nullable = false)
 	private String contentText;
@@ -47,7 +47,7 @@ public class Post {
 	@OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PostTag> tags = new ArrayList<>();
 	
-	//getters&setters
+	// getters & setters
 	public User getAuthor() {
 		return author;
 	}

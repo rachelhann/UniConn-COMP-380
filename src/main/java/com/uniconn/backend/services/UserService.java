@@ -1,49 +1,81 @@
-// Lillian Foster - User Service
+// Lillian Foster
+// UserService.java - handles user registration and login logic
+// throws proper exceptions so GlobalExceptionHandler returns meaningful errors
+
 package com.uniconn.backend.services;
 
-import com.uniconn.backend.dtos.RegisterRequest;
 import com.uniconn.backend.dtos.LoginRequest;
+import com.uniconn.backend.dtos.RegisterRequest;
 import com.uniconn.backend.entities.User;
-import jakarta.transaction.Transactional;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.uniconn.backend.exception.InvalidInputException;
+import com.uniconn.backend.exception.ResourceAlreadyExistsException;
+import com.uniconn.backend.exception.ResourceNotFoundException;
+import com.uniconn.backend.exception.UnauthorizedException;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/**
- * Handles all authentication logic for UniConn.
- * Includes registration, login, email validation,
- * and forgot password via secret question.
- * Note: secretQuestion and secretAnswer fields pending
- * addition to User entity by DB teammate.
- */
 @Service
 public class UserService extends BaseService {
 
-    // Used to hash passwords before saving to the database
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder;
 
-    /**
-     * Registers a new user after validating their CSUN email,
-     * checking for duplicate username/email, and hashing their password.
-     */
+    public UserService(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    // registers a new user after validating email, checking for duplicates,
+    // and hashing the password before saving
     @Transactional
     public User registerUser(RegisterRequest request) {
 
-        // Validate CSUN email format
+        // null check - unlikely but important
+        if (request == null) {
+            throw new InvalidInputException("Registration request cannot be null");
+        }
+
+        // validate CSUN email format
+        if (request.getCsunEmail() == null || request.getCsunEmail().isBlank()) {
+            throw new InvalidInputException("Email is required");
+        }
+
         if (!validateCsunEmail(request.getCsunEmail())) {
-            throw new RuntimeException("Email must end in @my.csun.edu and contain no spaces");
+            throw new InvalidInputException(
+                    "Email must end in @my.csun.edu and contain no spaces"
+            );
         }
 
-        // Check if email is already registered using findByEmail
+        // validate username
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new InvalidInputException("Username is required");
+        }
+
+        // validate password
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new InvalidInputException("Password is required");
+        }
+
+        if (request.getPassword().length() < 8) {
+            throw new InvalidInputException(
+                    "Password must be at least 8 characters"
+            );
+        }
+
+        // check if email is already registered
         if (userRepository.findByEmail(request.getCsunEmail()).isPresent()) {
-            throw new RuntimeException("Email already in use: " + request.getCsunEmail());
+            throw new ResourceAlreadyExistsException(
+                    "An account with this email already exists. Please log in instead."
+            );
         }
 
-        // Check if username is already taken using findByUsername
+        // check if username is already taken
         if (userRepository.findByUsername(request.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already taken: " + request.getUsername());
+            throw new ResourceAlreadyExistsException(
+                    "Username '" + request.getUsername() + "' is already taken. Please choose another."
+            );
         }
 
-        // Build the new user object using exact method names from User entity
+        // build and save the new user
         User user = new User();
         user.setUsername(request.getUsername());
         user.setName(request.getFullName());
@@ -51,64 +83,84 @@ public class UserService extends BaseService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setActive(true);
 
-        // TODO: add these lines once DB teammate adds secretQuestion
-        // and secretAnswer columns to User entity:
-        // user.setSecretQuestion(request.getSecretQuestion());
-        // user.setSecretAnswer(request.getSecretAnswer().toLowerCase().trim());
-
         return userRepository.save(user);
     }
 
-    /**
-     * Logs in a user by checking their email exists
-     * and password matches the stored hash.
-     */
+    // logs in a user by checking email exists and password matches
     public User loginUser(LoginRequest request) {
 
-        // Validate CSUN email format
-        if (!validateCsunEmail(request.getCsunEmail())) {
-            throw new RuntimeException("Invalid email format");
+        // null check
+        if (request == null) {
+            throw new InvalidInputException("Login request cannot be null");
         }
 
-        // Find user by email
-        User user = userRepository.findByEmail(request.getCsunEmail())
-                .orElseThrow(() -> new RuntimeException("No account found with that email"));
+        // validate email format
+        if (request.getCsunEmail() == null || request.getCsunEmail().isBlank()) {
+            throw new InvalidInputException("Email is required");
+        }
 
-        // Check if password matches the stored hash
+        if (!validateCsunEmail(request.getCsunEmail())) {
+            throw new InvalidInputException("Email must end in @my.csun.edu");
+        }
+
+        // validate password field exists
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new InvalidInputException("Password is required");
+        }
+
+        // find user by email - generic message to prevent account enumeration
+        User user = userRepository.findByEmail(request.getCsunEmail())
+                .orElseThrow(() -> new UnauthorizedException(
+                        "Invalid credentials"
+                ));
+
+        // check if account is active
+        if (!user.isActive()) {
+            throw new UnauthorizedException(
+                    "This account has been deactivated. Please contact support."
+            );
+        }
+
+        // check password matches stored hash
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Incorrect password");
+            throw new UnauthorizedException("Invalid credentials");
         }
 
         return user;
     }
 
-    /**
-     * Validates that the email ends in @my.csun.edu and has no spaces.
-     * Required for all UniConn accounts.
-     */
+    // validates that email ends in @my.csun.edu and has no spaces
     public boolean validateCsunEmail(String email) {
-        if (email == null) return false;
-        if (email.contains(" ")) return false;
-        return email.endsWith("@my.csun.edu");
+        return email != null
+                && !email.contains(" ")
+                && email.endsWith("@my.csun.edu");
     }
 
-    /**
-     * Resets a user's password after verifying their secret question answer.
-     * TODO: uncomment once DB teammate adds secretAnswer to User entity.
-     */
+    // resets password after verifying security question answer
     @Transactional
     public void resetPasswordBySecretQuestion(String csunEmail, String answer, String newPassword) {
 
-        // Find user by email
+        if (csunEmail == null || csunEmail.isBlank()) {
+            throw new InvalidInputException("Email is required");
+        }
+
+        if (answer == null || answer.isBlank()) {
+            throw new InvalidInputException("Answer is required");
+        }
+
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new InvalidInputException("New password is required");
+        }
+
+        if (newPassword.length() < 8) {
+            throw new InvalidInputException("New password must be at least 8 characters");
+        }
+
         User user = userRepository.findByEmail(csunEmail)
-                .orElseThrow(() -> new RuntimeException("No account found with that email"));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No account found with that email"
+                ));
 
-        // TODO: uncomment once secretAnswer is added to User entity
-        // if (!user.getSecretAnswer().equalsIgnoreCase(answer.trim())) {
-        //     throw new RuntimeException("Incorrect answer to secret question");
-        // }
-
-        // Hash and save new password
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }

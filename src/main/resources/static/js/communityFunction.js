@@ -1,7 +1,6 @@
 const communityNameInput     = document.getElementById('community-name-input');
 const communityDescInput     = document.getElementById('community-desc-input');
 const communityCategoryInput = document.getElementById('community-category-input');
-const communityTagsInput     = document.getElementById('community-tags-input');
 
 // init modal: reset fields when opened
 initModal({
@@ -11,8 +10,8 @@ initModal({
   onOpen() {
     communityNameInput.value     = '';
     communityDescInput.value     = '';
-    communityCategoryInput.value = ''; // resets dropdown to placeholder
-    communityTagsInput.value     = '';
+    communityCategoryInput.value = '';
+    clearTagBubbles('community-tags-container');
     communityNameInput.classList.remove('input-error');
     communityDescInput.classList.remove('input-error');
     communityCategoryInput.classList.remove('input-error');
@@ -36,11 +35,7 @@ document.getElementById('create-community-submit').addEventListener('click', asy
     return;
   }
 
-  // parse tags: split by comma, trim whitespace, drop empty strings if any
-  // tags are optional so an empty input just sends an empty array
-  const tags = communityTagsInput.value.trim()
-    ? communityTagsInput.value.split(',').map(t => t.trim()).filter(t => t !== '')
-    : [];
+  const tags = getTagsFrom('community-tags-container');
 
   try {
     const response = await fetch('/api/community/create', {
@@ -86,3 +81,5 @@ document.getElementById('create-community-submit').addEventListener('click', asy
 communityNameInput.addEventListener('input', () => communityNameInput.classList.remove('input-error'));
 communityDescInput.addEventListener('input', () => communityDescInput.classList.remove('input-error'));
 communityCategoryInput.addEventListener('change', () => communityCategoryInput.classList.remove('input-error'));
+
+initTagBubbles('community-tags-container', 'community-tags-input');

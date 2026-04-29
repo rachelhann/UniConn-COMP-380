@@ -4,7 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" th:href="@{/vector-logos/unicornLogo.png}" type="image/png">
+  <link rel="stylesheet" th:href="@{/css/base.css}">
+  <link rel="stylesheet" th:href="@{/css/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/modals.css}">
+  <link rel="stylesheet" th:href="@{/css/postCards.css}">
   <link rel="stylesheet" th:href="@{/css/userFeed.css}">
+  <link rel="stylesheet" th:href="@{/css/followButton.css}">
+  <link rel="stylesheet" th:href="@{/css/tagInput.css}">
   <title>My Feed</title>
 </head>
 
@@ -31,7 +39,7 @@
       <span class="signout-divider">|</span>
       <a href="#" class="signout-link" onclick="['token','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
-  </nav><hr><br>
+  </nav><hr class="navbar-divider">
 
 <!-- search modal -->
 <div id="search-modal" class="search-modal-overlay" aria-hidden="true">
@@ -87,7 +95,9 @@
     </div>
 
     <div class="create-post-title-wrap">
-      <input type="text" id="community-tags-input" class="create-post-title-input" placeholder="Tags (comma-separated, optional)">
+      <div class="tag-input-container" id="community-tags-container">
+        <input type="text" id="community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+      </div>
     </div>
 
     <div class="create-post-action">
@@ -136,6 +146,12 @@
       <textarea id="create-post-body-input" class="create-post-body" placeholder="Body text*" required></textarea>
     </div>
 
+    <div id="create-post-tags-section" class="create-post-title-wrap" style="display:none">
+      <div class="tag-input-container" id="create-post-tags-container">
+        <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+      </div>
+    </div>
+
     <!--post button-->
     <div class="create-post-action">
       <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
@@ -146,9 +162,10 @@
   <div class="wrap">
 
 <!-- left container: main user feed-->
-    <div class="left-container">
-        <div class="header-left"><h3>For You</h3></div>
-    </div>
+	<div class="left-container">
+  		<div class="header-left"><h3>For You</h3></div>
+  		<div class="feed-posts-list" id="feed-posts-list"></div>
+	</div>
 
   <div class="right-wrap">
     <div class="right-container">
@@ -174,21 +191,63 @@
       </div>
     </div>
 
-<!--right upper container: recommended communities -->
-    <div class="right-upper-container">
-        <div class="header-right"><h3>Recommended Communities</h3></div>
-    </div>
-<!--right lower container: recommended users -->
+<!-- Trending Topics -->
     <div class="right-lower-container">
-        <div class="header-right"><h3>Recommended Users</h3></div>
-      </div>
+      <div class="header-right"><h3>Trending Topics</h3></div>
+      <ul id="trending-tags-list" class="trending-tags-list"></ul>
+    </div>
     </div>
   </div> <!--end of right-container-->
 </div> <!--end of right wrap-->
 
+
+<!-- POST VIEW MODAL -->
+<div id="post-view-overlay" class="post-view-overlay" aria-hidden="true">
+  <div class="post-view-modal">
+    <div class="post-view-header">
+      <h3>Post</h3>
+    </div>
+    <button class="post-view-close" id="post-view-close" aria-label="Close">&times;</button>
+
+    <div class="post-view-body">
+      <!-- meta: author, community, date -->
+      <div class="post-view-meta" id="post-view-meta"></div>
+
+      <!-- title (community posts only) -->
+      <p class="post-view-title" id="post-view-title" style="display:none"></p>
+
+      <!-- full content -->
+      <p class="post-view-content" id="post-view-content"></p>
+
+      <!-- tags -->
+      <div class="post-view-tags" id="post-view-tags"></div>
+
+      <!-- like / comment count / delete -->
+      <div class="post-view-footer" id="post-view-footer"></div>
+
+      <hr class="comments-divider">
+
+      <!-- comment input -->
+      <div class="comment-input-wrap">
+        <textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
+        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
+      </div>
+
+      <!-- comments list -->
+      <div class="comments-list" id="post-view-comments-list">
+        <p class="comment-empty">Loading comments...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>document.addEventListener('DOMContentLoaded', () => document.getElementById('for-you-btn')?.classList.add('active'));</script>
+<script th:src="@{/js/userFeedLoad.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
 <script th:src="@{/js/notificationFunction.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>
+<script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
 <script th:src="@{/js/searchFunction.js}" defer></script>
 </body>

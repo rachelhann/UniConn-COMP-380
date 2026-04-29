@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="120" height="120">
+ <!-- Black main outline -->
+  <path d="M100 170
+       C 20 120, 20 60, 60 50
+       C 80 45, 95 60, 100 75
+       C 105 60, 120 45, 140 50
+       C 180 60, 180 120, 100 170 Z" fill="none" stroke="#000000" stroke-width="6" stroke-linejoin="round"></path>
+</svg>

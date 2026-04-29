@@ -6,5 +6,13 @@ spring.datasource.username=root
 spring.datasource.password=YOUR_PASSWORD
 
 ## Hibernate properties
-spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.open-in-view=false
+
+### Cloudinary
+cloudinary.cloud-name=your_cloud_name
+cloudinary.api-key=your_api_key
+cloudinary.api-secret=your_api_secret
+
+spring.servlet.multipart.max-file-size=2MB
+spring.servlet.multipart.max-request-size=2MB

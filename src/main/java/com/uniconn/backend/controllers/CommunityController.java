@@ -1,12 +1,13 @@
 package com.uniconn.backend.controllers;
 
-import com.uniconn.backend.dtos.CommunityDTO;
-import com.uniconn.backend.dtos.CommunityResponseDTO;
+import com.uniconn.backend.dtos.*;
 import com.uniconn.backend.services.CommunityService;
 
 import jakarta.validation.Valid;
 
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,9 +44,9 @@ public class CommunityController {
  
     // ---------------------------------------------------------------
     // MY COMMUNITIES — auth required
-    // GET /api/community/my-communities          → all joined
-    // GET /api/community/my-communities/created  → created by me
-    // GET /api/community/my-communities/joined   → member of (not creator)
+    // GET /api/community/my-communities          -> all joined
+    // GET /api/community/my-communities/created  -> created by me
+    // GET /api/community/my-communities/joined   -> member of (not creator)
     // ---------------------------------------------------------------
     @GetMapping("/my-communities")
     public ResponseEntity<List<CommunityResponseDTO>> getMyCommunities() {
@@ -60,10 +61,39 @@ public class CommunityController {
     @GetMapping("/my-communities/joined")
     public ResponseEntity<List<CommunityResponseDTO>> getCommunitiesIJoined() {
         return ResponseEntity.ok(communityService.getCommunitiesIJoined());
+    }    
+    
+    @GetMapping("/user/{userId}/communities")
+    public ResponseEntity<List<CommunityResponseDTO>> getCommunitiesByUser(@PathVariable Integer userId) {
+        return ResponseEntity.ok(communityService.getCommunitiesByUserId(userId));
+    }
+
+    @GetMapping("/trending-tags")
+    public ResponseEntity<List<String>> getTrendingTags() {
+        return ResponseEntity.ok(communityService.getTrendingTags());
     }
     
     @GetMapping("/{communityName}")
     public ResponseEntity<CommunityResponseDTO> getCommunityByName(@PathVariable String communityName) {
         return ResponseEntity.ok(communityService.getCommunityByName(communityName));
+    }
+
+    @PatchMapping("/{communityId}/update")
+    public ResponseEntity<CommunityResponseDTO> updateCommunity(
+            @PathVariable Integer communityId,
+            @RequestBody CommunityUpdateDTO request) {
+        return ResponseEntity.ok(communityService.updateCommunity(communityId, request));
+    }
+    
+    // ---------------------------------------------------------------
+    // COMMUNITY PICTURE UPDATE - admin only
+    // PATCH /api/community/{communityId}/picture
+    // ---------------------------------------------------------------
+    @PatchMapping("/{communityId}/picture")
+    public ResponseEntity<CommunityResponseDTO> updateCommunityPicture(
+            @PathVariable Integer communityId,
+            @RequestBody Map<String, String> body) {
+    	communityService.updateCommunityPicture(communityId, body.get("url"));
+        return ResponseEntity.noContent().build();
     }
 }

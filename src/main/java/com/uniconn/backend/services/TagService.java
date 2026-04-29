@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import com.uniconn.backend.entities.Tag;
 import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.TagRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TagService {

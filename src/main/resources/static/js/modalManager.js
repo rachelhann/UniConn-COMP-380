@@ -10,6 +10,8 @@ function initModal({ modalId, toggleId, closeId, onOpen, onClose }) {
   const toggle   = document.getElementById(toggleId);
   const closeBtn = document.getElementById(closeId);
 
+  if (!modal || !toggle || !closeBtn) return; // ← add this
+
   function openModal() {
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');

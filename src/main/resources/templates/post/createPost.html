@@ -4,7 +4,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" th:href="@{/css/base.css}">
+  <link rel="stylesheet" th:href="@{/css/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/layout.css}">
+  <link rel="stylesheet" th:href="@{/css/modals.css}">
+  <link rel="stylesheet" th:href="@{/css/postCards.css}">
   <link rel="stylesheet" th:href="@{/css/createPost.css}">
+  <link rel="stylesheet" th:href="@{/css/followButton.css}">
   <title>Create Post - UniConn</title>
 </head>
 
@@ -28,7 +34,7 @@
       <span class="signout-divider">|</span>
       <a href="#" class="signout-link" onclick="['token','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
-  </nav><hr><br>
+  </nav><hr class="navbar-divider">
 
 <!-- SEARCH MODAL -->
   <div id="search-modal" class="search-modal-overlay" aria-hidden="true">

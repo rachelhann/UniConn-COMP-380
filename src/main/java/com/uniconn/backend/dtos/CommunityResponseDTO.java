@@ -16,6 +16,8 @@ public class CommunityResponseDTO {
     private CommunityCategory category;
     private String communityPicture;
     private List<String> tags;
+    
+    public CommunityResponseDTO() {}
         
     public CommunityResponseDTO(Integer communityId, String communityName, String description,
             	int memberCount, LocalDateTime createdAt, Integer createdById, String createdByUsername, 

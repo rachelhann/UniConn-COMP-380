@@ -35,6 +35,11 @@ public class PageController {
     public String profilePage() {
         return "profile/profile";
     }
+
+    @GetMapping("/profile/{username}")
+    public String userProfilePage() {
+        return "profile/userProfile";
+    }
     
     @GetMapping("/post/createPost")
     public String createPostPage() {
@@ -43,7 +48,7 @@ public class PageController {
     
     
     
- // Explore page — all communities (category filter handled by same template)
+    // Explore page — all communities (category filter handled by same template)
     @GetMapping("/communities")
     public String communitiesPage() {
         return "communities/communities";

@@ -9,6 +9,7 @@ package com.uniconn.backend.dtos;
 public class ProfileData {
 
     // These fields match exactly what's in the User entity
+    private Integer userId;
     private String username;
     private String name;       // display name (not the same as username)
     private String email;
@@ -19,6 +20,8 @@ public class ProfileData {
     private int communityCount; // how many communities they've joined
 
     // --- Getters (used to READ the values) ---
+
+    public Integer getUserId() { return userId; }
 
     public String getUsername() { return username; }
 
@@ -37,6 +40,8 @@ public class ProfileData {
     public int getCommunityCount() { return communityCount; }
 
     // --- Setters (used to SET/update the values) ---
+
+    public void setUserId(Integer userId) { this.userId = userId; }
 
     public void setUsername(String username) { this.username = username; }
 

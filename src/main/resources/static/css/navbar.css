@@ -1,0 +1,59 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 20px;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 48px !important;
+  height: 48px !important;
+  margin: 0 !important;
+}
+
+.main {
+  font-size: 22px;
+  font-weight: 900;
+  margin-top: 0;
+  align-self: center;
+}
+
+.nav-icon img {
+  width: 28px !important;
+  height: 28px !important;
+  margin: 0 !important;
+}
+
+.signout-divider {
+  color: #ccc;
+  font-size: 1.2em;
+}
+
+.signout-link {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.signout-link:hover {
+  color: #65adc9;
+}
+
+hr.navbar-divider {
+  border: none;
+  border-bottom: 1px solid #3d3d3d;
+  width: 100%;
+  margin: 0;
+}

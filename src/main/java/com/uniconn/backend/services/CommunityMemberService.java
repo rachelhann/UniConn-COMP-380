@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import com.uniconn.backend.entities.*;
 import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
 
 @Service

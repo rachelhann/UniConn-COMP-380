@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..900;1,300..900&display=swap');
+
+:root {
+  --clr-bg: #ffffff;
+  --clr-fg: #24283b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::selection {
+  background: #24283b;
+  color: #ffffff;
+}
+
+html {
+  align-items: center;
+  overflow-y: scroll;
+  scrollbar-color: #242424;
+  scrollbar-width: thin;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #fff;
+  font-family: 'Open Sans', sans-serif;
+  line-height: 30px;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24'%3E%3Cpath fill='%2391C5E8' stroke='%23000000' stroke-width='2' d='M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.85a.5.5 0 0 0-.85.35Z'%3E%3C/path%3E%3C/svg%3E") 0 0, auto;
+}
+
+a {
+  color: #000;
+  text-decoration: none;
+}
+a:hover {
+  color: #65adc9;
+}
+
+img {
+  margin-top: 5px;
+  margin-left: 8px;
+  border: none;
+  display: block;
+  width: 100%;
+}
+
+hr {
+  border: none;
+  border-bottom: 1px solid #3d3d3d;
+  width: 100%;
+}
+
+button {
+  width: 100%;
+  height: 40px;
+  background: #83b5d6;
+  border: 2px solid #83b5d6;
+  outline: none;
+  border-radius: 20px;
+  font-size: 1em;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+}
+button:hover {
+  background: #91c5e8;
+  border: 2px solid #91c5e8;
+}
+
+#left-container-break {
+  width: 99%;
+  border: none;
+  border-bottom: 1px solid #3d3d3d;
+}
+
+.club-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.club-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  margin: 0;
+}
