@@ -367,10 +367,10 @@
     return;
   }
 
-  fetch(`/api/posts/feed/${currentUserId}`, { headers: authHeaders() })
-    .then(r => r.ok ? r.json() : [])
-    .then(renderFeed)
-    .catch(() => renderFeed([]));
+  fetch('/api/feed', { headers: authHeaders() })
+      .then(r => r.ok ? r.json() : [])
+      .then(renderFeed)
+      .catch(() => renderFeed([]));
 
   // ── trending tags ─────────────────────────────────────────────────
   fetch('/api/posts/trending', { headers: authHeaders() })
