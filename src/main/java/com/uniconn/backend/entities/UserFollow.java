@@ -5,8 +5,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import com.uniconn.backend.composite_keys.*;
 
-@Table(name = "user_follow", 
-	   indexes = { @Index(name = "idx_following_id", columnList = "following_id") })
+@Table(name = "user_follow",
+    indexes = {
+        @Index(name = "idx_following_id", columnList = "following_id")
+        // Uncomment for production — speeds up feed algorithm (finding who user follows)
+        // , @Index(name = "idx_follower_id", columnList = "follower_id")
+    }
+)
 @Entity
 public class UserFollow {
 	@EmbeddedId

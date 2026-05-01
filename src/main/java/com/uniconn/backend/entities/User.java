@@ -9,7 +9,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-@Table(name = "users")
+@Table(name = "users"
+    // Uncomment for production — speeds up login (email lookup) and search (username lookup)
+    // , indexes = {
+    //     @Index(name = "idx_user_username", columnList = "username"),
+    //     @Index(name = "idx_user_email", columnList = "email"),
+    //     @Index(name = "idx_user_is_active", columnList = "isActive")
+    // }
+)
 @Entity
 public class User {
 	@Id
