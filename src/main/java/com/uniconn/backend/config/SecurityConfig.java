@@ -1,7 +1,7 @@
 // Lillian Foster
 // SecurityConfig.java - Spring Security configuration for UniConn
 // sets up JWT filter, password encoder, and authentication manager
-// unauthenticated requests return 401 JSON response
+// unauthenticated API calls return 401, unknown routes redirect to /login
 
 package com.uniconn.backend.config;
 
@@ -47,14 +47,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         // public community API endpoints
                         .requestMatchers("/api/community/all", "/api/community/category/**", "/api/community/trending-tags").permitAll()
-                        // public pages
+                        // public HTML pages
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/feed", "/profile", "/profile/**", "/post/**", "/communities", "/my-communities", "/community/**").permitAll()
                         // static assets
                         .requestMatchers("/css/**", "/js/**", "/*.css", "/*.js", "/vector-logos/**", "/uploads/**").permitAll()
-                        // everything else requires authentication
+                        // all other API endpoints require authentication
                         .anyRequest().authenticated()
                 )
-                // return 401 JSON for unauthenticated API requests
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(jwtAuthEntryPoint)
                 )

@@ -1,5 +1,6 @@
 // Lillian Foster
-// JwtAuthEntryPoint.java - returns 401 JSON response for unauthenticated requests
+// JwtAuthEntryPoint.java - handles unauthenticated requests
+// API calls get 401 JSON, browser page requests get redirected to /login
 
 package com.uniconn.backend.config;
 
@@ -17,8 +18,17 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-        response.setContentType("application/json");
-        response.getWriter().write("{\"error\": \"Unauthorized. Please log in.\"}");
+
+        String path = request.getRequestURI();
+
+        if (path.startsWith("/api/")) {
+            // API calls get 401 JSON response
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Unauthorized. Please log in.\"}");
+        } else {
+            // browser page requests get redirected to login
+            response.sendRedirect("/login");
+        }
     }
 }
