@@ -104,6 +104,18 @@ public class PostManagementService extends BaseService {
         post.setDeleted(true);
         postRepository.save(post);
     }
+    
+    // post for postcard
+    @Transactional(readOnly = true)
+    public PostSummaryDTO getPost(Integer postId) {
+        User currentUser = getAuthenticatedUser();
+        Post post = postRepository.findByIdWithTags(postId)
+        	    .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
+        if (post.isDeleted()) {
+            throw new ResourceNotFoundException("Post not found: " + postId);
+        }
+        return mapToSummaryDTO(post, currentUser.getUserId());
+    }
 
     // ---------------------------------------------------------------
     // FEED
@@ -191,6 +203,18 @@ public class PostManagementService extends BaseService {
     public List<PostSummaryDTO> getPostsByCommunity(Integer communityId) {
         User currentUser = getAuthenticatedUser();
         return postRepository.findPostsByCommunity(communityId)
+                .stream()
+                .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
+                .collect(Collectors.toList());
+    }
+    
+    // ---------------------------------------------------------------
+    // POSTS USER LIKED
+    // ---------------------------------------------------------------
+    @Transactional(readOnly = true)
+    public List<PostSummaryDTO> getPostsLikedByUser(Integer userId) {
+        User currentUser = getAuthenticatedUser();
+        return postRepository.findPostsLikedByUser(userId)
                 .stream()
                 .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
                 .collect(Collectors.toList());

@@ -1,3 +1,6 @@
+// handles the create post modal: with destination option (profile vs community),
+// includes community dropdown, optional tag input, and form submission.
+// loaded on all pages that include the create-post-modal in sidenav
 const titleInput           = document.getElementById('create-post-title-input');
 const bodyInput            = document.getElementById('create-post-body-input');
 const destinationBtn       = document.getElementById('create-post-destination-btn');
@@ -102,7 +105,7 @@ destinationBtn.addEventListener('click', () => {
   communityList.classList.remove('open'); // close community list if open
 });
 
-// post in user profile — title and tags are hidden since profile posts don't need them
+// post in user profile — title hidden, tags shown
 document.getElementById('destination-profile').addEventListener('click', () => {
   postDestination     = 'profile';
   selectedCommunityId = null;
@@ -110,7 +113,7 @@ document.getElementById('destination-profile').addEventListener('click', () => {
   destinationBtn.classList.remove('input-error');
   destinationList.classList.remove('open');
   communitySection.style.display = 'none';
-  if (postTagSection) { postTagSection.style.display = 'none'; clearTagBubbles('create-post-tags-container'); }
+  if (postTagSection) { postTagSection.style.display = ''; clearTagBubbles('create-post-tags-container'); }
   titleInput.value = '';
   titleInput.classList.remove('input-error');
   titleInput.closest('.create-post-title-wrap').style.display = 'none';
@@ -152,7 +155,8 @@ document.getElementById('create-post-submit').addEventListener('click', async ()
   const body = {
     contentText: bodyInput.value.trim(),
     title:       postDestination === 'community' ? titleInput.value.trim() : null,
-    communityId: postDestination === 'community' ? selectedCommunityId   : null
+    communityId: postDestination === 'community' ? selectedCommunityId   : null,
+    tags:        getTagsFrom('create-post-tags-container')
   };
 
   try {

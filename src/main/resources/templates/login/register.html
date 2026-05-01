@@ -6,14 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" th:href="@{/vector-logos/unicornLogo.png}" type="image/png">
   <link rel="stylesheet" th:href="@{/css/register.css}">
+  <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
   <title>Register - UniConn</title>
 </head>
 
 <body>
 <!--navigation bar-->
   <nav class="navbar">
-    <img th:src="@{/vector-logos/unicornLogo.png}" alt="UniConn Logo" width="100">
+    <img class="logo-icon" th:src="@{/vector-logos/unicornLogo.png}" alt="UniConn Logo">
     <a th:href="@{/login}" class="main">UniConn</a>
+    <button id="dark-mode-toggle" class="dark-mode-btn" style="margin-left:auto" title="Toggle dark mode">🌙</button>
   </nav><hr><br><br>
 
     <div class="login-container">
@@ -39,13 +41,16 @@
         <img class="icon" th:src="@{/vector-logos/passwordSignIn.svg}">
         <input type="password" name="password" required placeholder=" ">
         <label>Password</label>
+        <button type="button" class="password-toggle" aria-label="Toggle password visibility"></button>
       </div>
 
-        <p id="register-error" style="color:#e05c5c;font-size:0.9em;display:none"></p>
+        <p id="register-error" style="color:#e05c5c;font-size:0.9em;min-height:1.4em"></p>
         <button type="submit">Register</button>
         <div class="login-link">
           <p>Already have an account?<a href="/login"> Sign In</a>
       </form>
+      <script th:src="@{/js/darkMode.js}" defer></script>
+      <script th:src="@{/js/passwordToggle.js}" defer></script>
       <script th:src="@{/js/register.js}" defer></script>
         </div>
 </body>

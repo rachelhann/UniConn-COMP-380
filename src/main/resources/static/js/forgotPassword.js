@@ -9,7 +9,7 @@ document.getElementById('forgot-form').addEventListener('submit', async (e) => {
 
   // reset message state before each attempt
   msg.className = 'forgot-message';
-  msg.style.display = 'none';
+  msg.textContent = '';
 
   try {
     const res = await fetch('/api/auth/forgot-password', {
@@ -32,5 +32,4 @@ document.getElementById('forgot-form').addEventListener('submit', async (e) => {
     msg.classList.add('error');
   }
 
-  msg.style.display = 'block';
 });

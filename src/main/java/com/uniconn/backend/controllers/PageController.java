@@ -45,6 +45,11 @@ public class PageController {
     public String createPostPage() {
         return "post/createPost";
     }
+
+    @GetMapping("/post/{postId}")
+    public String postDetailPage() {
+        return "post/postDetail";
+    }
     
     
     

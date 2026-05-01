@@ -5,16 +5,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" th:href="@{/vector-logos/unicornLogo.png}" type="image/png">
-  <link rel="stylesheet" th:href="@{/css/base.css}">
-  <link rel="stylesheet" th:href="@{/css/navbar.css}">
-  <link rel="stylesheet" th:href="@{/css/layout.css}">
-  <link rel="stylesheet" th:href="@{/css/modals.css}">
-  <link rel="stylesheet" th:href="@{/css/postCards.css}">
   <link rel="stylesheet" th:href="@{/css/communities.css}">
   <link rel="stylesheet" th:href="@{/css/followButton.css}">
   <link rel="stylesheet" th:href="@{/css/tagInput.css}">
   <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
-  <title>My Communities - UniConn</title>
+  <title>Post - UniConn</title>
 </head>
 
 <body>
@@ -23,7 +18,6 @@
       <img class="logo-icon" th:src="@{/vector-logos/unicornLogo.png}" alt="UniConn Logo" width="100" height="100">
       <a href="/feed" class="main">UniConn</a><hr><br>
     </div>
-
     <div class="navbar-right">
       <a href="#" class="nav-icon" title="Search" id="search-toggle">
         <img th:src="@{/vector-logos/magnifyGlass.svg}" alt="Search" width="36" height="36">
@@ -38,7 +32,7 @@
       <span class="signout-divider">|</span>
       <a href="#" class="signout-link" onclick="['token','currentUsername','currentUserId','myProfilePosts','myCommunities','profilePicture'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
-  </nav><hr class="navbar-divider">
+  </nav><hr><br>
 
   <!-- NOTIFICATION MODAL -->
   <div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
@@ -50,6 +44,82 @@
       <ul id="notification-list" class="search-results-list">
         <li style="padding:12px 8px;color:#999;font-size:0.9em">No notifications yet.</li>
       </ul>
+    </div>
+  </div>
+
+  <!-- CREATE COMMUNITY MODAL -->
+  <div id="create-community-modal" class="search-modal-overlay" aria-hidden="true">
+    <div class="search-modal create-post-modal">
+      <div class="header-right">
+        <h3 class="search-modal-title">Create Community</h3>
+      </div>
+      <button class="search-modal-close" id="create-community-close" aria-label="Close">&times;</button>
+      <div class="create-post-title-wrap">
+        <input type="text" id="community-name-input" class="create-post-title-input" placeholder="Community name*" required>
+        <span class="community-name-hint">Lowercase letters, numbers, dots, and underscores only (e.g. my_community)</span>
+      </div>
+      <div class="create-post-field">
+        <textarea id="community-desc-input" class="create-post-body" placeholder="Description*" required></textarea>
+      </div>
+      <div class="create-post-title-wrap">
+        <select id="community-category-input" class="create-post-title-input community-category-select">
+          <option value="" disabled selected>Category*</option>
+          <option value="ACADEMICS">Academics</option>
+          <option value="CAREER">Career</option>
+          <option value="SOCIAL">Social</option>
+          <option value="CAMPUS_AND_EVENTS">Campus &amp; Events</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+      <div class="create-post-title-wrap">
+        <div class="tag-input-container" id="community-tags-container">
+          <input type="text" id="community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+        </div>
+      </div>
+      <div class="create-post-action">
+        <button type="button" class="create-post-btn-post" id="create-community-submit">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CREATE POST MODAL -->
+  <div id="create-post-modal" class="search-modal-overlay" aria-hidden="true">
+    <div class="search-modal create-post-modal">
+      <div class="header-right">
+        <h3 class="search-modal-title">Create Post</h3>
+      </div>
+      <button class="search-modal-close" id="create-post-close" aria-label="Close">&times;</button>
+      <div class="create-post-community-wrap">
+        <button type="button" class="create-post-community-btn" id="create-post-destination-btn">
+          Post in... <span class="create-post-arrow">&#9662;</span>
+        </button>
+        <ul class="create-post-community-list" id="create-post-destination-list">
+          <li class="create-post-community-item" id="destination-profile">My Profile</li>
+          <li class="create-post-community-item" id="destination-community">Community</li>
+        </ul>
+      </div>
+      <div id="create-post-community-section" class="create-post-community-wrap" style="display:none">
+        <button type="button" class="create-post-community-btn" id="create-post-community-btn">
+          Select Community <span class="create-post-arrow">&#9662;</span>
+        </button>
+        <ul class="create-post-community-list" id="create-post-community-list">
+          <li class="create-post-community-empty">No communities available</li>
+        </ul>
+      </div>
+      <div class="create-post-title-wrap">
+        <input type="text" id="create-post-title-input" class="create-post-title-input" placeholder="Title*" required>
+      </div>
+      <div class="create-post-field">
+        <textarea id="create-post-body-input" class="create-post-body" placeholder="Body text*" required></textarea>
+      </div>
+      <div id="create-post-tags-section" class="create-post-title-wrap" style="display:none">
+        <div class="tag-input-container" id="create-post-tags-container">
+          <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
+        </div>
+      </div>
+      <div class="create-post-action">
+        <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
+      </div>
     </div>
   </div>
 
@@ -65,147 +135,42 @@
     </div>
   </div>
 
-
-  <!-- EDIT COMMUNITY MODAL -->
-  <div id="edit-community-modal" class="search-modal-overlay" aria-hidden="true">
-    <div class="search-modal create-post-modal">
-      <div class="header-right">
-        <h3 class="search-modal-title">Edit Community</h3>
-      </div>
-      <button class="search-modal-close" id="edit-community-close" aria-label="Close">&times;</button>
-      <div class="create-post-field">
-        <textarea id="edit-community-desc-input" class="create-post-body" placeholder="Description"></textarea>
-      </div>
-      <div class="create-post-title-wrap">
-        <div class="tag-input-container" id="edit-community-tags-container">
-          <input type="text" id="edit-community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
-        </div>
-      </div>
-      <p id="edit-community-message" class="profile-message" style="display:none"></p>
-      <div class="create-post-action">
-        <button type="button" class="create-post-btn-post" id="edit-community-submit">Save</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CREATE COMMUNITY MODAL -->
-  <div id="create-community-modal" class="search-modal-overlay" aria-hidden="true">
-    <div class="search-modal create-post-modal">
-      <div class="header-right">
-        <h3 class="search-modal-title">Create Community</h3>
-      </div>
-      <button class="search-modal-close" id="create-community-close" aria-label="Close">&times;</button>
-
-      <div class="create-post-title-wrap">
-        <input type="text" id="community-name-input" class="create-post-title-input" placeholder="Community name*" required>
-        <span class="community-name-hint">Lowercase letters, numbers, dots, and underscores only (e.g. my_community)</span>
-      </div>
-
-      <div class="create-post-field">
-        <textarea id="community-desc-input" class="create-post-body" placeholder="Description*" required></textarea>
-      </div>
-
-      <div class="create-post-title-wrap">
-        <select id="community-category-input" class="create-post-title-input community-category-select">
-          <option value="" disabled selected>Category*</option>
-          <option value="ACADEMICS">Academics</option>
-          <option value="CAREER">Career</option>
-          <option value="SOCIAL">Social</option>
-          <option value="CAMPUS_AND_EVENTS">Campus &amp; Events</option>
-          <option value="OTHER">Other</option>
-        </select>
-      </div>
-
-      <div class="create-post-title-wrap">
-        <div class="tag-input-container" id="community-tags-container">
-          <input type="text" id="community-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
-        </div>
-      </div>
-
-      <div class="create-post-action">
-        <button type="button" class="create-post-btn-post" id="create-community-submit">Create</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- CREATE POST MODAL -->
-  <div id="create-post-modal" class="search-modal-overlay" aria-hidden="true">
-    <div class="search-modal create-post-modal">
-      <div class="header-right">
-        <h3 class="search-modal-title">Create Post</h3>
-      </div>
-      <button class="search-modal-close" id="create-post-close" aria-label="Close">&times;</button>
-
-      <div class="create-post-community-wrap">
-        <button type="button" class="create-post-community-btn" id="create-post-destination-btn">
-          Post in... <span class="create-post-arrow">&#9662;</span>
-        </button>
-        <ul class="create-post-community-list" id="create-post-destination-list">
-          <li class="create-post-community-item" id="destination-profile">My Profile</li>
-          <li class="create-post-community-item" id="destination-community">Community</li>
-        </ul>
-      </div>
-
-      <div id="create-post-community-section" class="create-post-community-wrap" style="display:none">
-        <button type="button" class="create-post-community-btn" id="create-post-community-btn">
-          Select Community <span class="create-post-arrow">&#9662;</span>
-        </button>
-        <ul class="create-post-community-list" id="create-post-community-list">
-          <li class="create-post-community-empty">No communities available</li>
-        </ul>
-      </div>
-
-      <div class="create-post-title-wrap">
-        <input type="text" id="create-post-title-input" class="create-post-title-input" placeholder="Title*" required>
-      </div>
-
-      <div class="create-post-field">
-        <textarea id="create-post-body-input" class="create-post-body" placeholder="Body text*" required></textarea>
-      </div>
-
-      <div id="create-post-tags-section" class="create-post-title-wrap" style="display:none">
-        <div class="tag-input-container" id="create-post-tags-container">
-          <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
-        </div>
-      </div>
-
-      <div class="create-post-action">
-        <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
-      </div>
-    </div>
-  </div>
-
   <div class="wrap">
 
-    <!-- LEFT CONTAINER: my community list -->
+    <!-- LEFT CONTAINER: post detail -->
     <div class="left-container">
-      <div class="header-left"><h3>My Communities</h3></div>
-      <div class="mc-search-wrap">
-        <input type="text" id="communities-search" class="mc-search-input" placeholder="Search by community name or tag">
-        <img src="/vector-logos/magnifyGlass.svg" alt="Search" class="mc-search-icon">
+      <div class="header-left"><a id="post-detail-header-link" class="post-detail-header-link"><h3 id="post-detail-header-name">Post</h3></a></div>
+      <button class="back-btn" onclick="history.back()">&#8592; Back</button>
+
+      <div class="community-detail-content">
+        <div class="community-detail-top">
+
+          <div class="community-post-header">
+            <a id="post-detail-username" class="community-post-username post-username-link"></a>
+            <span id="post-detail-date" class="community-post-date"></span>
+          </div>
+          <h2 id="post-detail-title" class="post-detail-title"></h2>
+          <p id="post-detail-body" class="post-detail-body"></p>
+          <div id="post-detail-tags" class="community-detail-tags"></div>
+          <p id="post-detail-stats" class="post-detail-stats"></p>
+          <p id="post-not-found" class="post-detail-not-found" style="display:none">Post not found.</p>
+
+        </div>
       </div>
-      <div class="mc-filter-bubbles">
-        <button class="mc-filter-btn active" data-membership="all">All</button>
-        <button class="mc-filter-btn" data-membership="admin">Created by Me</button>
-        <button class="mc-filter-btn" data-membership="member">Member of</button>
-      </div>
-      <div id="my-communities-list" class="mc-list"></div>
     </div>
 
-    <!-- RIGHT CONTAINER -->
+    <!-- RIGHT CONTAINER: sidenav -->
     <div class="right-wrap">
       <div class="right-container">
-
-        <!-- RIGHT UPPER: explore panel -->
         <div class="right-upper-container">
           <div class="explore-actions">
-            <button type="button" class="explore-btn" id="for-you-btn" onclick="window.location.href='/feed'">
+            <button type="button" class="explore-btn" onclick="window.location.href='/feed'">
               <span class="explore-btn-inner"><img th:src="@{/vector-logos/feedLogo.svg}" alt="" class="explore-btn-icon"> Feed</span>
             </button>
-            <button type="button" class="explore-btn" id="explore-btn" onclick="window.location.href='/communities'">
+            <button type="button" class="explore-btn" onclick="window.location.href='/communities'">
               <span class="explore-btn-inner"><img th:src="@{/vector-logos/sparkleLogo.svg}" alt="" class="explore-btn-icon"> Explore Communities</span>
             </button>
-            <button type="button" class="explore-btn" id="my-communities-btn" onclick="window.location.href='/my-communities'">
+            <button type="button" class="explore-btn" onclick="window.location.href='/my-communities'">
               <span class="explore-btn-inner"><img th:src="@{/vector-logos/clubLogo.svg}" alt="" class="explore-btn-icon"> My Communities</span>
             </button>
             <button type="button" class="explore-btn" id="create-community-toggle">
@@ -217,51 +182,26 @@
           </div>
         </div>
 
-        <!-- TRENDING TOPICS -->
         <div class="right-lower-container">
           <div class="header-right"><h3>Trending Topics</h3></div>
           <ul id="trending-tags-list" class="trending-tags-list"></ul>
         </div>
-
       </div>
     </div>
 
   </div>
-
-<!-- POST VIEW MODAL -->
-<div id="post-view-overlay" class="post-view-overlay" aria-hidden="true">
-  <div class="post-view-modal">
-    <div class="post-view-header"><h3>Post</h3></div>
-    <button class="post-view-close" id="post-view-close" aria-label="Close">&times;</button>
-    <div class="post-view-body">
-      <div class="post-view-meta" id="post-view-meta"></div>
-      <p class="post-view-title" id="post-view-title" style="display:none"></p>
-      <p class="post-view-content" id="post-view-content"></p>
-      <div class="post-view-tags" id="post-view-tags"></div>
-      <div class="post-view-footer" id="post-view-footer"></div>
-      <hr class="comments-divider">
-      <div class="comment-input-wrap">
-        <textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
-        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
-      </div>
-      <div class="comments-list" id="post-view-comments-list">
-        <p class="comment-empty">Loading comments...</p>
-      </div>
-    </div>
-  </div>
-</div>
 
 <script th:src="@{/js/darkMode.js}" defer></script>
 <script th:src="@{/js/navbarPfp.js}" defer></script>
 <script th:src="@{/js/emojiPicker.js}" defer></script>
 <script th:src="@{/js/tagPostsModal.js}" defer></script>
-<script th:src="@{/js/postCardRenderer.js}" defer></script>
-<script th:src="@{/js/myCommunitiesLoad.js}" defer></script>
+<script th:src="@{/js/postDetailLoad.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
 <script th:src="@{/js/notificationFunction.js}" defer></script>
-<script th:src="@{/js/createPostFunction.js}" defer></script>
 <script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
-<script th:src="@{/js/searchFunction.js}" defer></script></body>
+<script th:src="@{/js/createPostFunction.js}" defer></script>
+<script th:src="@{/js/searchFunction.js}" defer></script>
+</body>
 
 </html>

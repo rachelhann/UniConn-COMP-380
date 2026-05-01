@@ -7,9 +7,22 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
-
+	
+	@Query("""
+		    SELECT p FROM Post p
+		    LEFT JOIN FETCH p.author
+		    LEFT JOIN FETCH p.community
+		    LEFT JOIN FETCH p.tags pt
+		    LEFT JOIN FETCH pt.tag
+		    WHERE p.postId = :postId
+		      AND p.isDeleted = false
+		""")
+		Optional<Post> findByIdWithTags(@Param("postId") Integer postId);
+	
+	
     // ---------------------------------------------------------------
     // FEED: posts from communities the user is a member of
     //       + posts from users the user follows
@@ -129,7 +142,24 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
         ORDER BY p.createdAt DESC
     """)
     List<Post> findCommunityPostsByUser(@Param("userId") Integer userId);
-
+    
+    // ---------------------------------------------------------------
+    // POSTS USER LIKED
+    // ---------------------------------------------------------------
+    @Query("""
+    	    SELECT DISTINCT p FROM Post p
+    	    LEFT JOIN FETCH p.author
+    	    LEFT JOIN FETCH p.community
+    	    LEFT JOIN FETCH p.tags pt
+    	    LEFT JOIN FETCH pt.tag
+    	    WHERE p.isDeleted = false
+    	      AND EXISTS (
+    	          SELECT 1 FROM PostLike pl
+    	          WHERE pl.post = p AND pl.user.userId = :userId
+    	      )
+    	    ORDER BY p.createdAt DESC
+    	""")
+    	List<Post> findPostsLikedByUser(@Param("userId") Integer userId);
 
     // ---------------------------------------------------------------
     // ALL POSTS IN A COMMUNITY
