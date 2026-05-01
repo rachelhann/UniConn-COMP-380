@@ -1,7 +1,9 @@
 package com.uniconn.backend.controllers;
 
 import com.uniconn.backend.dtos.*;
+import com.uniconn.backend.services.FeedAlgorithmService;
 import com.uniconn.backend.services.PostManagementService;
+import com.uniconn.backend.services.FeedAlgorithmService;
 
 import jakarta.validation.Valid;
 
@@ -13,10 +15,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/posts")
 public class PostManagementController {
-    private final PostManagementService postManagementService;
 
-    public PostManagementController(PostManagementService postManagementService) {
+
+    private final PostManagementService postManagementService;
+    private final FeedAlgorithmService feedAlgorithmService;
+
+    public PostManagementController(PostManagementService postManagementService, FeedAlgorithmService feedAlgorithmService) {
         this.postManagementService = postManagementService;
+        this.feedAlgorithmService = feedAlgorithmService;
     }
 
     // ---------------------------------------------------------------
@@ -44,7 +50,12 @@ public class PostManagementController {
     // ---------------------------------------------------------------
     @GetMapping("/feed/{userId}")
     public ResponseEntity<List<PostSummaryDTO>> getFeed(@PathVariable Integer userId) {
-        return ResponseEntity.ok(postManagementService.getFeedForUser(userId));
+        try {
+            List<PostSummaryDTO> feed = feedAlgorithmService.getFeed(userId);
+            return ResponseEntity.ok(feed);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // ---------------------------------------------------------------

@@ -367,7 +367,7 @@
     return;
   }
 
-  fetch('/api/feed', { headers: authHeaders() })
+  fetch(`/api/posts/feed/${currentUserId}`, { headers: authHeaders() })
       .then(r => r.ok ? r.json() : [])
       .then(renderFeed)
       .catch(() => renderFeed([]));

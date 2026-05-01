@@ -182,15 +182,14 @@ public class FeedAlgorithmService extends BaseService {
     // ---------------------------------------------------------------
     // GET INTEREST TAGS FROM LIKED POSTS
     // ---------------------------------------------------------------
-    private List<String> getInterestTags(Integer userId) {
-        return postLikeRepository.findAll()
+        private List<String> getInterestTags(Integer userId) {
+        return postLikeRepository.findByIdUserId(userId)
                 .stream()
-                .filter(pl -> pl.getId().getUserId().equals(userId))
                 .flatMap(pl -> pl.getPost().getTags().stream()
                         .map(pt -> pt.getTag().getName()))
                 .distinct()
                 .collect(Collectors.toList());
-    }
+        }
 
     // ---------------------------------------------------------------
     // HELPER RECORD
