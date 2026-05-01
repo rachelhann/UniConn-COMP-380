@@ -13,6 +13,20 @@ function authHeaders() {
   return { 'Authorization': 'Bearer ' + localStorage.getItem('token') };
 }
 
+// ── Sync a feed/profile card with latest state from the modal ────────────────
+function syncCardFromModal(postId, { liked, likeCount, commentCount }) {
+  const card = document.querySelector(`[data-post-id="${postId}"]`);
+  if (!card) return;
+
+  const likeImg  = card.querySelector('.post-card-action img[alt="Like"]');
+  const likeSpan = likeImg?.nextElementSibling;
+  if (likeImg)  likeImg.src = liked ? '/vector-logos/heartBlue.svg' : '/vector-logos/heartOutline.svg';
+  if (likeSpan) likeSpan.textContent = likeCount;
+
+  const commentSpan = card.querySelector('.post-card-action img[alt="Comments"]')?.nextElementSibling;
+  if (commentSpan && commentCount !== undefined) commentSpan.textContent = commentCount;
+}
+
 function createPostCard(post, { onDelete } = {}) {
   const card = document.createElement('div');
   card.className = 'post-card';
@@ -51,7 +65,7 @@ function createPostCard(post, { onDelete } = {}) {
       t.textContent = '#' + tag;
       t.addEventListener('click', e => {
         e.stopPropagation();
-        window.location.href = '/posts/tag/' + encodeURIComponent(tag);
+        if (typeof openTagPostsModal === 'function') openTagPostsModal(tag);
       });
       tagsWrap.appendChild(t);
     });
@@ -97,7 +111,7 @@ function createPostCard(post, { onDelete } = {}) {
   // comment count
   const commentBtn = document.createElement('button');
   commentBtn.className = 'post-card-action';
-  commentBtn.innerHTML = `<span>💬</span><span>${post.commentCount}</span>`;
+  commentBtn.innerHTML = `<img src="/vector-logos/commentCloud.svg" alt="Comments" style="width:18px;height:18px;margin:0"><span>${post.commentCount}</span>`;
   commentBtn.addEventListener('click', e => {
     e.stopPropagation();
     openPostViewModal(post);
@@ -148,8 +162,17 @@ function renderPostList(posts, containerId) {
   posts.forEach(post => container.appendChild(createPostCard(post)));
 }
 
-// ── Post view modal (shared) ──────────────────────────────────────
+// ── Post view modal (shared) ─────────────────────────────────────────────────
+
+// fetch fresh post data then render — ensures modal always shows current like/comment counts
 function openPostViewModal(post) {
+  fetch(`/api/posts/${post.postId}`, { headers: authHeaders() })
+    .then(r => r.ok ? r.json() : post)
+    .catch(() => post)
+    .then(freshPost => _renderPostViewModal(freshPost));
+}
+
+function _renderPostViewModal(post) {
   const overlay      = document.getElementById('post-view-overlay');
   const modalMeta    = document.getElementById('post-view-meta');
   const modalTitle   = document.getElementById('post-view-title');
@@ -160,8 +183,13 @@ function openPostViewModal(post) {
   const commentsList = document.getElementById('post-view-comments-list');
   if (!overlay) return;
 
+  // store active post state on overlay so createCommentEl can access it
+  overlay._activePostId    = post.postId;
+  overlay._activeLiked     = post.likedByCurrentUser;
+  overlay._activeLikeCount = post.likeCount;
+
   // meta
-  modalMeta.innerHTML = `<span style="font-weight:600;color:#333">u/${post.authorUsername}</span>`;
+  modalMeta.innerHTML = `<a href="/profile/${post.authorUsername}" class="post-modal-author post-username-link">u/${post.authorUsername}</a>`;
   if (post.communityName) {
     modalMeta.innerHTML += `<span class="post-view-community">c/${post.communityName}</span>`;
   }
@@ -182,15 +210,17 @@ function openPostViewModal(post) {
     const t = document.createElement('span');
     t.className = 'post-card-tag';
     t.textContent = '#' + tag;
-    t.addEventListener('click', () => {
-      window.location.href = '/posts/tag/' + encodeURIComponent(tag);
+    t.style.cursor = 'pointer';
+    t.addEventListener('click', e => {
+      e.stopPropagation();
+      openTagPostsModal(tag);
     });
     modalTags.appendChild(t);
   });
 
   // footer
   modalFooter.innerHTML = '';
-  let activeLiked = post.likedByCurrentUser;
+  let activeLiked     = post.likedByCurrentUser;
   let activeLikeCount = post.likeCount;
 
   const likeBtn = document.createElement('button');
@@ -202,6 +232,7 @@ function openPostViewModal(post) {
   likeCountSpan.textContent = activeLikeCount;
   likeBtn.appendChild(likeImg);
   likeBtn.appendChild(likeCountSpan);
+
   likeBtn.addEventListener('click', async () => {
     try {
       const res = await fetch(`/api/posts/${post.postId}/like`, {
@@ -209,19 +240,26 @@ function openPostViewModal(post) {
         headers: authHeaders()
       });
       if (res.ok) {
-        activeLiked = !activeLiked;
-        likeImg.src = activeLiked ? '/vector-logos/heartBlue.svg' : '/vector-logos/heartOutline.svg';
+        activeLiked     = !activeLiked;
         activeLikeCount = activeLiked ? activeLikeCount + 1 : activeLikeCount - 1;
+        likeImg.src = activeLiked ? '/vector-logos/heartBlue.svg' : '/vector-logos/heartOutline.svg';
         likeCountSpan.textContent = activeLikeCount;
+        overlay._activeLiked     = activeLiked;
+        overlay._activeLikeCount = activeLikeCount;
+        syncCardFromModal(post.postId, {
+          liked: activeLiked,
+          likeCount: activeLikeCount,
+          commentCount: parseInt(document.getElementById('modal-comment-count')?.textContent ?? 0)
+        });
       }
     } catch {}
   });
   modalFooter.appendChild(likeBtn);
 
-  const commentCount = document.createElement('span');
-  commentCount.className = 'post-card-action';
-  commentCount.innerHTML = `<span>💬</span><span id="modal-comment-count">${post.commentCount}</span>`;
-  modalFooter.appendChild(commentCount);
+  const commentCountEl = document.createElement('span');
+  commentCountEl.className = 'post-card-action';
+  commentCountEl.innerHTML = `<img src="/vector-logos/commentCloud.svg" alt="Comments" style="width:18px;height:18px;margin:0"><span id="modal-comment-count">${post.commentCount}</span>`;
+  modalFooter.appendChild(commentCountEl);
 
   if (post.canDelete) {
     const delBtn = document.createElement('button');
@@ -250,7 +288,13 @@ function openPostViewModal(post) {
     loadComments(post.postId, commentsList);
   }
 
-  overlay._activePostId = post.postId;
+  // also sync the card now with fresh data from the fetch
+  syncCardFromModal(post.postId, {
+    liked:        post.likedByCurrentUser,
+    likeCount:    post.likeCount,
+    commentCount: post.commentCount
+  });
+
   overlay.classList.add('active');
   overlay.setAttribute('aria-hidden', 'false');
 }
@@ -260,7 +304,9 @@ function closePostViewModal() {
   if (overlay) {
     overlay.classList.remove('active');
     overlay.setAttribute('aria-hidden', 'true');
-    overlay._activePostId = null;
+    overlay._activePostId    = null;
+    overlay._activeLiked     = null;
+    overlay._activeLikeCount = null;
   }
 }
 
@@ -301,8 +347,15 @@ function createCommentEl(c) {
         });
         if (res.ok) {
           el.remove();
-          const countEl = document.getElementById('modal-comment-count');
-          if (countEl) countEl.textContent = parseInt(countEl.textContent) - 1;
+          const countEl  = document.getElementById('modal-comment-count');
+          const newCount = parseInt(countEl?.textContent ?? 0) - 1;
+          if (countEl) countEl.textContent = newCount;
+          const overlay = document.getElementById('post-view-overlay');
+          syncCardFromModal(overlay?._activePostId, {
+            liked:        overlay?._activeLiked,
+            likeCount:    overlay?._activeLikeCount,
+            commentCount: newCount
+          });
         }
       } catch {}
     });
@@ -311,13 +364,13 @@ function createCommentEl(c) {
   return el;
 }
 
-// ── Wire up modal close + comment submit (call once on page load) ──
+// ── Wire up modal close + comment submit (call once on page load) ────────────
 function initPostViewModal() {
-  const overlay      = document.getElementById('post-view-overlay');
-  const closeBtn     = document.getElementById('post-view-close');
-  const commentInput = document.getElementById('post-view-comment-input');
+  const overlay       = document.getElementById('post-view-overlay');
+  const closeBtn      = document.getElementById('post-view-close');
+  const commentInput  = document.getElementById('post-view-comment-input');
   const commentSubmit = document.getElementById('post-view-comment-submit');
-  const commentsList = document.getElementById('post-view-comments-list');
+  const commentsList  = document.getElementById('post-view-comments-list');
   if (!overlay) return;
 
   closeBtn?.addEventListener('click', closePostViewModal);
@@ -325,7 +378,7 @@ function initPostViewModal() {
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePostViewModal(); });
 
   commentSubmit?.addEventListener('click', async () => {
-    const text = commentInput?.value.trim();
+    const text   = commentInput?.value.trim();
     const postId = overlay._activePostId;
     if (!text || !postId) return;
     try {
@@ -338,9 +391,15 @@ function initPostViewModal() {
         const newComment = await res.json();
         commentInput.value = '';
         if (commentsList.querySelector('.comment-empty')) commentsList.innerHTML = '';
-        commentsList.appendChild(createCommentEl(newComment));
-        const countEl = document.getElementById('modal-comment-count');
-        if (countEl) countEl.textContent = parseInt(countEl.textContent) + 1;
+        commentsList.prepend(createCommentEl(newComment));
+        const countEl  = document.getElementById('modal-comment-count');
+        const newCount = parseInt(countEl?.textContent ?? 0) + 1;
+        if (countEl) countEl.textContent = newCount;
+        syncCardFromModal(postId, {
+          liked:        overlay._activeLiked,
+          likeCount:    overlay._activeLikeCount,
+          commentCount: newCount
+        });
       }
     } catch {}
   });

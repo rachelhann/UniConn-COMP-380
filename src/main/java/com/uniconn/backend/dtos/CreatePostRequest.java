@@ -4,7 +4,6 @@ public class CreatePostRequest {
     private String contentText;
     private String title;
     private Integer communityId;
-
     public String getContentText() { return contentText; }
     public void setContentText(String contentText) { this.contentText = contentText; }
 

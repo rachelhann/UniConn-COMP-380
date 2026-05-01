@@ -1,3 +1,5 @@
+// Handles the Edit Profile modal: submits name/bio updates and refreshes the bio section in place.
+// Loaded on profile.html only.
 const editNameInput    = document.getElementById('edit-name-input');
 const editBioInput     = document.getElementById('edit-bio-input');
 const editMsg          = document.getElementById('edit-profile-message');
@@ -34,21 +36,17 @@ document.getElementById('edit-profile-submit').addEventListener('click', async (
       editMsg.classList.add('success');
       editMsg.style.display = 'block';
 
+      const fullnameEl = document.getElementById('profile-fullname');
+      if (fullnameEl) fullnameEl.textContent = body.name;
+
       const bioSection = document.querySelector('.profile-bio-section');
       bioSection.innerHTML = '';
-      if (body.name) {
-        const nameEl = document.createElement('span');
-        nameEl.className = 'profile-name';
-        nameEl.textContent = body.name;
-        bioSection.appendChild(nameEl);
-      }
       if (body.userBio) {
         const bioEl = document.createElement('p');
         bioEl.className = 'profile-bio';
         bioEl.textContent = body.userBio;
         bioSection.appendChild(bioEl);
-      }
-      if (!body.name && !body.userBio) {
+      } else {
         const emptyEl = document.createElement('p');
         emptyEl.className = 'profile-bio-empty';
         emptyEl.textContent = 'No bio yet.';

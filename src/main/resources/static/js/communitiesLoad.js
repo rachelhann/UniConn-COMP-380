@@ -190,7 +190,7 @@
       const li = document.createElement('li');
       li.className = 'trending-tag-item';
       li.innerHTML = `<span class="trending-tag-rank">#${i + 1}</span><span class="trending-tag-name">${tag}</span>`;
-      li.addEventListener('click', () => { window.location.href = '/communities?tag=' + encodeURIComponent(tag); });
+      li.addEventListener('click', () => openTagPostsModal(tag));
       trendingList.appendChild(li);
     });
   }

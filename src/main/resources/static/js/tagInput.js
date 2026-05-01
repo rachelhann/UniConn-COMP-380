@@ -1,3 +1,7 @@
+// Reusable tag bubble input system.
+// initTagBubbles(containerId, inputId) — activates Enter-to-add, Backspace-to-remove behavior.
+// getTagsFrom(containerId)            — returns current tag array (used before form submit).
+// clearTagBubbles / populateTagBubbles — used by modals that reset or pre-fill tags.
 function initTagBubbles(containerId, inputId) {
   const container = document.getElementById(containerId);
   const input = document.getElementById(inputId);

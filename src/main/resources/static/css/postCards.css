@@ -26,7 +26,7 @@
 .post-card-community { background: #d6ecf7; border-radius: 20px; padding: 2px 10px; font-size: 0.82em; color: #2a7aa8; font-weight: 500; }
 .post-card-title { font-weight: 700; font-size: 1em; color: #24283b; margin: 0; }
 .post-card-body {
-  font-size: 0.9em; color: #444;
+  font-size: 0.9em; color: #444; margin: 0;
   display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
 .post-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }

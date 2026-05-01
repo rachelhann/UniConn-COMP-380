@@ -1,3 +1,4 @@
+/* follow button */
 .follow-btn {
   width: auto;
   height: 28px;
@@ -16,6 +17,7 @@
   background: #91c5e8;
   border: 2px solid #000;
 }
+/* unfollow button */
 .unfollow-btn {
   background: #e0e0e0;
   color: #444;

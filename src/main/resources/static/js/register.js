@@ -9,7 +9,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
   const password = document.querySelector('input[name="password"]').value;
   const errorEl  = document.getElementById('register-error');
 
-  errorEl.style.display = 'none';
+  errorEl.textContent = '';
 
   try {
     const response = await fetch('/api/auth/register', {
@@ -26,10 +26,8 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
     } else {
       const msg = await response.text();
       errorEl.textContent = msg || 'Registration failed. Please try again.';
-      errorEl.style.display = 'block';
     }
   } catch {
     errorEl.textContent = 'Something went wrong. Please try again.';
-    errorEl.style.display = 'block';
   }
 });
