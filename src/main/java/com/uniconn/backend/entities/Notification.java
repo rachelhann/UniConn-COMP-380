@@ -27,7 +27,7 @@ public class Notification {
 	private NotificationType type;
 
 	public enum NotificationType {
-		NEW_FOLLOWER, POST_LIKED, POST_COMMENTED
+		NEW_FOLLOWER, POST_LIKED, POST_COMMENTED, USER_JOINED_COMMUNITY
 	}
 
 	@Column(name = "post_id")
@@ -35,6 +35,9 @@ public class Notification {
 
 	@Column(name = "comment_id")
 	private Integer commentId;
+
+	@Column(name = "community_id")
+	private Integer communityId;
 
 	@Column(nullable = false, length = 255)
 	private String message;
@@ -90,6 +93,14 @@ public class Notification {
 
 	public void setCommentId(Integer commentId) {
 		this.commentId = commentId;
+	}
+
+	public Integer getCommunityId() {
+		return communityId;
+	}
+
+	public void setCommunityId(Integer communityId) {
+		this.communityId = communityId;
 	}
 
 	public String getMessage() {
