@@ -1,5 +1,6 @@
 package com.uniconn.backend.services;
 
+import com.uniconn.backend.composite_keys.CommentLikeId;
 import com.uniconn.backend.composite_keys.PostLikeId;
 import com.uniconn.backend.dtos.*;
 import com.uniconn.backend.entities.*;
@@ -18,15 +19,18 @@ public class PostInteractionService extends BaseService {
     private final PostLikeRepository postLikeRepository;
     private final CommentRepository commentRepository;
     private final CommunityMemberRepository communityMemberRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     public PostInteractionService(PostRepository postRepository,
                                   PostLikeRepository postLikeRepository,
                                   CommentRepository commentRepository,
-                                  CommunityMemberRepository communityMemberRepository) {
+                                  CommunityMemberRepository communityMemberRepository,
+                                  CommentLikeRepository commentLikeRepository) {
         this.postRepository = postRepository;
         this.postLikeRepository = postLikeRepository;
         this.commentRepository = commentRepository;
         this.communityMemberRepository = communityMemberRepository;
+        this.commentLikeRepository = commentLikeRepository;
     }
 
     // ---------------------------------------------------------------
@@ -103,6 +107,7 @@ public class PostInteractionService extends BaseService {
         comment.setPost(post);
         comment.setAuthor(currentUser);
         comment.setContentText(dto.getContentText());
+        comment.setGifUrl(dto.getGifUrl());
 
         Comment saved = commentRepository.save(comment);
 
@@ -167,18 +172,81 @@ public class PostInteractionService extends BaseService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+    
+    // ---------------------------------------------------------------
+    // LIKE COMMENT
+    // ---------------------------------------------------------------
+    @Transactional
+    public void likeComment(Integer commentId) {
+        User currentUser = getAuthenticatedUser();
+
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + commentId));
+
+        if (comment.isDeleted()) {
+            throw new ResourceNotFoundException("Comment not found: " + commentId);
+        }
+
+        CommentLikeId likeId = new CommentLikeId(currentUser.getUserId(), commentId);
+
+        if (commentLikeRepository.existsById(likeId)) {
+            throw new ResourceAlreadyExistsException("You have already liked this comment");
+        }
+
+        CommentLike like = new CommentLike();
+        like.setId(likeId);
+        like.setUser(currentUser);
+        like.setComment(comment);
+        commentLikeRepository.save(like);
+
+        comment.setLikeCount(comment.getLikeCount() + 1);
+        commentRepository.save(comment);
+    }
+
+    // ---------------------------------------------------------------
+    // UNLIKE COMMENT
+    // ---------------------------------------------------------------
+    @Transactional
+    public void unlikeComment(Integer commentId) {
+        User currentUser = getAuthenticatedUser();
+
+        Comment comment = commentRepository.findById(commentId)
+            .orElseThrow(() -> new ResourceNotFoundException("Comment not found: " + commentId));
+
+        if (comment.isDeleted()) {
+            throw new ResourceNotFoundException("Comment not found: " + commentId);
+        }
+
+        CommentLikeId likeId = new CommentLikeId(currentUser.getUserId(), commentId);
+
+        if (!commentLikeRepository.existsById(likeId)) {
+            throw new ResourceNotFoundException("You have not liked this comment");
+        }
+
+        commentLikeRepository.deleteById(likeId);
+
+        comment.setLikeCount(Math.max(0, comment.getLikeCount() - 1));
+        commentRepository.save(comment);
+    }
 
     // ---------------------------------------------------------------
     // HELPER
     // ---------------------------------------------------------------
     private CommentSummaryDTO mapToDTO(Comment comment) {
+        User currentUser = getAuthenticatedUser();
+        boolean liked = commentLikeRepository.existsByComment_CommentIdAndUser_UserId(
+            comment.getCommentId(), currentUser.getUserId()
+        );
         return new CommentSummaryDTO(
             comment.getCommentId(),
             comment.getPost().getPostId(),
             comment.getAuthor().getUsername(),
             comment.getAuthor().getUserId(),
             comment.getContentText(),
-            comment.getCreatedAt()
+            comment.getCreatedAt(),
+            comment.getGifUrl(),
+            comment.getLikeCount(),
+            liked
         );
     }
 }

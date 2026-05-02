@@ -44,6 +44,7 @@ public class PostManagementService extends BaseService {
         Post post = new Post();
         post.setAuthor(currentUser);
         post.setContentText(dto.getContentText());
+        post.setGifUrl(dto.getGifUrl());
 
         if (dto.getCommunityId() != null) {
             Community community = communityRepository.findById(dto.getCommunityId())
@@ -258,7 +259,8 @@ public class PostManagementService extends BaseService {
             post.getCreatedAt(),
             tagNames,
             liked,
-            canDelete
+            canDelete,
+            post.getGifUrl()
         );
     }
 }

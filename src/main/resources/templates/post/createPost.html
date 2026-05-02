@@ -53,10 +53,19 @@
     <div class="main-container">
       <div class="header-left"><h3>Post</h3></div>
     </div> <!--end of main-container-->
-
+	
+	<!-- GIF picker trigger + preview -->
+	<div class="create-post-gif-wrap">
+	        <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	        <div id="post-gif-preview"></div>
+	      </div>
+	      <div class="create-post-action">
+	        <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
+	      </div>
   </div> <!--end of wrap-->
 
 <script th:src="@{/js/modalManager.js}" defer></script><script th:src="@{/js/searchFunction.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
 <script th:src="@{/js/navbarPfp.js}" defer></script>
 <script th:src="@{/js/emojiPicker.js}" defer></script>
 </body>

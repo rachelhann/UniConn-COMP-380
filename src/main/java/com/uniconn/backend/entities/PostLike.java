@@ -27,7 +27,7 @@ public class PostLike {
 	
 	public PostLike() {}
 	
-	//getters&setters
+	// getters & setters
 	public PostLikeId getId() {
 		return id;
 	}

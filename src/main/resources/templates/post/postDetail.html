@@ -117,6 +117,13 @@
           <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
         </div>
       </div>
+	  <div class="create-post-gif-wrap">
+	          <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	          <div id="post-gif-preview"></div>
+	        </div>
+	        <div class="create-post-action">
+	          <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
+	        </div>
       <div class="create-post-action">
         <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
       </div>
@@ -193,6 +200,7 @@
 
 <script th:src="@{/js/darkMode.js}" defer></script>
 <script th:src="@{/js/navbarPfp.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
 <script th:src="@{/js/emojiPicker.js}" defer></script>
 <script th:src="@{/js/tagPostsModal.js}" defer></script>
 <script th:src="@{/js/postDetailLoad.js}" defer></script>

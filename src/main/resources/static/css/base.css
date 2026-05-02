@@ -89,7 +89,7 @@ button:hover {
 .back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
   width: auto;
   height: auto;
   background: none;
@@ -97,10 +97,12 @@ button:hover {
   color: #555;
   font-size: 0.88em;
   font-weight: 600;
-  padding: 4px 0;
-  margin: 30px 10px -15px -5px;
+  padding: 4px 2px;
+  margin: 15px 0 0 8px;
+  flex-shrink: 0;
   cursor: pointer;
   border-radius: 6px;
+  line-height: 1;
 }
 .back-btn:hover { color: #2a7aa8; background: none; border: none; }
 body.dark-mode .back-btn { color: #aaa; }

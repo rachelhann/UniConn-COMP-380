@@ -17,6 +17,8 @@ public class PostSummaryDTO {
     private List<String> tags;
     private boolean isLikedByCurrentUser;
     private boolean canDelete;
+    
+    private String gifUrl;
 
     public PostSummaryDTO() {}
 
@@ -25,7 +27,7 @@ public class PostSummaryDTO {
                           String title, String contentText,
                           int likeCount, int commentCount,
                           LocalDateTime createdAt, List<String> tags,
-                          boolean isLikedByCurrentUser, boolean canDelete) {
+                          boolean isLikedByCurrentUser, boolean canDelete, String gifUrl) {
         this.postId = postId;
         this.authorUsername = authorUsername;
         this.authorId = authorId;
@@ -39,6 +41,7 @@ public class PostSummaryDTO {
         this.tags = tags;
         this.isLikedByCurrentUser = isLikedByCurrentUser;
         this.canDelete = canDelete;
+        this.gifUrl = gifUrl;
     }
     
     // getters
@@ -93,5 +96,9 @@ public class PostSummaryDTO {
 	public boolean isCanDelete() {
 		return canDelete;
 	}
+	
+	public String getGifUrl() {
+		return gifUrl;
+	} 
     
 }

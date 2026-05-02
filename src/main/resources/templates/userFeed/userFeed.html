@@ -153,6 +153,11 @@
       </div>
     </div>
 
+	  <div class="create-post-gif-wrap">
+	     <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	   <div id="post-gif-preview"></div>
+	 </div>
+			
     <!--post button-->
     <div class="create-post-action">
       <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
@@ -230,8 +235,10 @@
 
       <!-- comment input -->
       <div class="comment-input-wrap">
-        <textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
-        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
+		<textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
+		        <button type="button" class="gif-trigger-btn" id="comment-gif-btn">GIF</button>
+		        <div id="comment-gif-preview"></div>
+		        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
       </div>
 
       <!-- comments list -->
@@ -247,6 +254,7 @@
 <script th:src="@{/js/darkMode.js}" defer></script>
 <script th:src="@{/js/navbarPfp.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
 <script th:src="@{/js/emojiPicker.js}" defer></script>
 <script th:src="@{/js/tagPostsModal.js}" defer></script>
 <script th:src="@{/js/postCardRenderer.js}" defer></script>

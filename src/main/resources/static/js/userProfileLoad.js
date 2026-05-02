@@ -152,9 +152,13 @@
     const c = document.getElementById('profile-posts-container');
     if (!c) return;
 
-    c.innerHTML = '';
+    const ctrl = document.getElementById('profile-posts-controls');
+    if (ctrl && controls) {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(controls);
+    }
 
-    if (controls) c.appendChild(controls);
+    c.innerHTML = '';
 
     if (!posts || posts.length === 0) {
       const empty = document.createElement('p');
@@ -187,6 +191,31 @@
     document.getElementById('follower-count').textContent = profile.followerCount ?? 0;
     document.getElementById('following-count').textContent = profile.followingCount ?? 0;
     document.getElementById('community-count').textContent = profile.communityCount ?? 0;
+
+    // ── follow button ──────────────────────────────────────────────
+    const followBtn = document.getElementById('follow-profile-btn');
+    const currentUsername = localStorage.getItem('currentUsername');
+    if (followBtn && token && profile.username !== currentUsername) {
+      const isFollowing = followingIds.includes(profile.userId);
+      followBtn.textContent  = isFollowing ? 'Unfollow' : 'Follow';
+      followBtn.classList.toggle('unfollow-btn', isFollowing);
+      followBtn.style.display = '';
+
+      followBtn.addEventListener('click', async () => {
+        const following = followBtn.classList.contains('unfollow-btn');
+        const res = await fetch(`/api/users/${profile.userId}/${following ? 'unfollow' : 'follow'}`, {
+          method: following ? 'DELETE' : 'POST',
+          headers: authHeaders
+        });
+        if (res.ok) {
+          const nowFollowing = !following;
+          followBtn.textContent = nowFollowing ? 'Unfollow' : 'Follow';
+          followBtn.classList.toggle('unfollow-btn', nowFollowing);
+          const countEl = document.getElementById('follower-count');
+          countEl.textContent = parseInt(countEl.textContent) + (nowFollowing ? 1 : -1);
+        }
+      });
+    }
 
     renderTrending(trendingTags);
 

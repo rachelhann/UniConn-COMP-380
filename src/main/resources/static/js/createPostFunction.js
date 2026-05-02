@@ -16,6 +16,8 @@ let postTagsInitialized = false;
 let postDestination    = null;
 // tracks selected communitys ID (null if posting to profile)
 let selectedCommunityId = null;
+// giphy
+let selectedGifUrl     = null;
 
 // fetches user's communities and populates community dropdown
 async function loadCommunities() {
@@ -77,10 +79,13 @@ initModal({
       initTagBubbles('create-post-tags-container', 'create-post-tags-input');
       postTagsInitialized = true;
     }
-    titleInput.value = '';
-    bodyInput.value  = '';
-    postDestination  = null;
-    selectedCommunityId = null;
+	titleInput.value = '';
+	bodyInput.value  = '';
+	postDestination  = null;
+	selectedCommunityId = null;
+	selectedGifUrl   = null;
+	const postGifPreview = document.getElementById('post-gif-preview');
+	if (postGifPreview) postGifPreview.innerHTML = '';
     destinationBtn.innerHTML = 'Post in... <span class="create-post-arrow">&#9662;</span>';
     communityBtn.innerHTML = 'Select Community <span class="create-post-arrow">&#9662;</span>';
     destinationList.classList.remove('open');
@@ -156,7 +161,8 @@ document.getElementById('create-post-submit').addEventListener('click', async ()
     contentText: bodyInput.value.trim(),
     title:       postDestination === 'community' ? titleInput.value.trim() : null,
     communityId: postDestination === 'community' ? selectedCommunityId   : null,
-    tags:        getTagsFrom('create-post-tags-container')
+    tags:        getTagsFrom('create-post-tags-container'),
+    gifUrl:      selectedGifUrl || null
   };
 
   try {
@@ -187,3 +193,12 @@ document.getElementById('create-post-submit').addEventListener('click', async ()
 
 titleInput.addEventListener('input', () => titleInput.classList.remove('input-error'));
 bodyInput.addEventListener('input', () => bodyInput.classList.remove('input-error'));
+
+// init GIF picker for create post modal
+initGifPicker({
+  triggerBtnId:       'post-gif-btn',
+  previewContainerId: 'post-gif-preview',
+  onSelect(url) {
+    selectedGifUrl = url;
+  }
+});
