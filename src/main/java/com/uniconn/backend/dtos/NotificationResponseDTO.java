@@ -9,6 +9,7 @@ public class NotificationResponseDTO {
 	private String senderUsername;
 	private String senderProfilePicture;
 	private Integer postId;
+	private Integer communityId;
 	private boolean isRead;
 	private LocalDateTime createdAt;
 
@@ -53,6 +54,13 @@ public class NotificationResponseDTO {
 	}
 	public void setPostId(Integer postId) {
 		this.postId = postId;
+	}
+
+	public Integer getCommunityId() {
+		return communityId;
+	}
+	public void setCommunityId(Integer communityId) {
+		this.communityId = communityId;
 	}
 
 	public boolean isRead() {
