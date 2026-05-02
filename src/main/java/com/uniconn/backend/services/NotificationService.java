@@ -42,6 +42,26 @@ public class NotificationService extends BaseService {
     }
 
     // ---------------------------------------------------------------
+    // CREATE COMMUNITY-JOIN NOTIFICATION
+    // ---------------------------------------------------------------
+    @Transactional
+    public void createCommunityJoinNotification(User recipient, User sender,
+                                                Integer communityId, String communityName) {
+    
+        if (sender != null && sender.getUserId().equals(recipient.getUserId())) {
+            return;
+        }
+
+        Notification n = new Notification();
+        n.setRecipient(recipient);
+        n.setSender(sender);
+        n.setType(NotificationType.USER_JOINED_COMMUNITY);
+        n.setCommunityId(communityId);
+        n.setMessage(sender.getUsername() + " joined your community " + communityName);
+        notificationRepository.save(n);
+    }
+
+    // ---------------------------------------------------------------
     // GET MY NOTIFICATIONS
     // ---------------------------------------------------------------
     @Transactional(readOnly = true)
@@ -83,6 +103,7 @@ public class NotificationService extends BaseService {
             case POST_LIKED -> name + " liked your post";
             case POST_COMMENTED -> name + " commented on your post";
             case NEW_FOLLOWER -> name + " started following you";
+            case USER_JOINED_COMMUNITY -> name + " joined your community";
         };
     }
 
@@ -96,6 +117,7 @@ public class NotificationService extends BaseService {
             dto.setSenderProfilePicture(n.getSender().getProfilePicture());
         }
         dto.setPostId(n.getPostId());
+        dto.setCommunityId(n.getCommunityId());
         dto.setRead(n.isRead());
         dto.setCreatedAt(n.getCreatedAt());
         return dto;
