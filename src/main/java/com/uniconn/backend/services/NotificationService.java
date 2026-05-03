@@ -75,6 +75,46 @@ public class NotificationService extends BaseService {
     }
 
     // ---------------------------------------------------------------
+    // GET UNREAD COUNT (powers the bell badge)
+    // ---------------------------------------------------------------
+    @Transactional(readOnly = true)
+    public long getUnreadCount() {
+        User currentUser = getAuthenticatedUser();
+        return notificationRepository
+                .countByRecipient_UserIdAndIsReadFalse(currentUser.getUserId());
+    }
+
+    // ---------------------------------------------------------------
+    // MARK ALL AS READ (the "Mark all as Read" dropdown option)
+    // ---------------------------------------------------------------
+    @Transactional
+    public int markAllAsRead() {
+        User currentUser = getAuthenticatedUser();
+        List<Notification> unread = notificationRepository
+                .findByRecipient_UserIdAndIsReadFalse(currentUser.getUserId());
+        for (Notification n : unread) {
+            n.setRead(true);
+        }
+        notificationRepository.saveAll(unread);
+        return unread.size();
+    }
+
+    // ---------------------------------------------------------------
+    // MARK ALL AS UNREAD (the "Mark all as Unread" dropdown option)
+    // ---------------------------------------------------------------
+    @Transactional
+    public int markAllAsUnread() {
+        User currentUser = getAuthenticatedUser();
+        List<Notification> read = notificationRepository
+                .findByRecipient_UserIdAndIsReadTrue(currentUser.getUserId());
+        for (Notification n : read) {
+            n.setRead(false);
+        }
+        notificationRepository.saveAll(read);
+        return read.size();
+    }
+
+    // ---------------------------------------------------------------
     // MARK AS READ
     // ---------------------------------------------------------------
     @Transactional
