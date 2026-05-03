@@ -31,6 +31,7 @@
       </a>
       <a href="#" class="nav-icon" title="Notifications" id="notification-toggle">
         <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="30" height="36">
+        <span id="notification-badge" class="notification-badge"></span>
       </a>
       <a th:href="@{/profile}" class="nav-icon" title="Profile">
         <img th:src="@{/vector-logos/usernameSignIn.svg}" alt="Profile" width="26" height="36">
@@ -48,6 +49,26 @@
       <h3 class="search-modal-title">Notifications</h3>
     </div>
     <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
+    <div class="notif-toolbar">
+      <select id="notif-type-filter">
+        <option value="ALL">All types</option>
+        <option value="LIKE">Likes</option>
+        <option value="COMMENT">Comments</option>
+        <option value="FOLLOW">Follows</option>
+        <option value="USER_JOINED_COMMUNITY">Community</option>
+      </select>
+      <select id="notif-date-filter">
+        <option value="ALL">All time</option>
+        <option value="TODAY">Today</option>
+        <option value="WEEK">This week</option>
+        <option value="MONTH">This month</option>
+      </select>
+      <select id="notif-mark-all">
+        <option value="">Mark all as...</option>
+        <option value="READ">Read</option>
+        <option value="UNREAD">Unread</option>
+      </select>
+    </div>
     <ul id="notification-list" class="search-results-list">
       <li style="padding:12px 8px;color:#999;font-size:0.9em">No notifications yet.</li>
     </ul>
