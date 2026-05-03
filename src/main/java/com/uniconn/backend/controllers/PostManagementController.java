@@ -63,9 +63,10 @@ public class PostManagementController {
         try {
             List<PostSummaryDTO> feed = feedAlgorithmService.getFeed(userId, page, size);
             return ResponseEntity.ok(feed);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.badRequest().build();
+            }
     }
 
     // ---------------------------------------------------------------

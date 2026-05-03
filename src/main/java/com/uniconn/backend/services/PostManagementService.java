@@ -260,7 +260,8 @@ public class PostManagementService extends BaseService {
             tagNames,
             liked,
             canDelete,
-            post.getGifUrl()
+            post.getGifUrl(),
+            false
         );
     }
 }

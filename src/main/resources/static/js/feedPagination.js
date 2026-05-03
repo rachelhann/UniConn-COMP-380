@@ -1,7 +1,4 @@
 // feedPagination.js — Owned by Abigail Artiga
-// Infinite scroll for the main feed — loads page 1, 2, 3... on scroll
-// Page 0 is loaded by userFeedLoad.js
-
 (function () {
   const token = localStorage.getItem('token');
   const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
@@ -11,6 +8,9 @@
   let isLoading = false;
   let hasMore = true;
 
+  // ---------------------------------------------------------------
+  // LOAD NEXT PAGE
+  // ---------------------------------------------------------------
   function loadNextPage() {
     if (isLoading || !hasMore) return;
     const userId = localStorage.getItem('currentUserId');
@@ -24,6 +24,7 @@
       .then(posts => {
         if (!posts || posts.length === 0) {
           hasMore = false;
+          showEndOfFeed();
           console.log('[feedPagination] No more posts.');
           return;
         }
@@ -37,6 +38,7 @@
 
         if (posts.length < pageSize) {
           hasMore = false;
+          showEndOfFeed();
           console.log('[feedPagination] Last page reached.');
         }
       })
@@ -47,27 +49,64 @@
       .finally(() => { isLoading = false; });
   }
 
-  // Wait for page 0 to finish rendering before setting up observer
-  window.addEventListener('feedPage0Loaded', function () {
-      const container = document.getElementById('feed-posts-list');
-      if (!container) return;
+  // ---------------------------------------------------------------
+  // END OF FEED INDICATOR
+  // Appended OUTSIDE the scrollable container so mask-image
+  // CSS fade doesn't hide it
+  // ---------------------------------------------------------------
+function showEndOfFeed() {
+    const existing = document.getElementById('feed-end-msg');
+    if (existing) return;
+    const msg = document.createElement('div');
+    msg.id = 'feed-end-msg';
+    msg.style.cssText = [
+      'text-align:center',
+      'padding:12px 0',
+      'color:#999',
+      'font-size:0.85rem',
+      'letter-spacing:0.01em',
+      'width:100%',
+      'mask-image:none',
+      '-webkit-mask-image:none'
+    ].join(';');
+    msg.textContent = "You're all caught up ✓";
+    const container = document.getElementById('feed-posts-list');
+    if (container) container.appendChild(msg);
+  }
 
-      const sentinel = document.createElement('div');
-      sentinel.id = 'feed-sentinel';
-      sentinel.style.height = '20px';
-      sentinel.style.background = 'transparent';
-      container.insertAdjacentElement('afterend', sentinel);
+  // ---------------------------------------------------------------
+  // SCROLL LISTENER
+  // Uses scroll event on the container directly — more reliable
+  // than IntersectionObserver for fixed-height overflow-y:auto divs.
+  // Triggers loadNextPage when user is within 150px of the bottom.
+  // ---------------------------------------------------------------
+  function setupScrollListener() {
+    const container = document.getElementById('feed-posts-list');
+    if (!container) return;
 
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            console.log('[feedPagination] Sentinel visible — loading next page');
-            loadNextPage();
-          }
-        });
-      }, { rootMargin: '400px' });
+    container.addEventListener('scroll', function () {
+      if (!hasMore || isLoading) return;
 
-      observer.observe(sentinel);
-      console.log('[feedPagination] Infinite scroll ready.');
+      const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+      console.log(`[feedPagination] Distance from bottom: ${Math.round(distanceFromBottom)}px`);
+
+      if (distanceFromBottom < 150) {
+        loadNextPage();
+      }
     });
+
+    console.log('[feedPagination] Infinite scroll ready.');
+  }
+
+  // ---------------------------------------------------------------
+  // WAIT FOR PAGE 0 TO FINISH PAINTING THEN SET UP SCROLL LISTENER
+  // ---------------------------------------------------------------
+  window.addEventListener('feedPage0Loaded', function () {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setupScrollListener();
+      });
+    });
+  });
+
 })();

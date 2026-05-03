@@ -44,7 +44,9 @@
         .then(r => r.ok ? r.json() : [])
         .then(posts => {
             renderPostList(posts, 'feed-posts-list');
-            window.dispatchEvent(new CustomEvent('feedPage0Loaded'));
+            requestAnimationFrame(() => {
+              window.dispatchEvent(new CustomEvent('feedPage0Loaded'));
+            });
           })
         .catch(() => renderPostList([], 'feed-posts-list'));
     })
