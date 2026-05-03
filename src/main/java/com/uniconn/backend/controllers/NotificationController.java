@@ -28,4 +28,22 @@ public class NotificationController {
     public ResponseEntity<NotificationResponseDTO> markAsRead(@PathVariable Integer id) {
         return ResponseEntity.ok(notificationService.markAsRead(id));
     }
+
+    // GET /api/notifications/unread-count
+    @GetMapping("/unread-count")
+    public ResponseEntity<Long> getUnreadCount() {
+        return ResponseEntity.ok(notificationService.getUnreadCount());
+    }
+
+    // PATCH /api/notifications/read-all
+    @PatchMapping("/read-all")
+    public ResponseEntity<Integer> markAllAsRead() {
+        return ResponseEntity.ok(notificationService.markAllAsRead());
+    }
+
+    // PATCH /api/notifications/unread-all
+    @PatchMapping("/unread-all")
+    public ResponseEntity<Integer> markAllAsUnread() {
+        return ResponseEntity.ok(notificationService.markAllAsUnread());
+    }
 }
