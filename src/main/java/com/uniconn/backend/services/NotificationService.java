@@ -100,9 +100,9 @@ public class NotificationService extends BaseService {
     private String buildMessage(User sender, NotificationType type) {
         String name = (sender == null) ? "Someone" : sender.getUsername();
         return switch (type) {
-            case POST_LIKED -> name + " liked your post";
-            case POST_COMMENTED -> name + " commented on your post";
-            case NEW_FOLLOWER -> name + " started following you";
+            case LIKE -> name + " liked your post";
+            case COMMENT -> name + " commented on your post";
+            case FOLLOW -> name + " started following you";
             case USER_JOINED_COMMUNITY -> name + " joined your community";
         };
     }
@@ -113,8 +113,8 @@ public class NotificationService extends BaseService {
         dto.setType(n.getType().name());
         dto.setMessage(n.getMessage());
         if (n.getSender() != null) {
-            dto.setSenderUsername(n.getSender().getUsername());
-            dto.setSenderProfilePicture(n.getSender().getProfilePicture());
+            dto.setActorUsername(n.getSender().getUsername());
+            dto.setActorProfilePicture(n.getSender().getProfilePicture());
         }
         dto.setPostId(n.getPostId());
         dto.setCommunityId(n.getCommunityId());

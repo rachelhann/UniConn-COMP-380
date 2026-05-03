@@ -14,15 +14,15 @@
 html {
   align-items: center;
   overflow-y: scroll;
-  scrollbar-color: #242424;
+  scrollbar-color: #c0cdd6 #f0f2f5;
   scrollbar-width: thin; 
 }
 
 .main {
-  font-size: 30px;
+  font-size: 22px;
   font-weight: 900;
-  align-self: flex-start;
-  margin-top: 60px;
+  align-self: center;
+  margin-top: 0;
 }
 
 body {
@@ -53,29 +53,42 @@ body {
 .login-container {
   position: relative;
   width: 700px;
-  height: 550px;
+  min-height: 550px;
   background-color: white;
   border-radius: 10px;
   border: 2px solid black;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-top: 30px;
 }
 
 .header {
-    height:30px;
-    width: 699px;
-    overflow:hidden;
+    height: 30px;
+    width: 100%;
+    overflow: hidden;
     position: absolute;
-    margin-top: -115px;
-    margin-left: -194px;
+    top: 0;
+    left: 0;
     background: #91c5e8;
-    border: 2px solid black;
-    border-left: 1px solid black;
-    border-right: 1px solid black;
+    border: none;
+    border-bottom: 2px solid black;
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
+    box-sizing: border-box;
     z-index: 999;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #000;
 }
 h3 {
   margin: -1px auto 0 10px;
@@ -102,13 +115,15 @@ h3 {
 .input-box input {
   width: 100%;
   padding-left: 32px;
+  padding-right: 36px;
   height: 30px;
   background: transparent;
   font-size: 1em;
   border-radius: 10px;
 }
 .input-box input:focus + label,
-.input-box input:not(:placeholder-shown) + label {
+.input-box input:not(:placeholder-shown) + label,
+.input-box input:-webkit-autofill + label {
   opacity: 0;
   visibility: hidden;
 }
@@ -164,4 +179,4 @@ button:hover {
   text-align: center;
   margin: 25px 0 10px;
 }
-img[alt='UniConn Logo'] { width: 120px; height: auto; }
+.logo-icon { width: 48px !important; height: auto !important; margin: 0 !important; }

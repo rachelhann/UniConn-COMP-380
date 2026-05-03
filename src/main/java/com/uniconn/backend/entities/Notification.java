@@ -27,7 +27,7 @@ public class Notification {
 	private NotificationType type;
 
 	public enum NotificationType {
-		NEW_FOLLOWER, POST_LIKED, POST_COMMENTED, USER_JOINED_COMMUNITY
+		FOLLOW, LIKE, COMMENT, USER_JOINED_COMMUNITY
 	}
 
 	@Column(name = "post_id")

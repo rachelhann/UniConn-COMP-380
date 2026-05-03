@@ -23,6 +23,13 @@ public class Comment {
 
     @Column(length = 1000, nullable = false)
     private String contentText;
+    
+    @Column(name = "gif_url")
+    private String gifUrl;
+    
+    @Column(nullable = false)
+    @ColumnDefault("0")
+    private int likeCount = 0;
 
     @CreationTimestamp
     @Column(updatable = false)
@@ -77,6 +84,22 @@ public class Comment {
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
-	}    
+	}
 
+	public String getGifUrl() {
+		return gifUrl;
+	}
+
+	public void setGifUrl(String gifUrl) {
+		this.gifUrl = gifUrl;
+	}
+
+	public int getLikeCount() {
+		return likeCount;
+	}
+
+	public void setLikeCount(int likeCount) {
+		this.likeCount = likeCount;
+	}    
+	
 }

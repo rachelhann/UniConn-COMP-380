@@ -13,6 +13,7 @@
   <link rel="stylesheet" th:href="@{/css/communities.css}">
   <link rel="stylesheet" th:href="@{/css/followButton.css}">
   <link rel="stylesheet" th:href="@{/css/tagInput.css}">
+  <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
   <title>Communities - UniConn</title>
 </head>
 
@@ -27,18 +28,30 @@
       <a href="#" class="nav-icon" title="Search" id="search-toggle">
         <img th:src="@{/vector-logos/magnifyGlass.svg}" alt="Search" width="36" height="36">
       </a>
-
       <a href="#" class="nav-icon" title="Notifications" id="notification-toggle">
-        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="34" height="34">
+        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="30" height="36">
       </a>
-
       <a th:href="@{/profile}" class="nav-icon" title="Profile">
         <img th:src="@{/vector-logos/usernameSignIn.svg}" alt="Profile" width="26" height="36">
       </a>
+      <button id="dark-mode-toggle" class="dark-mode-btn" title="Toggle dark mode">🌙</button>
       <span class="signout-divider">|</span>
-      <a href="#" class="signout-link" onclick="['token','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
+      <a href="#" class="signout-link" onclick="['token','currentUsername','currentUserId','myProfilePosts','myCommunities','profilePicture'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
   </nav><hr class="navbar-divider">
+
+  <!-- NOTIFICATION MODAL -->
+  <div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
+    <div class="search-modal">
+      <div class="header-right">
+        <h3 class="search-modal-title">Notifications</h3>
+      </div>
+      <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
+      <ul id="notification-list" class="search-results-list">
+        <li style="padding:12px 8px;color:#999;font-size:0.9em">No notifications yet.</li>
+      </ul>
+    </div>
+  </div>
 
   <!-- SEARCH MODAL -->
   <div id="search-modal" class="search-modal-overlay" aria-hidden="true">
@@ -52,18 +65,6 @@
     </div>
   </div>
 
-  <!-- NOTIFICATIONS MODAL -->
-  <div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
-    <div class="search-modal">
-      <div class="header-right">
-        <h3 class="search-modal-title">Notifications</h3>
-      </div>
-      <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
-      <ul id="notification-list" class="notification-list">
-        <li class="notification-empty">No notifications yet.</li>
-      </ul>
-    </div>
-  </div>
 
   <!-- EDIT COMMUNITY MODAL -->
   <div id="edit-community-modal" class="search-modal-overlay" aria-hidden="true">
@@ -167,7 +168,12 @@
           <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
         </div>
       </div>
-
+	
+	  <div class="create-post-gif-wrap">
+	     <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	   <div id="post-gif-preview"></div>
+	 </div>
+			
       <div class="create-post-action">
         <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
       </div>
@@ -230,13 +236,45 @@
 
   </div>
 
+<!-- POST VIEW MODAL -->
+<div id="post-view-overlay" class="post-view-overlay" aria-hidden="true">
+  <div class="post-view-modal">
+    <div class="post-view-header"><h3>Post</h3></div>
+    <button class="post-view-close" id="post-view-close" aria-label="Close">&times;</button>
+    <div class="post-view-body">
+      <div class="post-view-meta" id="post-view-meta"></div>
+      <p class="post-view-title" id="post-view-title" style="display:none"></p>
+      <p class="post-view-content" id="post-view-content"></p>
+      <div class="post-view-tags" id="post-view-tags"></div>
+      <div class="post-view-footer" id="post-view-footer"></div>
+      <hr class="comments-divider">
+	  <div class="comment-input-wrap">
+		<textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
+		        <button type="button" class="gif-trigger-btn" id="comment-gif-btn">GIF</button>
+		        <div id="comment-gif-preview"></div>
+		        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
+	    <div id="comment-gif-preview"></div>
+	    <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
+	  </div>
+      <div class="comments-list" id="post-view-comments-list">
+        <p class="comment-empty">Loading comments...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:src="@{/js/darkMode.js}" defer></script>
+<script th:src="@{/js/navbarPfp.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
+<script th:src="@{/js/emojiPicker.js}" defer></script>
+<script th:src="@{/js/tagPostsModal.js}" defer></script>
+<script th:src="@{/js/postCardRenderer.js}" defer></script>
 <script th:src="@{/js/communitiesLoad.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
+<script th:src="@{/js/notificationFunction.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>
 <script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
-<script th:src="@{/js/searchFunction.js}" defer></script>
-<script th:src="@{/js/notificationFunction.js}" defer></script>
-</body>
+<script th:src="@{/js/searchFunction.js}" defer></script></body>
 
 </html>

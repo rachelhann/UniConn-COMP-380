@@ -6,8 +6,8 @@ public class NotificationResponseDTO {
 	private Integer id;
 	private String type;
 	private String message;
-	private String senderUsername;
-	private String senderProfilePicture;
+	private String actorUsername;
+	private String actorProfilePicture;
 	private Integer postId;
 	private Integer communityId;
 	private boolean isRead;
@@ -35,18 +35,18 @@ public class NotificationResponseDTO {
 		this.message = message;
 	}
 
-	public String getSenderUsername() {
-		return senderUsername;
+	public String getActorUsername() {
+		return actorUsername;
 	}
-	public void setSenderUsername(String senderUsername) {
-		this.senderUsername = senderUsername;
+	public void setActorUsername(String actorUsername) {
+		this.actorUsername = actorUsername;
 	}
 
-	public String getSenderProfilePicture() {
-		return senderProfilePicture;
+	public String getActorProfilePicture() {
+		return actorProfilePicture;
 	}
-	public void setSenderProfilePicture(String senderProfilePicture) {
-		this.senderProfilePicture = senderProfilePicture;
+	public void setActorProfilePicture(String actorProfilePicture) {
+		this.actorProfilePicture = actorProfilePicture;
 	}
 
 	public Integer getPostId() {

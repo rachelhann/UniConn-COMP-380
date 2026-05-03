@@ -44,6 +44,7 @@ public class PostManagementService extends BaseService {
         Post post = new Post();
         post.setAuthor(currentUser);
         post.setContentText(dto.getContentText());
+        post.setGifUrl(dto.getGifUrl());
 
         if (dto.getCommunityId() != null) {
             Community community = communityRepository.findById(dto.getCommunityId())
@@ -103,6 +104,18 @@ public class PostManagementService extends BaseService {
 
         post.setDeleted(true);
         postRepository.save(post);
+    }
+    
+    // post for postcard
+    @Transactional(readOnly = true)
+    public PostSummaryDTO getPost(Integer postId) {
+        User currentUser = getAuthenticatedUser();
+        Post post = postRepository.findByIdWithTags(postId)
+        	    .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + postId));
+        if (post.isDeleted()) {
+            throw new ResourceNotFoundException("Post not found: " + postId);
+        }
+        return mapToSummaryDTO(post, currentUser.getUserId());
     }
 
     // ---------------------------------------------------------------
@@ -195,6 +208,18 @@ public class PostManagementService extends BaseService {
                 .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
                 .collect(Collectors.toList());
     }
+    
+    // ---------------------------------------------------------------
+    // POSTS USER LIKED
+    // ---------------------------------------------------------------
+    @Transactional(readOnly = true)
+    public List<PostSummaryDTO> getPostsLikedByUser(Integer userId) {
+        User currentUser = getAuthenticatedUser();
+        return postRepository.findPostsLikedByUser(userId)
+                .stream()
+                .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
+                .collect(Collectors.toList());
+    }
 
     // ---------------------------------------------------------------
     // HELPERS
@@ -234,7 +259,8 @@ public class PostManagementService extends BaseService {
             post.getCreatedAt(),
             tagNames,
             liked,
-            canDelete
+            canDelete,
+            post.getGifUrl()
         );
     }
 }

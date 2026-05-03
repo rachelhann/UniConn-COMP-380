@@ -13,6 +13,7 @@
   <link rel="stylesheet" th:href="@{/css/userFeed.css}">
   <link rel="stylesheet" th:href="@{/css/followButton.css}">
   <link rel="stylesheet" th:href="@{/css/tagInput.css}">
+  <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
   <title>My Feed</title>
 </head>
 
@@ -28,18 +29,30 @@
       <a href="#" class="nav-icon" title="Search" id="search-toggle">
         <img th:src="@{/vector-logos/magnifyGlass.svg}" alt="Search" width="36" height="36">
       </a>
-
       <a href="#" class="nav-icon" title="Notifications" id="notification-toggle">
-        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="34" height="34">
+        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="30" height="36">
       </a>
-
       <a th:href="@{/profile}" class="nav-icon" title="Profile">
         <img th:src="@{/vector-logos/usernameSignIn.svg}" alt="Profile" width="26" height="36">
       </a>
+      <button id="dark-mode-toggle" class="dark-mode-btn" title="Toggle dark mode">🌙</button>
       <span class="signout-divider">|</span>
-      <a href="#" class="signout-link" onclick="['token','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
+      <a href="#" class="signout-link" onclick="['token','currentUsername','currentUserId','myProfilePosts','myCommunities','profilePicture'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
   </nav><hr class="navbar-divider">
+
+<!-- NOTIFICATION MODAL -->
+<div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
+  <div class="search-modal">
+    <div class="header-right">
+      <h3 class="search-modal-title">Notifications</h3>
+    </div>
+    <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
+    <ul id="notification-list" class="search-results-list">
+      <li style="padding:12px 8px;color:#999;font-size:0.9em">No notifications yet.</li>
+    </ul>
+  </div>
+</div>
 
 <!-- search modal -->
 <div id="search-modal" class="search-modal-overlay" aria-hidden="true">
@@ -53,18 +66,6 @@
     </div> <!-- end of search modal class-->
   </div> <!-- end of search modal overlay id-->
 
-<!-- NOTIFICATIONS MODAL -->
-<div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
-  <div class="search-modal">
-    <div class="header-right">
-      <h3 class="search-modal-title">Notifications</h3>
-    </div>
-    <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
-    <ul id="notification-list" class="notification-list">
-      <li class="notification-empty">No notifications yet.</li>
-    </ul>
-  </div>
-</div>
 
 <!--CREATE COMMUNITY MODAL-->
 <div id="create-community-modal" class="search-modal-overlay" aria-hidden="true">
@@ -152,6 +153,11 @@
       </div>
     </div>
 
+	  <div class="create-post-gif-wrap">
+	     <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	   <div id="post-gif-preview"></div>
+	 </div>
+			
     <!--post button-->
     <div class="create-post-action">
       <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
@@ -162,10 +168,10 @@
   <div class="wrap">
 
 <!-- left container: main user feed-->
-	<div class="left-container">
-  		<div class="header-left"><h3>For You</h3></div>
-  		<div class="feed-posts-list" id="feed-posts-list"></div>
-	</div>
+    <div class="left-container">
+        <div class="header-left"><h3>For You</h3></div>
+        <div class="feed-posts-list" id="feed-posts-list"></div>
+    </div>
 
   <div class="right-wrap">
     <div class="right-container">
@@ -229,8 +235,10 @@
 
       <!-- comment input -->
       <div class="comment-input-wrap">
-        <textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
-        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
+		<textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
+		        <button type="button" class="gif-trigger-btn" id="comment-gif-btn">GIF</button>
+		        <div id="comment-gif-preview"></div>
+		        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
       </div>
 
       <!-- comments list -->
@@ -243,11 +251,17 @@
 
 
 <script>document.addEventListener('DOMContentLoaded', () => document.getElementById('for-you-btn')?.classList.add('active'));</script>
-<script th:src="@{/js/userFeedLoad.js}" defer></script>
+<script th:src="@{/js/darkMode.js}" defer></script>
+<script th:src="@{/js/navbarPfp.js}" defer></script>
 <script th:src="@{/js/modalManager.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
+<script th:src="@{/js/emojiPicker.js}" defer></script>
+<script th:src="@{/js/tagPostsModal.js}" defer></script>
+<script th:src="@{/js/postCardRenderer.js}" defer></script>
+<script th:src="@{/js/tagInput.js}" defer></script>
+<script th:src="@{/js/userFeedLoad.js}" defer></script>
 <script th:src="@{/js/notificationFunction.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>
-<script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
 <script th:src="@{/js/searchFunction.js}" defer></script>
 </body>

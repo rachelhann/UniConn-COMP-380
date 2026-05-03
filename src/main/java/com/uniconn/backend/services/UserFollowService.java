@@ -65,7 +65,7 @@ public class UserFollowService extends BaseService {
 
 		// Notify the user that someone started following them
 		notificationService.createNotification(
-			following, currentUser, NotificationType.NEW_FOLLOWER, null, null);
+			following, currentUser, NotificationType.FOLLOW, null, null);
 
 		return "Followed user successfully!";
 	}

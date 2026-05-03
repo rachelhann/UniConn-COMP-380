@@ -37,6 +37,13 @@ public class PostManagementController {
         postManagementService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
+    
+    // GET /api/posts/{postId}
+    // Fetch a single post by ID (used to refresh modal state)
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostSummaryDTO> getPost(@PathVariable Integer postId) {
+    	return ResponseEntity.ok(postManagementService.getPost(postId));
+    }
 
     // ---------------------------------------------------------------
     // GET /api/posts/feed/{userId}
@@ -102,6 +109,13 @@ public class PostManagementController {
     @GetMapping("/user/{userId}/community")
     public ResponseEntity<List<PostSummaryDTO>> getCommunityPostsByUser(@PathVariable Integer userId) {
         return ResponseEntity.ok(postManagementService.getCommunityPostsByUser(userId));
+    }
+    
+    // GET /api/posts/liked-by/{userId}
+    // Posts user liked
+    @GetMapping("/liked-by/{userId}")
+    public ResponseEntity<List<PostSummaryDTO>> getPostsLikedByUser(@PathVariable Integer userId) {
+        return ResponseEntity.ok(postManagementService.getPostsLikedByUser(userId));
     }
 
     // ---------------------------------------------------------------

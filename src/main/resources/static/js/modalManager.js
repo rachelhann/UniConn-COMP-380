@@ -10,7 +10,7 @@ function initModal({ modalId, toggleId, closeId, onOpen, onClose }) {
   const toggle   = document.getElementById(toggleId);
   const closeBtn = document.getElementById(closeId);
 
-  if (!modal || !toggle || !closeBtn) return; // ← add this
+  if (!modal || !toggle || !closeBtn) return;
 
   function openModal() {
     modal.classList.add('active');

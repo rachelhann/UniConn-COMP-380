@@ -29,6 +29,9 @@ public class Post {
 	@Column(length = 2000, nullable = false)
 	private String contentText;
 	
+	@Column(name = "gif_url")
+	private String gifUrl;
+	
 	@Column(nullable = false)
 	private int likeCount = 0;
 	
@@ -119,4 +122,13 @@ public class Post {
 	public void setTags(List<PostTag> tags) {
 	    this.tags = tags;
 	}
+	
+	public String getGifUrl() {
+		return gifUrl;
+	}
+
+	public void setGifUrl(String gifUrl) {
+		this.gifUrl = gifUrl;
+	}
+	
 }

@@ -1,3 +1,6 @@
+// handles the create post modal: with destination option (profile vs community),
+// includes community dropdown, optional tag input, and form submission.
+// loaded on all pages that include the create-post-modal in sidenav
 const titleInput           = document.getElementById('create-post-title-input');
 const bodyInput            = document.getElementById('create-post-body-input');
 const destinationBtn       = document.getElementById('create-post-destination-btn');
@@ -13,6 +16,8 @@ let postTagsInitialized = false;
 let postDestination    = null;
 // tracks selected communitys ID (null if posting to profile)
 let selectedCommunityId = null;
+// giphy
+let selectedGifUrl     = null;
 
 // fetches user's communities and populates community dropdown
 async function loadCommunities() {
@@ -74,10 +79,13 @@ initModal({
       initTagBubbles('create-post-tags-container', 'create-post-tags-input');
       postTagsInitialized = true;
     }
-    titleInput.value = '';
-    bodyInput.value  = '';
-    postDestination  = null;
-    selectedCommunityId = null;
+	titleInput.value = '';
+	bodyInput.value  = '';
+	postDestination  = null;
+	selectedCommunityId = null;
+	selectedGifUrl   = null;
+	const postGifPreview = document.getElementById('post-gif-preview');
+	if (postGifPreview) postGifPreview.innerHTML = '';
     destinationBtn.innerHTML = 'Post in... <span class="create-post-arrow">&#9662;</span>';
     communityBtn.innerHTML = 'Select Community <span class="create-post-arrow">&#9662;</span>';
     destinationList.classList.remove('open');
@@ -102,7 +110,7 @@ destinationBtn.addEventListener('click', () => {
   communityList.classList.remove('open'); // close community list if open
 });
 
-// post in user profile — title and tags are hidden since profile posts don't need them
+// post in user profile — title hidden, tags shown
 document.getElementById('destination-profile').addEventListener('click', () => {
   postDestination     = 'profile';
   selectedCommunityId = null;
@@ -110,7 +118,7 @@ document.getElementById('destination-profile').addEventListener('click', () => {
   destinationBtn.classList.remove('input-error');
   destinationList.classList.remove('open');
   communitySection.style.display = 'none';
-  if (postTagSection) { postTagSection.style.display = 'none'; clearTagBubbles('create-post-tags-container'); }
+  if (postTagSection) { postTagSection.style.display = ''; clearTagBubbles('create-post-tags-container'); }
   titleInput.value = '';
   titleInput.classList.remove('input-error');
   titleInput.closest('.create-post-title-wrap').style.display = 'none';
@@ -152,7 +160,9 @@ document.getElementById('create-post-submit').addEventListener('click', async ()
   const body = {
     contentText: bodyInput.value.trim(),
     title:       postDestination === 'community' ? titleInput.value.trim() : null,
-    communityId: postDestination === 'community' ? selectedCommunityId   : null
+    communityId: postDestination === 'community' ? selectedCommunityId   : null,
+    tags:        getTagsFrom('create-post-tags-container'),
+    gifUrl:      selectedGifUrl || null
   };
 
   try {
@@ -183,3 +193,27 @@ document.getElementById('create-post-submit').addEventListener('click', async ()
 
 titleInput.addEventListener('input', () => titleInput.classList.remove('input-error'));
 bodyInput.addEventListener('input', () => bodyInput.classList.remove('input-error'));
+
+// init GIF picker for create post modal
+initGifPicker({
+  triggerBtnId:       'post-gif-btn',
+  previewContainerId: 'post-gif-preview',
+  onSelect(url) {
+    selectedGifUrl = url;
+  }
+});
+
+// Stack GIF button below emoji trigger in a side column.
+// Must run inside DOMContentLoaded so emojiPicker.js has already attached.
+document.addEventListener('DOMContentLoaded', () => {
+  const emojiWrap    = document.querySelector('#create-post-modal .uc-emoji-wrap');
+  const emojiTrigger = emojiWrap?.querySelector('.uc-emoji-trigger');
+  const gifBtn       = document.getElementById('post-gif-btn');
+  if (emojiWrap && emojiTrigger && gifBtn) {
+    const col = document.createElement('div');
+    col.className = 'post-btn-column';
+    emojiWrap.insertBefore(col, emojiTrigger);
+    col.appendChild(emojiTrigger);
+    col.appendChild(gifBtn);
+  }
+});

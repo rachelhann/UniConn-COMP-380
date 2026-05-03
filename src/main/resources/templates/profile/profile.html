@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+<!-- My Profile -->
+ <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -13,7 +14,8 @@
   <link rel="stylesheet" th:href="@{/css/profile.css}">
   <link rel="stylesheet" th:href="@{/css/followButton.css}">
   <link rel="stylesheet" th:href="@{/css/tagInput.css}">
-  <title>My Profile - UniConn</title>
+  <link rel="stylesheet" th:href="@{/css/dark-mode.css}">
+  <title>Profile - UniConn</title>
 </head>
 
 <body>
@@ -27,18 +29,30 @@
       <a href="#" class="nav-icon" title="Search" id="search-toggle">
         <img th:src="@{/vector-logos/magnifyGlass.svg}" alt="Search" width="36" height="36">
       </a>
-
       <a href="#" class="nav-icon" title="Notifications" id="notification-toggle">
-        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="34" height="34">
+        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="30" height="36">
       </a>
-
       <a th:href="@{/profile}" class="nav-icon" title="Profile">
         <img th:src="@{/vector-logos/usernameSignIn.svg}" alt="Profile" width="26" height="36">
       </a>
+      <button id="dark-mode-toggle" class="dark-mode-btn" title="Toggle dark mode">🌙</button>
       <span class="signout-divider">|</span>
-      <a href="#" class="signout-link" onclick="['token','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
+      <a href="#" class="signout-link" onclick="['token','currentUsername','currentUserId','myProfilePosts','myCommunities','profilePicture'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
   </nav><hr class="navbar-divider">
+
+<!-- NOTIFICATION MODAL -->
+  <div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
+    <div class="search-modal">
+      <div class="header-right">
+        <h3 class="search-modal-title">Notifications</h3>
+      </div>
+      <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
+      <ul id="notification-list" class="search-results-list">
+        <li style="padding:12px 8px;color:#999;font-size:0.9em">No notifications yet.</li>
+      </ul>
+    </div>
+  </div>
 
 <!-- SEARCH MODAL -->
   <div id="search-modal" class="search-modal-overlay" aria-hidden="true">
@@ -52,18 +66,6 @@
     </div>
   </div>
 
-<!-- NOTIFICATIONS MODAL -->
-<div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
-  <div class="search-modal">
-    <div class="header-right">
-      <h3 class="search-modal-title">Notifications</h3>
-    </div>
-    <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
-    <ul id="notification-list" class="notification-list">
-      <li class="notification-empty">No notifications yet.</li>
-    </ul>
-  </div>
-</div>
 
 <!--CREATE COMMUNITY MODAL-->
 <div id="create-community-modal" class="search-modal-overlay" aria-hidden="true">
@@ -135,6 +137,12 @@
         <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
       </div>
     </div>
+
+	  <div class="create-post-gif-wrap">
+	     <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	   <div id="post-gif-preview"></div>
+	 </div>
+			
     <div class="create-post-action">
       <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
     </div>
@@ -148,6 +156,7 @@
       <h3 class="search-modal-title">Communities</h3>
     </div>
     <button class="search-modal-close" id="communities-modal-close" aria-label="Close">&times;</button>
+    <input type="text" id="communities-modal-search" class="search-modal-input" placeholder="Search communities...">
     <ul id="communities-modal-list" class="follow-list"></ul>
   </div>
 </div>
@@ -159,6 +168,7 @@
       <h3 class="search-modal-title" id="follow-list-title">Followers</h3>
     </div>
     <button class="search-modal-close" id="follow-list-close" aria-label="Close">&times;</button>
+    <input type="text" id="follow-search" class="search-modal-input" placeholder="Search by username...">
     <ul id="follow-list" class="follow-list"></ul>
   </div>
 </div>
@@ -178,8 +188,10 @@
       <div class="post-view-footer" id="post-view-footer"></div>
       <hr class="comments-divider">
       <div class="comment-input-wrap">
-        <textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
-        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
+		<textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
+		        <button type="button" class="gif-trigger-btn" id="comment-gif-btn">GIF</button>
+		        <div id="comment-gif-preview"></div>
+		        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
       </div>
       <div class="comments-list" id="post-view-comments-list">
         <p class="comment-empty">Loading comments...</p>
@@ -226,6 +238,7 @@
 		  <div class="profile-avatar-wrap" id="profile-avatar-wrap"> <!-- or profile-avatar-static for userProfile -->
 		    <img id="profile-picture-img" src="/vector-logos/usernameSignIn.svg" alt="User Avatar" class="avatar-img">
 		    <div class="profile-avatar-overlay">Choose Photo</div> <!-- only on profile.html -->
+		    <input type="file" id="profile-picture-input" accept="image/jpeg,image/png,image/webp" style="display:none">
 		  </div>
 		  <div class="profile-right">
 		    <span class="profile-username" id="profile-username">u/</span>
@@ -257,6 +270,7 @@
 
         <hr id="left-container-break">
 
+        <div id="profile-posts-controls"></div>
         <div id="profile-posts-container"></div>
 
       </div>
@@ -297,16 +311,19 @@
 
   </div>
 
-  <script th:src="@{/js/modalManager.js}" defer></script>
-  <script th:src="@{/js/postCardRenderer.js}" defer></script>
-  <script th:src="@{/js/profileLoad.js}" defer></script>
-  <script th:src="@{/js/profilePostsLoad.js}" defer></script>
-  <script th:src="@{/js/notificationFunction.js}" defer></script>
-  <script th:src="@{/js/searchFunction.js}" defer></script>
-  <script th:src="@{/js/editProfileFunction.js}" defer></script>
-  <script th:src="@{/js/tagInput.js}" defer></script>
-  <script th:src="@{/js/communityFunction.js}" defer></script>
-  <script th:src="@{/js/createPostFunction.js}" defer></script>
+<script th:src="@{/js/darkMode.js}" defer></script>
+<script th:src="@{/js/navbarPfp.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
+<script th:src="@{/js/emojiPicker.js}" defer></script>
+<script th:src="@{/js/tagPostsModal.js}" defer></script>
+<script th:src="@{/js/profileLoad.js}" defer></script>
+<script th:src="@{/js/postCardRenderer.js}" defer></script>
+<script th:src="@{/js/profilePostsLoad.js}" defer></script>
+<script th:src="@{/js/modalManager.js}" defer></script><script th:src="@{/js/notificationFunction.js}" defer></script><script th:src="@{/js/searchFunction.js}" defer></script>
+<script th:src="@{/js/editProfileFunction.js}" defer></script>
+<script th:src="@{/js/tagInput.js}" defer></script>
+<script th:src="@{/js/communityFunction.js}" defer></script>
+<script th:src="@{/js/createPostFunction.js}" defer></script>
 </body>
 
 </html>

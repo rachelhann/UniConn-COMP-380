@@ -25,14 +25,11 @@
       <a href="#" class="nav-icon" title="Search" id="search-toggle">
         <img th:src="@{/vector-logos/magnifyGlass.svg}" alt="Search" width="36" height="36">
       </a>
-      <a href="#" class="nav-icon" title="Notifications" id="notification-toggle">
-        <img th:src="@{/vector-logos/notifLogo.svg}" alt="Notifications" width="34" height="34">
-      </a>
       <a th:href="@{/profile}" class="nav-icon" title="Profile">
         <img th:src="@{/vector-logos/usernameSignIn.svg}" alt="Profile" width="26" height="36">
       </a>
       <span class="signout-divider">|</span>
-      <a href="#" class="signout-link" onclick="['token','currentUsername','myProfilePosts','myCommunities'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
+      <a href="#" class="signout-link" onclick="['token','currentUsername','currentUserId','myProfilePosts','myCommunities','profilePicture'].forEach(k=>localStorage.removeItem(k)); window.location.href='/login'; return false;">Sign Out</a>
     </div>
   </nav><hr class="navbar-divider">
 
@@ -48,18 +45,6 @@
     </div>
   </div>
 
-<!-- NOTIFICATIONS MODAL -->
-<div id="notification-modal" class="search-modal-overlay" aria-hidden="true">
-  <div class="search-modal">
-    <div class="header-right">
-      <h3 class="search-modal-title">Notifications</h3>
-    </div>
-    <button class="search-modal-close" id="notification-close" aria-label="Close">&times;</button>
-    <ul id="notification-list" class="notification-list">
-      <li class="notification-empty">No notifications yet.</li>
-    </ul>
-  </div>
-</div>
 
 
   <div class="wrap">
@@ -68,12 +53,21 @@
     <div class="main-container">
       <div class="header-left"><h3>Post</h3></div>
     </div> <!--end of main-container-->
-
+	
+	<!-- GIF picker trigger + preview -->
+	<div class="create-post-gif-wrap">
+	        <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	        <div id="post-gif-preview"></div>
+	      </div>
+	      <div class="create-post-action">
+	        <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
+	      </div>
   </div> <!--end of wrap-->
 
-<script th:src="@{/js/modalManager.js}" defer></script>
-<script th:src="@{/js/notificationFunction.js}" defer></script>
-<script th:src="@{/js/searchFunction.js}" defer></script>
+<script th:src="@{/js/modalManager.js}" defer></script><script th:src="@{/js/searchFunction.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
+<script th:src="@{/js/navbarPfp.js}" defer></script>
+<script th:src="@{/js/emojiPicker.js}" defer></script>
 </body>
 
 </html>

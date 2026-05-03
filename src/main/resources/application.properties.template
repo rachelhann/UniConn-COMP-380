@@ -1,7 +1,7 @@
 spring.application.name=UniConn
 
 # Database connection
-spring.datasource.url=jdbc:mysql://localhost:3306/uni_conn
+spring.datasource.url=jdbc:mysql://localhost:3306/uni_conn?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
 spring.datasource.username=root
 spring.datasource.password=YOUR_PASSWORD
 
@@ -16,3 +16,6 @@ cloudinary.api-secret=your_api_secret
 
 spring.servlet.multipart.max-file-size=2MB
 spring.servlet.multipart.max-request-size=2MB
+
+#### Giphy
+giphy.api.key=YOUR_NEW_KEY_HERE
