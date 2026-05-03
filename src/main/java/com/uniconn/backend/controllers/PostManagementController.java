@@ -56,12 +56,15 @@ public class PostManagementController {
     // User feed: posts from followed users + member communities
     // ---------------------------------------------------------------
     @GetMapping("/feed/{userId}")
-    public ResponseEntity<List<PostSummaryDTO>> getFeed(@PathVariable Integer userId) {
+    public ResponseEntity<List<PostSummaryDTO>> getFeed(
+            @PathVariable Integer userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
         try {
-            List<PostSummaryDTO> feed = feedAlgorithmService.getFeed(userId);
+            List<PostSummaryDTO> feed = feedAlgorithmService.getFeed(userId, page, size);
             return ResponseEntity.ok(feed);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 

@@ -26,7 +26,6 @@ public class FeedAlgorithmService extends BaseService {
     private final PostLikeRepository postLikeRepository;
     private final CommunityMemberRepository communityMemberRepository;
 
-    // Default page size — 20 posts per page
     private static final int DEFAULT_PAGE_SIZE = 20;
 
     public FeedAlgorithmService(PostRepository postRepository,
@@ -53,7 +52,6 @@ public class FeedAlgorithmService extends BaseService {
         return getPersonalizedFeed(userId, page, size);
     }
 
-    // Overload — keeps PostManagementController working without changes
     public List<PostSummaryDTO> getFeed(Integer userId) {
         return getFeed(userId, 0, DEFAULT_PAGE_SIZE);
     }
@@ -93,7 +91,6 @@ public class FeedAlgorithmService extends BaseService {
 
         if (feed.isEmpty()) feed = allPosts;
 
-        // Apply pagination
         int fromIndex = page * size;
         if (fromIndex >= feed.size()) return new ArrayList<>();
         int toIndex = Math.min(fromIndex + size, feed.size());
@@ -104,74 +101,53 @@ public class FeedAlgorithmService extends BaseService {
                 .collect(Collectors.toList());
     }
 
-    // Overload for backward compatibility
     public List<PostSummaryDTO> getDefaultFeed(Integer userId) {
         return getDefaultFeed(userId, 0, DEFAULT_PAGE_SIZE);
     }
 
     // ---------------------------------------------------------------
-    // ALGORITHM 2 — Personalized feed for active users
-    // 85% personalized + 15% discovery, scored, never empty
+    // ALGORITHM 2 — Personalized feed, newest first, deduplicated
     // ---------------------------------------------------------------
     public List<PostSummaryDTO> getPersonalizedFeed(Integer userId, int page, int size) {
         List<Post> personalizedPosts = new ArrayList<>(postRepository.findFeedPostsForUser(userId));
-        // Add the user's own posts so they appear in their own feed
+
+        // Add own posts
         List<Post> ownPosts = postRepository.findProfilePostsByUser(userId);
+        Set<Integer> seenIds = personalizedPosts.stream()
+                .map(Post::getPostId)
+                .collect(Collectors.toSet());
         for (Post p : ownPosts) {
-                if (personalizedPosts.stream().noneMatch(existing -> existing.getPostId().equals(p.getPostId()))) {
-                        personalizedPosts.add(p);
-                }
-        }
-
-        List<String> interestTags = getInterestTags(userId);
-
-        List<Post> tagPosts = new ArrayList<>();
-        if (!interestTags.isEmpty()) {
-            Set<Integer> seenIds = personalizedPosts.stream()
-                    .map(Post::getPostId)
-                    .collect(Collectors.toSet());
-
-            for (String tag : interestTags) {
-                postRepository.findPostsByExactTag(tag).stream()
-                        .filter(p -> !seenIds.contains(p.getPostId()))
-                        .forEach(p -> { tagPosts.add(p); seenIds.add(p.getPostId()); });
+            if (seenIds.add(p.getPostId())) {
+                personalizedPosts.add(p);
             }
         }
 
-        List<ScoredPost> scoredPersonal = personalizedPosts.stream()
-                .map(p -> new ScoredPost(p, scorePost(p, true)))
-                .sorted(Comparator.comparingDouble(ScoredPost::score).reversed())
-                .collect(Collectors.toList());
+        // Add tag discovery posts
+        List<String> interestTags = getInterestTags(userId);
+        if (!interestTags.isEmpty()) {
+            for (String tag : interestTags) {
+                postRepository.findPostsByExactTag(tag).stream()
+                        .filter(p -> seenIds.add(p.getPostId()))
+                        .forEach(personalizedPosts::add);
+            }
+        }
 
-        List<ScoredPost> scoredDiscovery = tagPosts.stream()
-                .map(p -> new ScoredPost(p, scorePost(p, false)))
-                .sorted(Comparator.comparingDouble(ScoredPost::score).reversed())
-                .collect(Collectors.toList());
+        // Sort strictly newest first
+        personalizedPosts.sort(Comparator.comparing(Post::getCreatedAt).reversed());
 
-        int total = scoredPersonal.size() + scoredDiscovery.size();
-        int personalTarget = (int) (total * 0.85);
-        int discoveryTarget = total - personalTarget;
+        if (personalizedPosts.isEmpty()) return getDefaultFeed(userId, page, size);
 
-        List<Post> finalFeed = new ArrayList<>();
-        scoredPersonal.stream().limit(personalTarget).forEach(sp -> finalFeed.add(sp.post()));
-        scoredDiscovery.stream().limit(discoveryTarget).forEach(sp -> finalFeed.add(sp.post()));
-
-        finalFeed.sort(Comparator.comparing(Post::getCreatedAt).reversed());
-
-        if (finalFeed.isEmpty()) return getDefaultFeed(userId, page, size);
-
-        // Apply pagination
+        // Paginate
         int fromIndex = page * size;
-        if (fromIndex >= finalFeed.size()) return new ArrayList<>();
-        int toIndex = Math.min(fromIndex + size, finalFeed.size());
+        if (fromIndex >= personalizedPosts.size()) return new ArrayList<>();
+        int toIndex = Math.min(fromIndex + size, personalizedPosts.size());
 
-        return finalFeed.subList(fromIndex, toIndex)
+        return personalizedPosts.subList(fromIndex, toIndex)
                 .stream()
                 .map(p -> toDTO(p, userId))
                 .collect(Collectors.toList());
     }
 
-    // Overload for backward compatibility
     public List<PostSummaryDTO> getPersonalizedFeed(Integer userId) {
         return getPersonalizedFeed(userId, 0, DEFAULT_PAGE_SIZE);
     }
@@ -232,20 +208,20 @@ public class FeedAlgorithmService extends BaseService {
                         CommunityMemberRole.ADMIN));
 
         return new PostSummaryDTO(
-                        post.getPostId(),
-                        post.getAuthor().getUsername(),
-                        post.getAuthor().getUserId(),
-                        post.getCommunity() != null ? post.getCommunity().getCommunityName() : null,
-                        post.getCommunity() != null ? post.getCommunity().getCommunityId() : null,
-                        post.getTitle(),
-                        post.getContentText(),
-                        post.getLikeCount(),
-                        post.getCommentCount(),
-                        post.getCreatedAt(),
-                        tagNames,
-                        liked,
-                        canDelete,
-                        post.getGifUrl()
-                );
+                post.getPostId(),
+                post.getAuthor().getUsername(),
+                post.getAuthor().getUserId(),
+                post.getCommunity() != null ? post.getCommunity().getCommunityName() : null,
+                post.getCommunity() != null ? post.getCommunity().getCommunityId() : null,
+                post.getTitle(),
+                post.getContentText(),
+                post.getLikeCount(),
+                post.getCommentCount(),
+                post.getCreatedAt(),
+                tagNames,
+                liked,
+                canDelete,
+                post.getGifUrl()
+        );
     }
 }
