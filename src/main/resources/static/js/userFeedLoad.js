@@ -42,7 +42,10 @@
       // ── feed posts ────────────────────────────────────────────────
       fetch(`/api/posts/feed/${currentUserId}?page=0&size=20`, { headers })
         .then(r => r.ok ? r.json() : [])
-        .then(posts => renderPostList(posts, 'feed-posts-list'))
+        .then(posts => {
+            renderPostList(posts, 'feed-posts-list');
+            window.dispatchEvent(new CustomEvent('feedPage0Loaded'));
+          })
         .catch(() => renderPostList([], 'feed-posts-list'));
     })
     .catch(() => renderPostList([], 'feed-posts-list'));

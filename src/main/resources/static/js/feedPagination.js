@@ -48,8 +48,7 @@
   }
 
   // Wait for page 0 to finish rendering before setting up observer
-  window.addEventListener('load', function () {
-    setTimeout(function () {
+  window.addEventListener('feedPage0Loaded', function () {
       const container = document.getElementById('feed-posts-list');
       if (!container) return;
 
@@ -70,6 +69,5 @@
 
       observer.observe(sentinel);
       console.log('[feedPagination] Infinite scroll ready.');
-    }, 1500); // wait 1.5s for page 0 to finish rendering
-  });
+    });
 })();
