@@ -7,15 +7,14 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.*;
 
-@Table(name = "post"
-    // Uncomment for production — speeds up feed queries (author, community, date, deleted filter)
-    // , indexes = {
-    //     @Index(name = "idx_post_author_id", columnList = "author_id"),
-    //     @Index(name = "idx_post_community_id", columnList = "community_id"),
-    //     @Index(name = "idx_post_created_at", columnList = "created_at"),
-    //     @Index(name = "idx_post_is_deleted", columnList = "isDeleted"),
-    //     @Index(name = "idx_post_community_deleted", columnList = "community_id, isDeleted")
-    // }
+@Table(name = "post",
+	indexes = {
+		@Index(name = "idx_post_author_id", columnList = "author_id"),
+		@Index(name = "idx_post_community_id", columnList = "community_id"),
+		@Index(name = "idx_post_created_at", columnList = "created_at"),
+		@Index(name = "idx_post_is_deleted", columnList = "isDeleted"),
+		@Index(name = "idx_post_community_deleted", columnList = "community_id, isDeleted")
+	}
 )
 @Entity
 public class Post {

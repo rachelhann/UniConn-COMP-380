@@ -7,13 +7,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Table(name = "community"
-    // Uncomment for production — speeds up explore page (name search, member count ordering)
-    // , indexes = {
-    //     @Index(name = "idx_community_name", columnList = "communityName"),
-    //     @Index(name = "idx_community_member_count", columnList = "memberCount"),
-    //     @Index(name = "idx_community_category", columnList = "category")
-    // }
+@Table(name = "community",
+	indexes = {
+		@Index(name = "idx_community_name", columnList = "communityName"),
+		@Index(name = "idx_community_member_count", columnList = "memberCount"),
+		@Index(name = "idx_community_category", columnList = "category")
+	}
 )
 @Entity
 public class Community {
