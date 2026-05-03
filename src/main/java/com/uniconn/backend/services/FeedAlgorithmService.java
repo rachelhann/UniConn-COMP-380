@@ -26,6 +26,9 @@ public class FeedAlgorithmService extends BaseService {
     private final PostLikeRepository postLikeRepository;
     private final CommunityMemberRepository communityMemberRepository;
 
+    // Default page size — 20 posts per page
+    private static final int DEFAULT_PAGE_SIZE = 20;
+
     public FeedAlgorithmService(PostRepository postRepository,
                                 PostLikeRepository postLikeRepository,
                                 CommunityMemberRepository communityMemberRepository) {
@@ -37,12 +40,7 @@ public class FeedAlgorithmService extends BaseService {
     // ---------------------------------------------------------------
     // MAIN ENTRY — auto-selects Algorithm 1 or 2
     // ---------------------------------------------------------------
-    public List<PostSummaryDTO> getFeedForAuthenticatedUser() {
-        Integer userId = getAuthenticatedUser().getUserId();
-        return getFeed(userId);
-    }
-
-    public List<PostSummaryDTO> getFeed(Integer userId) {
+    public List<PostSummaryDTO> getFeed(Integer userId, int page, int size) {
         long communities = communityMemberRepository
                 .findByUser_UserId(userId).size();
         long following = userRepository.findById(userId)
@@ -50,19 +48,21 @@ public class FeedAlgorithmService extends BaseService {
                 .orElse(0);
 
         if (communities == 0 && following == 0) {
-            return getDefaultFeed(userId);
+            return getDefaultFeed(userId, page, size);
         }
-        return getPersonalizedFeed(userId);
+        return getPersonalizedFeed(userId, page, size);
+    }
+
+    // Overload — keeps PostManagementController working without changes
+    public List<PostSummaryDTO> getFeed(Integer userId) {
+        return getFeed(userId, 0, DEFAULT_PAGE_SIZE);
     }
 
     // ---------------------------------------------------------------
     // ALGORITHM 1 — Default feed for new users
-    // Uses existing findFeedPostsForUser but falls back to ALL posts
-    // if user has nothing — 80% community posts, 20% profile posts
-    // newest first, NEVER empty
+    // 80% community posts, 20% profile posts, newest first, NEVER empty
     // ---------------------------------------------------------------
-    public List<PostSummaryDTO> getDefaultFeed(Integer userId) {
-        // Try to get all posts — order by popular community first, then newest
+    public List<PostSummaryDTO> getDefaultFeed(Integer userId, int page, int size) {
         List<Post> allPosts = postRepository.findAll()
                 .stream()
                 .filter(p -> !p.isDeleted())
@@ -73,7 +73,6 @@ public class FeedAlgorithmService extends BaseService {
                         .thenComparing(Comparator.comparing(Post::getCreatedAt).reversed()))
                 .collect(Collectors.toList());
 
-        // 80% community posts, 20% profile posts
         List<Post> communityPosts = allPosts.stream()
                 .filter(p -> p.getCommunity() != null)
                 .collect(Collectors.toList());
@@ -82,7 +81,7 @@ public class FeedAlgorithmService extends BaseService {
                 .filter(p -> p.getCommunity() == null)
                 .collect(Collectors.toList());
 
-        int total = Math.min(allPosts.size(), 50);
+        int total = allPosts.size();
         int communityTarget = (int) (total * 0.8);
         int profileTarget = total - communityTarget;
 
@@ -90,30 +89,42 @@ public class FeedAlgorithmService extends BaseService {
         feed.addAll(communityPosts.stream().limit(communityTarget).collect(Collectors.toList()));
         feed.addAll(profilePosts.stream().limit(profileTarget).collect(Collectors.toList()));
 
-        // Final sort: newest first
         feed.sort(Comparator.comparing(Post::getCreatedAt).reversed());
 
-        // Fallback: never empty
-        if (feed.isEmpty()) feed = allPosts.stream().limit(50).collect(Collectors.toList());
+        if (feed.isEmpty()) feed = allPosts;
 
-        return feed.stream()
+        // Apply pagination
+        int fromIndex = page * size;
+        if (fromIndex >= feed.size()) return new ArrayList<>();
+        int toIndex = Math.min(fromIndex + size, feed.size());
+
+        return feed.subList(fromIndex, toIndex)
+                .stream()
                 .map(p -> toDTO(p, userId))
                 .collect(Collectors.toList());
     }
 
+    // Overload for backward compatibility
+    public List<PostSummaryDTO> getDefaultFeed(Integer userId) {
+        return getDefaultFeed(userId, 0, DEFAULT_PAGE_SIZE);
+    }
+
     // ---------------------------------------------------------------
     // ALGORITHM 2 — Personalized feed for active users
-    // Uses existing findFeedPostsForUser as base, adds scoring layer
-    // + tag interest discovery, 85/15 split, never empty
+    // 85% personalized + 15% discovery, scored, never empty
     // ---------------------------------------------------------------
-    public List<PostSummaryDTO> getPersonalizedFeed(Integer userId) {
-        // Base: posts from communities + following (reuse teammate's query)
-        List<Post> personalizedPosts = postRepository.findFeedPostsForUser(userId);
+    public List<PostSummaryDTO> getPersonalizedFeed(Integer userId, int page, int size) {
+        List<Post> personalizedPosts = new ArrayList<>(postRepository.findFeedPostsForUser(userId));
+        // Add the user's own posts so they appear in their own feed
+        List<Post> ownPosts = postRepository.findProfilePostsByUser(userId);
+        for (Post p : ownPosts) {
+                if (personalizedPosts.stream().noneMatch(existing -> existing.getPostId().equals(p.getPostId()))) {
+                        personalizedPosts.add(p);
+                }
+        }
 
-        // Interest tags from posts user liked
         List<String> interestTags = getInterestTags(userId);
 
-        // Discovery posts by interest tags
         List<Post> tagPosts = new ArrayList<>();
         if (!interestTags.isEmpty()) {
             Set<Integer> seenIds = personalizedPosts.stream()
@@ -127,20 +138,17 @@ public class FeedAlgorithmService extends BaseService {
             }
         }
 
-        // Score personalized posts
         List<ScoredPost> scoredPersonal = personalizedPosts.stream()
                 .map(p -> new ScoredPost(p, scorePost(p, true)))
                 .sorted(Comparator.comparingDouble(ScoredPost::score).reversed())
                 .collect(Collectors.toList());
 
-        // Score discovery posts
         List<ScoredPost> scoredDiscovery = tagPosts.stream()
                 .map(p -> new ScoredPost(p, scorePost(p, false)))
                 .sorted(Comparator.comparingDouble(ScoredPost::score).reversed())
                 .collect(Collectors.toList());
 
-        // 85% personalized, 15% discovery
-        int total = Math.min(scoredPersonal.size() + scoredDiscovery.size(), 50);
+        int total = scoredPersonal.size() + scoredDiscovery.size();
         int personalTarget = (int) (total * 0.85);
         int discoveryTarget = total - personalTarget;
 
@@ -148,15 +156,24 @@ public class FeedAlgorithmService extends BaseService {
         scoredPersonal.stream().limit(personalTarget).forEach(sp -> finalFeed.add(sp.post()));
         scoredDiscovery.stream().limit(discoveryTarget).forEach(sp -> finalFeed.add(sp.post()));
 
-        // Final sort: newest first
         finalFeed.sort(Comparator.comparing(Post::getCreatedAt).reversed());
 
-        // Fallback: never empty
-        if (finalFeed.isEmpty()) return getDefaultFeed(userId);
+        if (finalFeed.isEmpty()) return getDefaultFeed(userId, page, size);
 
-        return finalFeed.stream()
+        // Apply pagination
+        int fromIndex = page * size;
+        if (fromIndex >= finalFeed.size()) return new ArrayList<>();
+        int toIndex = Math.min(fromIndex + size, finalFeed.size());
+
+        return finalFeed.subList(fromIndex, toIndex)
+                .stream()
                 .map(p -> toDTO(p, userId))
                 .collect(Collectors.toList());
+    }
+
+    // Overload for backward compatibility
+    public List<PostSummaryDTO> getPersonalizedFeed(Integer userId) {
+        return getPersonalizedFeed(userId, 0, DEFAULT_PAGE_SIZE);
     }
 
     // ---------------------------------------------------------------
@@ -182,14 +199,14 @@ public class FeedAlgorithmService extends BaseService {
     // ---------------------------------------------------------------
     // GET INTEREST TAGS FROM LIKED POSTS
     // ---------------------------------------------------------------
-        private List<String> getInterestTags(Integer userId) {
+    private List<String> getInterestTags(Integer userId) {
         return postLikeRepository.findByIdUserId(userId)
                 .stream()
                 .flatMap(pl -> pl.getPost().getTags().stream()
                         .map(pt -> pt.getTag().getName()))
                 .distinct()
                 .collect(Collectors.toList());
-        }
+    }
 
     // ---------------------------------------------------------------
     // HELPER RECORD
@@ -197,7 +214,7 @@ public class FeedAlgorithmService extends BaseService {
     private record ScoredPost(Post post, double score) {}
 
     // ---------------------------------------------------------------
-    // DTO MAPPER — matches PostManagementService exactly
+    // DTO MAPPER
     // ---------------------------------------------------------------
     private PostSummaryDTO toDTO(Post post, Integer currentUserId) {
         List<String> tagNames = post.getTags().stream()
@@ -215,19 +232,20 @@ public class FeedAlgorithmService extends BaseService {
                         CommunityMemberRole.ADMIN));
 
         return new PostSummaryDTO(
-                post.getPostId(),
-                post.getAuthor().getUsername(),
-                post.getAuthor().getUserId(),
-                post.getCommunity() != null ? post.getCommunity().getCommunityName() : null,
-                post.getCommunity() != null ? post.getCommunity().getCommunityId() : null,
-                post.getTitle(),
-                post.getContentText(),
-                post.getLikeCount(),
-                post.getCommentCount(),
-                post.getCreatedAt(),
-                tagNames,
-                liked,
-                canDelete
-        );
+                        post.getPostId(),
+                        post.getAuthor().getUsername(),
+                        post.getAuthor().getUserId(),
+                        post.getCommunity() != null ? post.getCommunity().getCommunityName() : null,
+                        post.getCommunity() != null ? post.getCommunity().getCommunityId() : null,
+                        post.getTitle(),
+                        post.getContentText(),
+                        post.getLikeCount(),
+                        post.getCommentCount(),
+                        post.getCreatedAt(),
+                        tagNames,
+                        liked,
+                        canDelete,
+                        post.getGifUrl()
+                );
     }
 }
