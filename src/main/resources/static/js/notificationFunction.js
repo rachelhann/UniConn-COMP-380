@@ -135,10 +135,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Disable the "Delete all notifications" option when the list is empty
+  // (so the user can't trigger a delete with nothing to delete).
+  function updateDeleteAllOption() {
+    const sel = document.getElementById('notif-mark-all');
+    if (!sel) return;
+    const opt = sel.querySelector('option[value="DELETE_ALL"]');
+    if (opt) opt.disabled = (allNotifications.length === 0);
+  }
+
   function renderList() {
     const list = document.getElementById('notification-list');
     if (!list) return;
     list.innerHTML = '';
+    if (allNotifications.length === 0) {
+      // Truly empty (e.g., right after Delete All) — show plain "No notifications".
+      list.innerHTML = '<li class="search-result-empty">No notifications.</li>';
+      return;
+    }
     const visible = applyFilters(allNotifications);
     if (visible.length === 0) {
       list.innerHTML = '<li class="search-result-empty">No notifications match this filter.</li>';
@@ -164,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         allNotifications = notifications || [];
         renderList();
         loadUnreadCount();
+        updateDeleteAllOption();   // re-evaluate: disable if list came back empty
       })
       .catch(() => {
         list.innerHTML = '<li class="search-result-empty">No notifications yet.</li>';
@@ -183,28 +198,52 @@ document.addEventListener('DOMContentLoaded', () => {
     renderList();
   });
 
-  // "Mark all as..." dropdown — value 'READ' or 'UNREAD' fires the matching bulk action
+  // "Mark all as..." dropdown — value 'READ' / 'UNREAD' / 'DELETE_ALL' fires the matching bulk action
   const markAllSel = document.getElementById('notif-mark-all');
   if (markAllSel) markAllSel.addEventListener('change', () => {
     if (!token) { markAllSel.value = ''; return; }
     const action = markAllSel.value;
-    if (action !== 'READ' && action !== 'UNREAD') return;
 
-    const url        = action === 'READ' ? '/api/notifications/read-all' : '/api/notifications/unread-all';
-    const newReadVal = (action === 'READ');
+    if (action === 'READ' || action === 'UNREAD') {
+      const url        = action === 'READ' ? '/api/notifications/read-all' : '/api/notifications/unread-all';
+      const newReadVal = (action === 'READ');
 
-    fetch(url, { method: 'PATCH', headers: authHeaders })
-      .then(r => r.ok ? r.json() : 0)
-      .then(() => {
-        allNotifications.forEach(n => n.read = newReadVal);
-        renderList();
-        loadUnreadCount();
-      })
-      .catch(() => {});
+      fetch(url, { method: 'PATCH', headers: authHeaders })
+        .then(r => r.ok ? r.json() : 0)
+        .then(() => {
+          allNotifications.forEach(n => n.read = newReadVal);
+          renderList();
+          loadUnreadCount();
+        })
+        .catch(() => {});
 
-    markAllSel.value = '';   // reset back to placeholder so the same option can be picked again
+      markAllSel.value = '';   // reset back to placeholder so the same option can be picked again
+      return;
+    }
+
+    if (action === 'DELETE_ALL') {
+      if (!confirm('Are you sure you want to delete all notifications? This cannot be undone.')) {
+        markAllSel.value = '';
+        return;
+      }
+      fetch('/api/notifications', { method: 'DELETE', headers: authHeaders })
+        .then(r => r.ok ? r.json() : { deletedCount: 0 })
+        .then(() => {
+          allNotifications = [];        // 1. clear in-memory state
+          updateBadge(0);                // 2. reset unread badge to 0 (hides it)
+          renderList();                  // 3. re-render UI -> shows "No notifications."
+          updateDeleteAllOption();       // 4. disable the option (nothing left to delete)
+        })
+        .catch(() => {});
+
+      markAllSel.value = '';
+      return;
+    }
   });
 
   // Initial badge load on page open (so badge appears before modal is opened)
   loadUnreadCount();
+  // Start with the DELETE_ALL option in the correct state (disabled when list is empty,
+  // which it always is until the modal is opened and notifications fetch).
+  updateDeleteAllOption();
 });
