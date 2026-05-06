@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -45,5 +46,12 @@ public class NotificationController {
     @PatchMapping("/unread-all")
     public ResponseEntity<Integer> markAllAsUnread() {
         return ResponseEntity.ok(notificationService.markAllAsUnread());
+    }
+
+    // DELETE /api/notifications  ->  { "deletedCount": <n> }
+    @DeleteMapping
+    public ResponseEntity<Map<String, Integer>> deleteAllNotifications() {
+        int count = notificationService.deleteAllNotifications();
+        return ResponseEntity.ok(Map.of("deletedCount", count));
     }
 }
