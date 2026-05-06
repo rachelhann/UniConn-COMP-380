@@ -115,6 +115,18 @@ public class NotificationService extends BaseService {
     }
 
     // ---------------------------------------------------------------
+    // DELETE ALL NOTIFICATIONS (the "Delete all notifications" dropdown option)
+    // ---------------------------------------------------------------
+    @Transactional
+    public int deleteAllNotifications() {
+        User currentUser = getAuthenticatedUser();
+        List<Notification> all = notificationRepository
+                .findByRecipient_UserIdOrderByCreatedAtDesc(currentUser.getUserId());
+        notificationRepository.deleteAll(all);
+        return all.size();
+    }
+
+    // ---------------------------------------------------------------
     // MARK AS READ
     // ---------------------------------------------------------------
     @Transactional
