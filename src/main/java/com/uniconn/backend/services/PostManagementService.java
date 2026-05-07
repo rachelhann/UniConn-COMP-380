@@ -4,8 +4,10 @@ import com.uniconn.backend.composite_keys.CommunityMemberId;
 import com.uniconn.backend.composite_keys.PostLikeId;
 import com.uniconn.backend.dtos.*;
 import com.uniconn.backend.entities.*;
+import com.uniconn.backend.events.PostCreatedEvent;
 import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +23,20 @@ public class PostManagementService extends BaseService {
     private final CommunityMemberRepository communityMemberRepository;
     private final PostTagService postTagService;
     private final PostLikeRepository postLikeRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PostManagementService(PostRepository postRepository,
                                  CommunityRepository communityRepository,
                                  CommunityMemberRepository communityMemberRepository,
                                  PostTagService postTagService,
-                                 PostLikeRepository postLikeRepository) {
+                                 PostLikeRepository postLikeRepository,
+                                 ApplicationEventPublisher eventPublisher) {
         this.postRepository = postRepository;
         this.communityRepository = communityRepository;
         this.communityMemberRepository = communityMemberRepository;
         this.postTagService = postTagService;
         this.postLikeRepository = postLikeRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     // ---------------------------------------------------------------
@@ -67,6 +72,15 @@ public class PostManagementService extends BaseService {
 
         Post saved = postRepository.save(post);
         List<String> tagNames = postTagService.saveTags(saved, dto.getTags());
+
+        // Publish a domain event so listeners (e.g. NotificationEventListener) can react
+        // without this service knowing about notifications. The actual handler runs after
+        // this transaction commits, on a separate thread.
+        eventPublisher.publishEvent(new PostCreatedEvent(
+                this,
+                saved.getPostId(),
+                saved.getCommunity() != null ? saved.getCommunity().getCommunityId() : null,
+                currentUser.getUserId()));
 
         // freshly created post: not liked yet, author can always delete own post
         return mapToSummaryDTO(saved, tagNames, currentUser.getUserId());
