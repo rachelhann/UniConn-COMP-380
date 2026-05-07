@@ -3,10 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const token       = localStorage.getItem('token');
   const authHeaders = token ? { 'Authorization': 'Bearer ' + token } : {};
 
-  // ---- in-memory state (one user's notifications + active filters) ----
   let allNotifications = [];
-  let activeTypeFilter = 'ALL';   // 'ALL' | 'LIKE' | 'COMMENT' | 'FOLLOW' | 'USER_JOINED_COMMUNITY'
-  let activeDateFilter = 'ALL';   // 'ALL' | 'TODAY' | 'WEEK' | 'MONTH'
+  let activeTypeFilter = 'ALL';   
+  let activeDateFilter = 'ALL';  
 
   initModal({
     modalId:  'notification-modal',
@@ -45,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(() => {});
   }
 
-  // ---- mark a single notification as read (called when user clicks it) ----
   function markRead(notificationId, liElement) {
     if (!token) return Promise.resolve();
     return fetch('/api/notifications/' + notificationId + '/read', {
@@ -79,6 +77,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (n.type === 'COMMENT') {
       actionText = 'commented on your post';
       descText   = n.commentText || n.postTitle || '';
+    } else if (n.type === 'ADMIN_POST') {
+      actionText = 'posted in your community';
+      descText   = n.postTitle || '';
     } else {
       actionText = n.message || '';
     }
@@ -96,7 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
     `;
 
-    // Click: mark read (only if currently unread), then navigate
     li.addEventListener('click', () => {
       const navigate = () => {
         if (n.type === 'FOLLOW') {
@@ -115,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return li;
   }
 
-  // ---- filtering (runs over cached array, no network) ----
   function dateCutoff(filter) {
     const now = new Date();
     if (filter === 'TODAY') {
@@ -123,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (filter === 'WEEK')  return new Date(now.getTime() - 7  * 86400000);
     if (filter === 'MONTH') return new Date(now.getTime() - 30 * 86400000);
-    return null;  // ALL
+    return null; 
   }
 
   function applyFilters(notifications) {
@@ -135,8 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Disable the "Delete all notifications" option when the list is empty
-  // (so the user can't trigger a delete with nothing to delete).
   function updateDeleteAllOption() {
     const sel = document.getElementById('notif-mark-all');
     if (!sel) return;
@@ -149,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!list) return;
     list.innerHTML = '';
     if (allNotifications.length === 0) {
-      // Truly empty (e.g., right after Delete All) — show plain "No notifications".
       list.innerHTML = '<li class="search-result-empty">No notifications.</li>';
       return;
     }
@@ -178,14 +174,13 @@ document.addEventListener('DOMContentLoaded', () => {
         allNotifications = notifications || [];
         renderList();
         loadUnreadCount();
-        updateDeleteAllOption();   // re-evaluate: disable if list came back empty
+        updateDeleteAllOption(); 
       })
       .catch(() => {
         list.innerHTML = '<li class="search-result-empty">No notifications yet.</li>';
       });
   }
 
-  // ---- toolbar wiring (type dropdown, date dropdown, mark-all button) ----
   const typeSel = document.getElementById('notif-type-filter');
   if (typeSel) typeSel.addEventListener('change', () => {
     activeTypeFilter = typeSel.value;
@@ -198,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
     renderList();
   });
 
-  // "Mark all as..." dropdown — value 'READ' / 'UNREAD' / 'DELETE_ALL' fires the matching bulk action
   const markAllSel = document.getElementById('notif-mark-all');
   if (markAllSel) markAllSel.addEventListener('change', () => {
     if (!token) { markAllSel.value = ''; return; }
@@ -217,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(() => {});
 
-      markAllSel.value = '';   // reset back to placeholder so the same option can be picked again
+      markAllSel.value = ''; 
       return;
     }
 
@@ -229,10 +223,10 @@ document.addEventListener('DOMContentLoaded', () => {
       fetch('/api/notifications', { method: 'DELETE', headers: authHeaders })
         .then(r => r.ok ? r.json() : { deletedCount: 0 })
         .then(() => {
-          allNotifications = [];        // 1. clear in-memory state
-          updateBadge(0);                // 2. reset unread badge to 0 (hides it)
-          renderList();                  // 3. re-render UI -> shows "No notifications."
-          updateDeleteAllOption();       // 4. disable the option (nothing left to delete)
+          allNotifications = [];       
+          updateBadge(0);                
+          renderList();                
+          updateDeleteAllOption();     
         })
         .catch(() => {});
 
@@ -240,10 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
   });
-
-  // Initial badge load on page open (so badge appears before modal is opened)
+ 
   loadUnreadCount();
-  // Start with the DELETE_ALL option in the correct state (disabled when list is empty,
-  // which it always is until the modal is opened and notifications fetch).
   updateDeleteAllOption();
 });
