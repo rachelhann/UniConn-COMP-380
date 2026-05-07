@@ -20,13 +20,10 @@ public class NotificationService extends BaseService {
         this.notificationRepository = notificationRepository;
     }
 
-    // ---------------------------------------------------------------
-    // CREATE NOTIFICATION (called by other services)
-    // ---------------------------------------------------------------
+    // CREATE NOTIFICATION
     @Transactional
     public void createNotification(User recipient, User sender, NotificationType type,
                                    Integer postId, Integer commentId) {
-        // Don't notify yourself (e.g., liking your own post)
         if (sender != null && sender.getUserId().equals(recipient.getUserId())) {
             return;
         }
@@ -41,13 +38,11 @@ public class NotificationService extends BaseService {
         notificationRepository.save(n);
     }
 
-    // ---------------------------------------------------------------
     // CREATE COMMUNITY-JOIN NOTIFICATION
-    // ---------------------------------------------------------------
     @Transactional
     public void createCommunityJoinNotification(User recipient, User sender,
                                                 Integer communityId, String communityName) {
-    
+
         if (sender != null && sender.getUserId().equals(recipient.getUserId())) {
             return;
         }
@@ -61,9 +56,32 @@ public class NotificationService extends BaseService {
         notificationRepository.save(n);
     }
 
-    // ---------------------------------------------------------------
+    // CREATE ADMIN/MOD POST NOTIFICATION
+    @Transactional
+    public void createAdminPostNotification(User recipient, User sender,
+                                            Integer postId, Integer communityId,
+                                            String communityName) {
+        // self-exclusion: an admin/mod doesn't get notified about their own post
+        if (sender != null && sender.getUserId().equals(recipient.getUserId())) {
+            return;
+        }
+
+        if (notificationRepository.existsByRecipient_UserIdAndTypeAndPostId(
+                recipient.getUserId(), NotificationType.ADMIN_POST, postId)) {
+            return;
+        }
+
+        Notification n = new Notification();
+        n.setRecipient(recipient);
+        n.setSender(sender);
+        n.setType(NotificationType.ADMIN_POST);
+        n.setPostId(postId);
+        n.setCommunityId(communityId);
+        n.setMessage(sender.getUsername() + " posted in " + communityName);
+        notificationRepository.save(n);
+    }
+
     // GET MY NOTIFICATIONS
-    // ---------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<NotificationResponseDTO> getMyNotifications() {
         User currentUser = getAuthenticatedUser();
@@ -74,9 +92,7 @@ public class NotificationService extends BaseService {
                 .collect(Collectors.toList());
     }
 
-    // ---------------------------------------------------------------
-    // GET UNREAD COUNT (powers the bell badge)
-    // ---------------------------------------------------------------
+    // GET UNREAD COUNT 
     @Transactional(readOnly = true)
     public long getUnreadCount() {
         User currentUser = getAuthenticatedUser();
@@ -84,9 +100,7 @@ public class NotificationService extends BaseService {
                 .countByRecipient_UserIdAndIsReadFalse(currentUser.getUserId());
     }
 
-    // ---------------------------------------------------------------
-    // MARK ALL AS READ (the "Mark all as Read" dropdown option)
-    // ---------------------------------------------------------------
+    // MARK ALL AS READ
     @Transactional
     public int markAllAsRead() {
         User currentUser = getAuthenticatedUser();
@@ -99,9 +113,7 @@ public class NotificationService extends BaseService {
         return unread.size();
     }
 
-    // ---------------------------------------------------------------
-    // MARK ALL AS UNREAD (the "Mark all as Unread" dropdown option)
-    // ---------------------------------------------------------------
+    // MARK ALL AS UNREAD 
     @Transactional
     public int markAllAsUnread() {
         User currentUser = getAuthenticatedUser();
@@ -114,9 +126,7 @@ public class NotificationService extends BaseService {
         return read.size();
     }
 
-    // ---------------------------------------------------------------
-    // DELETE ALL NOTIFICATIONS (the "Delete all notifications" dropdown option)
-    // ---------------------------------------------------------------
+    // DELETE ALL NOTIFICATIONS
     @Transactional
     public int deleteAllNotifications() {
         User currentUser = getAuthenticatedUser();
@@ -126,9 +136,7 @@ public class NotificationService extends BaseService {
         return all.size();
     }
 
-    // ---------------------------------------------------------------
     // MARK AS READ
-    // ---------------------------------------------------------------
     @Transactional
     public NotificationResponseDTO markAsRead(Integer notificationId) {
         User currentUser = getAuthenticatedUser();
@@ -146,9 +154,7 @@ public class NotificationService extends BaseService {
         return mapToDTO(saved);
     }
 
-    // ---------------------------------------------------------------
     // HELPERS
-    // ---------------------------------------------------------------
     private String buildMessage(User sender, NotificationType type) {
         String name = (sender == null) ? "Someone" : sender.getUsername();
         return switch (type) {
@@ -156,6 +162,7 @@ public class NotificationService extends BaseService {
             case COMMENT -> name + " commented on your post";
             case FOLLOW -> name + " started following you";
             case USER_JOINED_COMMUNITY -> name + " joined your community";
+            case ADMIN_POST -> name + " posted in your community";
         };
     }
 
