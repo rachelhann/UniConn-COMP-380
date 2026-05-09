@@ -47,11 +47,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         // public community API endpoints
                         .requestMatchers("/api/community/all", "/api/community/category/**", "/api/community/trending-tags").permitAll()
+<<<<<<< HEAD
                         // public HTML pages
                         .requestMatchers("/", "/login", "/register", "/forgot-password", "/feed", "/profile", "/profile/**", "/post/**", "/communities", "/my-communities", "/community/**").permitAll()
                         // static assets
                         .requestMatchers("/css/**", "/js/**", "/*.css", "/*.js", "/vector-logos/**", "/uploads/**").permitAll()
                         // all other API endpoints require authentication
+=======
+                        .requestMatchers("/", "/login", "/register", "/forgot-password", "/feed", "/profile", "/profile/**", "/post/**", "/communities", "/my-communities", "/community/**", "/api/giphy/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/*.css", "/*.js", "/vector-logos/**", "/uploads/**", "/auth-guard.html").permitAll()
+>>>>>>> 585c6bb5654fd43c8425bb80b60c4fe0b763937b
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex

@@ -7,7 +7,9 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.*;
 
-@Table(name = "post")
+@Table(name = "post", indexes = {
+	    @Index(name = "idx_post_created_at", columnList = "is_deleted, created_at DESC")
+	})
 @Entity
 public class Post {
 	@Id
@@ -28,6 +30,9 @@ public class Post {
 	
 	@Column(length = 2000, nullable = false)
 	private String contentText;
+	
+	@Column(name = "gif_url")
+	private String gifUrl;
 	
 	@Column(nullable = false)
 	private int likeCount = 0;
@@ -119,4 +124,13 @@ public class Post {
 	public void setTags(List<PostTag> tags) {
 	    this.tags = tags;
 	}
+	
+	public String getGifUrl() {
+		return gifUrl;
+	}
+
+	public void setGifUrl(String gifUrl) {
+		this.gifUrl = gifUrl;
+	}
+	
 }

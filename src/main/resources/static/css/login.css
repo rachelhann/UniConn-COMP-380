@@ -96,6 +96,18 @@ body {
     box-sizing: border-box;
     z-index: 999;
 }
+.header::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #000;
+}
 h3 {
   margin: -1px auto 0 10px;
 }
@@ -124,7 +136,7 @@ h3 {
 }
 
 .forgot-password {
-  margin: -25px 0 5px;
+  margin: -40px 0 5px;
   margin-left: 200px;
   font-size: 0.9em;
   color: #fff;

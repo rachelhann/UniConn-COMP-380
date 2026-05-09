@@ -36,12 +36,16 @@ document.getElementById('search-input').addEventListener('input', function() {
   results.innerHTML = '<li class="search-result-empty">Searching...</li>';
 
   try {
-    const [data, followingIds, tagPosts] = await Promise.all([
+    const currentUserId = localStorage.getItem('currentUserId');
+    const [data, followingIds, tagPosts, memberCommunities] = await Promise.all([
       fetch(`/api/search?q=${encodeURIComponent(query)}`, { headers: authHeaders }).then(r => r.json()),
       token
         ? fetch('/api/users/following/ids', { headers: authHeaders }).then(r => r.ok ? r.json() : [])
         : Promise.resolve([]),
-      fetch(`/api/posts/search?q=${encodeURIComponent(query)}`, { headers: authHeaders }).then(r => r.ok ? r.json() : [])
+      fetch(`/api/posts/search?q=${encodeURIComponent(query)}`, { headers: authHeaders }).then(r => r.ok ? r.json() : []),
+      token && currentUserId
+        ? fetch(`/api/community/user/${currentUserId}/communities`, { headers: authHeaders }).then(r => r.ok ? r.json() : [])
+        : Promise.resolve([])
     ]);
 
     results.innerHTML = '';
@@ -58,6 +62,7 @@ document.getElementById('search-input').addEventListener('input', function() {
     }
 
     const followingSet = new Set(followingIds);
+    const joinedSet = new Set(memberCommunities.map(c => c.communityId));
 
     // --- Users ---
     if (data.users.length > 0) {
@@ -91,6 +96,8 @@ document.getElementById('search-input').addEventListener('input', function() {
             if (res.ok) {
               btn.textContent = following ? 'Follow' : 'Unfollow';
               btn.classList.toggle('unfollow-btn', !following);
+              const followingEl = document.getElementById('following-count');
+              if (followingEl) followingEl.textContent = parseInt(followingEl.textContent) + (following ? -1 : 1);
             }
           });
         }
@@ -106,6 +113,7 @@ document.getElementById('search-input').addEventListener('input', function() {
     if (data.communities.length > 0) {
       results.appendChild(sectionLabel('Communities'));
       data.communities.forEach(c => {
+        const isMember = joinedSet.has(c.communityId);
         const li = document.createElement('li');
         li.className = 'search-result-card';
         li.innerHTML = `
@@ -115,13 +123,34 @@ document.getElementById('search-input').addEventListener('input', function() {
               <div class="src-card-header">
                 <span class="src-card-name">c/${c.communityName}</span>
                 ${c.category ? `<span class="mc-card-category">${fmt(c.category)}</span>` : ''}
+                ${token ? `<button class="follow-btn ${isMember ? 'unfollow-btn' : ''}" data-cid="${c.communityId}">${isMember ? 'Leave' : 'Join'}</button>` : ''}
               </div>
               <span class="src-card-members">${c.memberCount ?? 0} members</span>
               ${c.description ? `<p class="src-card-desc">${c.description}</p>` : ''}
             </div>
           </div>
         `;
-        li.addEventListener('click', () => window.location.href = '/community/' + c.communityName);
+        if (token) {
+          const btn = li.querySelector('.follow-btn');
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const leaving = btn.classList.contains('unfollow-btn');
+            const res = await fetch(`/api/community/${c.communityId}/${leaving ? 'leave' : 'join'}`, {
+              method: leaving ? 'DELETE' : 'POST',
+              headers: authHeaders
+            });
+            if (res.ok) {
+              btn.textContent = leaving ? 'Join' : 'Leave';
+              btn.classList.toggle('unfollow-btn', !leaving);
+              const communityEl = document.getElementById('community-count');
+              if (communityEl) communityEl.textContent = parseInt(communityEl.textContent) + (leaving ? -1 : 1);
+            }
+          });
+        }
+        li.addEventListener('click', (e) => {
+          if (e.target.closest('.follow-btn')) return;
+          window.location.href = '/community/' + c.communityName;
+        });
         results.appendChild(li);
       });
     }

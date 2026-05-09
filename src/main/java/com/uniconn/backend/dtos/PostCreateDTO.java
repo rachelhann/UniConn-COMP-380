@@ -21,6 +21,9 @@ public class PostCreateDTO {
                  @Size(max = 20, message = "Tag must not exceed 20 characters")
                  @ValidTag String> tags;
     
+    @Pattern(regexp = "^https://media[0-9]*\\.giphy\\.com/.*$", message = "Invalid GIF URL")
+    private String gifUrl;
+    
     // getters & setters
 	public Integer getCommunityId() {
 		return communityId;
@@ -53,5 +56,13 @@ public class PostCreateDTO {
 	public void setTags(List<String> tags) {
 		this.tags = tags;
 	}    
+	
+	public String getGifUrl() {
+		return gifUrl;
+	}
 
+	public void setGifUrl(String gifUrl) {
+		this.gifUrl = gifUrl;
+	}
+	
 }

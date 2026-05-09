@@ -16,3 +16,6 @@ cloudinary.api-secret=your_api_secret
 
 spring.servlet.multipart.max-file-size=2MB
 spring.servlet.multipart.max-request-size=2MB
+
+#### Giphy
+giphy.api.key=YOUR_NEW_KEY_HERE

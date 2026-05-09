@@ -105,8 +105,10 @@
         <div class="post-view-footer" id="post-view-footer"></div>
         <hr class="comments-divider">
         <div class="comment-input-wrap">
-          <textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
-          <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
+			<textarea class="comment-input" id="post-view-comment-input" placeholder="Write a comment..." rows="1"></textarea>
+			        <button type="button" class="gif-trigger-btn" id="comment-gif-btn">GIF</button>
+			        <div id="comment-gif-preview"></div>
+			        <button class="comment-submit-btn" id="post-view-comment-submit">Post</button>
         </div>
         <div class="comments-list" id="post-view-comments-list">
           <p class="comment-empty">Loading comments...</p>
@@ -124,7 +126,7 @@
       <button class="search-modal-close" id="create-community-close" aria-label="Close">&times;</button>
       <div class="create-post-title-wrap">
         <input type="text" id="community-name-input" class="create-post-title-input" placeholder="Community name*" required>
-        <span class="community-name-hint">Lowercase letters, numbers, dots, and underscores only (e.g. my_community)</span>
+        
       </div>
       <div class="create-post-field">
         <textarea id="community-desc-input" class="create-post-body" placeholder="Description*" required></textarea>
@@ -185,6 +187,12 @@
           <input type="text" id="create-post-tags-input" class="tag-text-input" placeholder="Press enter to add a tag">
         </div>
       </div>
+
+	    <div class="create-post-gif-wrap">
+	       <button type="button" class="gif-trigger-btn" id="post-gif-btn">GIF</button>
+	     <div id="post-gif-preview"></div>
+	   </div>
+	  		
       <div class="create-post-action">
         <button type="button" class="create-post-btn-post" id="create-post-submit">Post</button>
       </div>
@@ -231,6 +239,7 @@
 
         <hr id="left-container-break">
 
+        <div id="profile-posts-controls"></div>
         <div id="profile-posts-container"></div>
 
       </div>
@@ -268,13 +277,17 @@
 
   </div>
 
+<script src="/js/auth-guard.js"></script>
 <script th:src="@{/js/darkMode.js}" defer></script>
 <script th:src="@{/js/navbarPfp.js}" defer></script>
+<script th:src="@{/js/gifPicker.js}" defer></script>
 <script th:src="@{/js/emojiPicker.js}" defer></script>
 <script th:src="@{/js/tagPostsModal.js}" defer></script>
 <script th:src="@{/js/postCardRenderer.js}" defer></script>
 <script th:src="@{/js/userProfileLoad.js}" defer></script>
-<script th:src="@{/js/modalManager.js}" defer></script><script th:src="@{/js/notificationFunction.js}" defer></script><script th:src="@{/js/searchFunction.js}" defer></script>
+<script th:src="@{/js/modalManager.js}" defer></script>
+<script th:src="@{/js/notificationFunction.js}" defer></script>
+<script th:src="@{/js/searchFunction.js}" defer></script>
 <script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>

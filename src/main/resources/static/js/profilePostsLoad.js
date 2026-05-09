@@ -109,7 +109,7 @@
     const wrapper = document.createElement('div');
     wrapper.className = 'posts-controls-wrapper';
 
-    // LEFT → dropdown
+    // LEFT -> dropdown
     const filterBar = document.createElement('div');
     filterBar.className = 'posts-filter-bar';
 
@@ -131,7 +131,7 @@
 
     filterBar.appendChild(select);
 
-    // RIGHT → separate liked button
+    // RIGHT -> separate liked button
     const likedBtn = document.createElement('button');
     likedBtn.className = 'liked-posts-btn';
 	likedBtn.innerHTML = `
@@ -150,9 +150,13 @@
     const c = document.getElementById('profile-posts-container');
     if (!c) return;
 
-    c.innerHTML = '';
+    const ctrl = document.getElementById('profile-posts-controls');
+    if (ctrl && controlWrapper) {
+      ctrl.innerHTML = '';
+      ctrl.appendChild(controlWrapper);
+    }
 
-    if (controlWrapper) c.appendChild(controlWrapper);
+    c.innerHTML = '';
 
     if (!posts || posts.length === 0) {
       const empty = document.createElement('p');
