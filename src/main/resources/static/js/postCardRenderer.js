@@ -35,11 +35,15 @@ function createPostCard(post, { onDelete } = {}) {
   // meta
   const meta = document.createElement('div');
   meta.className = 'post-card-meta';
-  meta.innerHTML = `<span class="post-card-author">u/${post.authorUsername}</span>`;
+  meta.innerHTML = `<a href="/profile/${post.authorUsername}" class="post-card-author post-username-link">u/${post.authorUsername}</a>`;
   if (post.communityName) {
-    meta.innerHTML += `<span class="post-card-community">c/${post.communityName}</span>`;
+	meta.innerHTML += `<a href="/community/${post.communityName}" class="post-card-community">c/${post.communityName}</a>`;
+
   }
   card.appendChild(meta);
+  
+  meta.querySelector('a.post-card-author')?.addEventListener('click', e => e.stopPropagation());
+  meta.querySelector('a.post-card-community')?.addEventListener('click', e => e.stopPropagation());
 
   // title
   if (post.title) {
@@ -201,7 +205,7 @@ function _renderPostViewModal(post) {
   // meta
   modalMeta.innerHTML = `<a href="/profile/${post.authorUsername}" class="post-modal-author post-username-link">u/${post.authorUsername}</a>`;
   if (post.communityName) {
-    modalMeta.innerHTML += `<span class="post-view-community">c/${post.communityName}</span>`;
+    modalMeta.innerHTML += `<a href="/community/${post.communityName}" class="post-view-community post-card-community">c/${post.communityName}</a>`;
   }
   modalMeta.innerHTML += `<span style="margin-left:auto;font-size:0.78em;color:#aaa">${formatPostDate(post.createdAt)}</span>`;
 
@@ -449,7 +453,7 @@ function initPostViewModal() {
   commentSubmit?.addEventListener('click', async () => {
     const text   = commentInput?.value.trim();
     const postId = overlay._activePostId;
-    if (!text || !postId) return;
+    if ((!text && !commentGifUrl) || !postId) return;
     try {
       const res = await fetch('/api/posts/comments', {
         method: 'POST',

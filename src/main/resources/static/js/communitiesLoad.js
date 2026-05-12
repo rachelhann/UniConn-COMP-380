@@ -124,14 +124,14 @@
           <div class="mc-card-header">
             <span class="mc-card-name">c/${c.communityName || ''}</span>
             <span class="mc-card-category">${fmt(c.category)}</span>
-            ${isAdmin
-              ? `<button class="join-leave-btn update-btn" data-id="${c.communityId}">Update</button>`
-              : `<button class="join-leave-btn ${isMember ? 'leave-btn' : 'join-btn'}" data-id="${c.communityId}">${isMember ? 'Leave' : 'Join'}</button>`}
           </div>
           <span class="mc-card-members">${c.memberCount ?? 0} members</span>
           <p class="mc-card-desc">${c.description || ''}</p>
           ${tags ? `<div class="mc-card-tags">${tags}</div>` : ''}
         </div>
+        ${isAdmin
+          ? `<button class="join-leave-btn update-btn" data-id="${c.communityId}">Update</button>`
+          : `<button class="join-leave-btn ${isMember ? 'leave-btn' : 'join-btn'}" data-id="${c.communityId}">${isMember ? 'Leave' : 'Join'}</button>`}
       `;
 
       card.addEventListener('click', (e) => {

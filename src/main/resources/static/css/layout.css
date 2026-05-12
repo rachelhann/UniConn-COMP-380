@@ -67,6 +67,19 @@
   border-top-right-radius: 10px;
   z-index: 999;
 }
+.header-left::after, .header-right::after {
+  content: '';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #000;
+}
+.search-modal .header-right::after { display: none; }
 
 h3 {
   margin: -1px auto 0 10px;

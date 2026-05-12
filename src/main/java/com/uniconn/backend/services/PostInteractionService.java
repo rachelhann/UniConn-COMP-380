@@ -95,6 +95,11 @@ public class PostInteractionService extends BaseService {
     @Transactional
     public CommentSummaryDTO createComment(CommentCreateDTO dto) {
         User currentUser = getAuthenticatedUser();
+        
+        if ((dto.getContentText() == null || dto.getContentText().isBlank()) && 
+        	    (dto.getGifUrl() == null || dto.getGifUrl().isBlank())) {
+        	    throw new IllegalArgumentException("Comment must have text or a GIF");
+        	}
 
         Post post = postRepository.findById(dto.getPostId())
             .orElseThrow(() -> new ResourceNotFoundException("Post not found: " + dto.getPostId()));

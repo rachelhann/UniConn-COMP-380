@@ -10,7 +10,7 @@ public class CommentCreateDTO {
     @NotNull(message = "Post ID is required")
     private Integer postId;
 
-    @NotBlank(message = "Content is required")
+    //@NotBlank(message = "Content is required")
     @Size(max = 1000, message = "Comment must not exceed 1000 characters")
     private String contentText;
     

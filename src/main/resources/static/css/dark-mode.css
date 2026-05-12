@@ -152,15 +152,16 @@ body.dark-mode .community-detail-name { color: #e0e0e0; }
 body.dark-mode .community-detail-desc { color: #ccc; }
 body.dark-mode .community-detail-members { color: #aaa; }
 body.dark-mode .community-detail-created { color: #666; }
-body.dark-mode .community-detail-category {
+body.dark-mode .community-detail-category,
+body.dark-mode .mc-card-category {
   background: #2e2e2e;
   color: #aaa;
 }
 body.dark-mode .community-tag,
 body.dark-mode .mc-tag {
-  background: #2e2e2e;
-  color: #aaa;
-  border-color: #3d3d3d;
+  background: #444;
+  color: #ccc;
+  border-color: #555;
 }
 
 /* profile */

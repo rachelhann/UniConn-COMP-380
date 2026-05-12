@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository
@@ -15,16 +16,29 @@ public interface SearchRepository extends JpaRepository<User, Integer> {
     @Query("SELECT u FROM User u WHERE " +
            "LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
            "LOWER(u.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(u.userBio) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+           "LOWER(u.userBio) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "ORDER BY " +
+           "CASE WHEN LOWER(u.username) LIKE LOWER(CONCAT(:keyword, '%')) THEN 0 " +
+           "     WHEN LOWER(u.name) LIKE LOWER(CONCAT(:keyword, '%')) THEN 1 " +
+           "     ELSE 2 END, " +
+           "u.username ASC")
     List<User> searchUsers(@Param("keyword") String keyword);
 
     @Query("SELECT c FROM Community c WHERE " +
            "LOWER(c.communityName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(c.description) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+           "LOWER(c.description) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+           "ORDER BY " +
+           "CASE WHEN LOWER(c.communityName) LIKE LOWER(CONCAT(:keyword, '%')) THEN 0 " +
+           "     ELSE 1 END, " +
+           "c.communityName ASC")
     List<Community> searchCommunities(@Param("keyword") String keyword);
 
     @Query("SELECT p FROM Post p JOIN FETCH p.author WHERE p.isDeleted = false AND (" +
            "LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
-           "LOWER(p.contentText) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+           "LOWER(p.contentText) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+           "ORDER BY " +
+           "CASE WHEN LOWER(p.title) LIKE LOWER(CONCAT(:keyword, '%')) THEN 0 " +
+           "     ELSE 1 END, " +
+           "p.createdAt DESC")
     List<Post> searchPosts(@Param("keyword") String keyword);
 }
