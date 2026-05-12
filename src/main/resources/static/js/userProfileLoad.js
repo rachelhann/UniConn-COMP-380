@@ -219,6 +219,118 @@
 
     renderTrending(trendingTags);
 
+    // ── followers / following modal ────────────────────────────────
+    const followModal  = document.getElementById('follow-list-modal');
+    const followTitle  = document.getElementById('follow-list-title');
+    const followList   = document.getElementById('follow-list');
+    const followClose  = document.getElementById('follow-list-close');
+
+    function closeFollowModal() {
+      followModal.classList.remove('active');
+      followModal.setAttribute('aria-hidden', 'true');
+    }
+
+    if (followClose) followClose.addEventListener('click', closeFollowModal);
+    if (followModal) followModal.addEventListener('click', e => { if (e.target === followModal) closeFollowModal(); });
+
+    async function openFollowModal(type) {
+      followTitle.textContent = type === 'followers' ? 'Followers' : 'Following';
+      followList.innerHTML = '<li style="padding:12px 8px;color:#999;font-size:0.9em">Loading...</li>';
+      followModal.classList.add('active');
+      followModal.setAttribute('aria-hidden', 'false');
+
+      const [users, myFollowingIds] = await Promise.all([
+        fetch(`/api/users/${profile.userId}/${type}`, { headers: authHeaders }).then(r => r.ok ? r.json() : []),
+        token ? fetch('/api/users/following/ids', { headers: authHeaders }).then(r => r.ok ? r.json() : []) : Promise.resolve([])
+      ]);
+
+      const followingSet = new Set(myFollowingIds);
+      followList.innerHTML = '';
+
+      if (!users.length) {
+        followList.innerHTML = `<li style="padding:12px 8px;color:#999;font-size:0.9em">No ${type} yet.</li>`;
+        return;
+      }
+
+      users.forEach(u => {
+        const isSelf = u.username === currentUsername;
+        const isFollowing = followingSet.has(u.userId);
+        const li = document.createElement('li');
+        li.className = 'follow-list-item';
+        li.style.cursor = 'pointer';
+        li.innerHTML = `
+          <img src="${u.profilePicture || '/vector-logos/usernameSignIn.svg'}" alt="" class="follow-list-avatar">
+          <div class="follow-list-info">
+            <span class="follow-list-username">u/${u.username}</span>
+            ${u.name ? `<span class="follow-list-name">${u.name}</span>` : ''}
+          </div>
+          ${!isSelf ? `<button class="follow-btn ${isFollowing ? 'unfollow-btn' : ''}" data-uid="${u.userId}">${isFollowing ? 'Unfollow' : 'Follow'}</button>` : ''}
+        `;
+        li.addEventListener('click', e => {
+          if (e.target.closest('.follow-btn')) return;
+          window.location.href = '/profile/' + u.username;
+        });
+        if (!isSelf) {
+          const btn = li.querySelector('.follow-btn');
+          btn.addEventListener('click', async e => {
+            e.stopPropagation();
+            const following = btn.classList.contains('unfollow-btn');
+            const res = await fetch(`/api/users/${u.userId}/${following ? 'unfollow' : 'follow'}`, {
+              method: following ? 'DELETE' : 'POST',
+              headers: authHeaders
+            });
+            if (res.ok) {
+              btn.textContent = following ? 'Follow' : 'Unfollow';
+              btn.classList.toggle('unfollow-btn', !following);
+            }
+          });
+        }
+        followList.appendChild(li);
+      });
+    }
+
+    document.getElementById('stat-followers')?.addEventListener('click', () => openFollowModal('followers'));
+    document.getElementById('stat-following')?.addEventListener('click', () => openFollowModal('following'));
+
+    // ── communities modal ──────────────────────────────────────────
+    const commModal      = document.getElementById('communities-modal');
+    const commModalList  = document.getElementById('communities-modal-list');
+    const commModalClose = document.getElementById('communities-modal-close');
+
+    if (commModal) {
+      commModalClose?.addEventListener('click', () => { commModal.classList.remove('active'); commModal.setAttribute('aria-hidden', 'true'); });
+      commModal.addEventListener('click', e => { if (e.target === commModal) { commModal.classList.remove('active'); commModal.setAttribute('aria-hidden', 'true'); } });
+
+      document.getElementById('stat-communities')?.addEventListener('click', async () => {
+        commModalList.innerHTML = '<li style="padding:12px 8px;color:#999;font-size:0.9em">Loading...</li>';
+        commModal.classList.add('active');
+        commModal.setAttribute('aria-hidden', 'false');
+
+        const communities = await fetch(`/api/community/user/${profile.userId}/communities`, { headers: authHeaders })
+          .then(r => r.ok ? r.json() : []);
+
+        commModalList.innerHTML = '';
+        if (!communities.length) {
+          commModalList.innerHTML = '<li style="padding:12px 8px;color:#999;font-size:0.9em">No communities yet.</li>';
+          return;
+        }
+        communities.forEach(c => {
+          const li = document.createElement('li');
+          li.className = 'follow-list-item';
+          li.style.cursor = 'pointer';
+          li.innerHTML = `
+            <img src="${c.communityPicture || '/vector-logos/clubLogo.svg'}" alt="" class="follow-list-avatar">
+            <div class="follow-list-info">
+              <span class="follow-list-username">c/${c.communityName}</span>
+              ${c.description ? `<span class="follow-list-name">${c.description}</span>` : ''}
+            </div>
+          `;
+          li.addEventListener('click', () => window.location.href = '/community/' + c.communityName);
+          commModalList.appendChild(li);
+        });
+      });
+    }
+
     // ── posts fetch ────────────────────────────────────────────────
     return Promise.all([
       fetch(`/api/posts/profile/by-username/${viewedUsername}`, { headers: authHeaders }).then(r => r.ok ? r.json() : []),
@@ -240,4 +352,14 @@
     });
 
   }).catch(() => {});
+
+  function filterList(listId, query) {
+    const q = query.toLowerCase();
+    document.querySelectorAll(`#${listId} .follow-list-item`).forEach(li => {
+      li.style.display = li.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  document.getElementById('follow-search')?.addEventListener('input', e => filterList('follow-list', e.target.value.trim()));
+  document.getElementById('communities-modal-search')?.addEventListener('input', e => filterList('communities-modal-list', e.target.value.trim()));
 })();

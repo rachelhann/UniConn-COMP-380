@@ -3,7 +3,6 @@ package com.uniconn.backend.services;
 import com.uniconn.backend.dtos.SearchResultDTO;
 import com.uniconn.backend.repositories.SearchRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.util.stream.Collectors;
 
 @Service

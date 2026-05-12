@@ -173,6 +173,8 @@ button:hover {
   border: 1px solid #91c5e8;
 }
 
+#register-error { margin-bottom: 0; }
+
 .login-link {
   font-size: 0.9em;
   color: #000;

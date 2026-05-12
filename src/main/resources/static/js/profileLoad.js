@@ -178,6 +178,8 @@
             if (res.ok) {
               btn.textContent = following ? 'Follow' : 'Unfollow';
               btn.classList.toggle('unfollow-btn', !following);
+              const followingEl = document.getElementById('following-count');
+              if (followingEl) followingEl.textContent = parseInt(followingEl.textContent) + (following ? -1 : 1);
             }
           });
         }
@@ -240,6 +242,8 @@
               if (res.ok) {
                 btn.textContent = leaving ? 'Join' : 'Leave';
                 btn.classList.toggle('unfollow-btn', !leaving);
+                const communityEl = document.getElementById('community-count');
+                if (communityEl) communityEl.textContent = parseInt(communityEl.textContent) + (leaving ? -1 : 1);
               }
             });
           }

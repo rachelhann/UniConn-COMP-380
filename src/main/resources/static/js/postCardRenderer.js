@@ -38,7 +38,13 @@ function createPostCard(post, { onDelete } = {}) {
   meta.innerHTML = `<a href="/profile/${post.authorUsername}" class="post-card-author post-username-link">u/${post.authorUsername}</a>`;
   if (post.communityName) {
 	meta.innerHTML += `<a href="/community/${post.communityName}" class="post-card-community">c/${post.communityName}</a>`;
-
+  }  
+  // suggested label — pushed to the right via margin-left: auto
+  if (post.suggested) {
+    const badge = document.createElement('span');
+    badge.className = 'post-card-suggested';
+    badge.innerHTML = `<img src="/vector-logos/sparkleLogo.svg" alt="" class="post-card-suggested-icon"> Suggested`;
+    meta.appendChild(badge);
   }
   card.appendChild(meta);
   
@@ -364,7 +370,7 @@ function createCommentEl(c) {
     ${c.gifUrl ? `<img src="${c.gifUrl}" class="comment-gif" alt="GIF">` : ''}
     <div class="comment-footer">
       <button class="comment-like-btn" data-liked="${c.likedByCurrentUser ? 'true' : 'false'}">
-        <img src="${c.likedByCurrentUser ? '/vector-logos/heartBlue.svg' : '/vector-logos/heartOutline.svg'}" 
+        <img src="${c.likedByCurrentUser ? '/vector-logos/heartBlue.svg' : '/vector-logos/heartOutline.svg'}"
              alt="Like" class="comment-like-icon">
         <span class="comment-like-count">${c.likeCount ?? 0}</span>
       </button>

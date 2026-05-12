@@ -3,7 +3,10 @@ package com.uniconn.backend.entities;
 import com.uniconn.backend.composite_keys.PostTagId;
 import jakarta.persistence.*;
 
-@Table(name = "post_tag")
+@Table(name = "post_tag", indexes = {
+	    @Index(name = "idx_post_tag_tag_id", columnList = "tag_id"),
+	    @Index(name = "idx_post_tag_post_id", columnList = "post_id")
+	})
 @Entity
 public class PostTag {
 	@EmbeddedId

@@ -1,23 +1,26 @@
 # UniConn-COMP-380 :unicorn: 
 
-Social platform for CSUN students.
+**A (Uni)versity (Conn)ection platform for CSUN students.**  
+Discover communities, spark conversations, and stay in the loop with everything campus.
+
+*Built with💙 by fellow Matadors — COMP 380/L · Spring 2026 · CSUN*
 
 ## :computer: Tech Stack
 
-- Java 17+
-- Spring Boot (3.3.5 version)
-- MySQL Community Server and Workbench
-- Maven
-- Front-end: HTML, CSS, JS (Thymeleaf implementation)
+| Layer | Technology |
+|---|---|
+| Backend | Java 17, Spring Boot 3.3.5, Spring Security, Hibernate/JPA |
+| Database | MySQL (Community Server & Workbench) |
+| Auth | JWT |
+| Frontend | HTML, CSS, JS (Thymeleaf) |
 
 ## Prerequisites
 
 Make sure you have the following installed before running the project:
-
-- [Java 17+](https://www.oracle.com/java/technologies/downloads/)
+- [Java 17](https://www.oracle.com/java/technologies/downloads/)
 - [Maven 3.8+](https://maven.apache.org/download.cgi)
-- [MySQL 8+](https://dev.mysql.com/downloads/) - Community Server and Workbench(should have it if followed video tutorial provided)
-- [IntelliJ IDEA](https://www.jetbrains.com/idea/) (recommended) or any IDE of your choice (I work in Eclipse)
+- [MySQL 8+](https://dev.mysql.com/downloads/) - Community Server and Workbench
+- [IntelliJ IDEA](https://www.jetbrains.com/idea/) (recommended) or any IDE of your choice
 
 
 ## :arrow_forward: Getting Started
@@ -37,9 +40,16 @@ CREATE DATABASE uni_conn;
 Open `src/main/resources/application.properties` and update the following with your local MySQL credentials:
 
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/uni_conn
-spring.datasource.username=your_mysql_username  // I have root
+spring.application.name=UniConn
+
+# Database connection
+spring.datasource.url=jdbc:mysql://localhost:3306/uni_conn?useUnicode=true&characterEncoding=UTF-8&connectionCollation=utf8mb4_unicode_ci
+spring.datasource.username=your_mysql_username 
 spring.datasource.password=your_mysql_password
+
+## Hibernate properties
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.open-in-view=false
 ```
 
 **4. Run the application** :rocket: 
@@ -56,6 +66,12 @@ On first run, Maven will download all required dependencies from `pom.xml` autom
 
 The API will start at `http://localhost:8080`.
 
+> [!IMPORTANT]
+> `spring.jpa.hibernate.ddl-auto` set to `update` — Hibernate will run entities and create tables in database
+> 
+> After first run:
+> - Verify all tables were created in database properly
+> - Switch `spring.jpa.hibernate.ddl-auto` to `validate` — Hibernate will be checking entity/schema alignment on startup but will not modify the database
 
 ## :file_cabinet: Project Structure
 
@@ -63,10 +79,10 @@ The API will start at `http://localhost:8080`.
 src/
 ├── main/
 │   ├── java/com/uniconn/backend/
-│   │   ├── composite-keys/         # For join tables (UserFollow, CommunityMember, ...)
+│   │   ├── composite-keys/         # Composite PKs for join tables (UserFollowId, PostLikeId, ...)
 │   │   ├── config/                 # Security configurations
 │   │   ├── controllers/            # REST controllers
-│   │   ├── dtos/                   # (LoginResponseDTO, CommunityDTO, ...)
+│   │   ├── dtos/                   # Data transfer objects (request/response)
 │   │   ├── entities/               # JPA entities (User, Community, ...)
 │   │   ├── exception/              # GlobalExceptionHandler and related exception classes
 │   │   ├── repositories/           # Spring Data repositories
@@ -93,101 +109,74 @@ Open `src/main/resources/db/users_test_data.sql` in Workbench and execute.
 **Step 2 — Communities:**
 Open `src/main/resources/db/community_test_data.sql` in Workbench and execute.
 
+**Step 3 — Posts:**
+Open `src/main/resources/db/posts_test_data.sql` in Workbench and execute.
+
 **Test data summary:**
-* 20 Active Users (password for all accounts: `Password123!`, emails end with `@my.csun.edu`, optional fields omitted: `name`, `user_bio`, `profile_picture_path`)
-* 20 Tags (used both by communities and posts - **MAX 5**)
-* 10 Communities (only `community_picture_path = NULL`)
+* 20 Active Users (password for all accounts: `Password123!`, emails end with `@my.csun.edu`)
+* 20 Tags (used both by communities and posts)
+* 10 Communities
 * Members added to communities
-* Community member roles (`ADMIN`, `MODERATOR`, `REGULAR_MEMBER`)
+* Community member roles (`ADMIN`, `REGULAR_MEMBER`)
+* 150 Posts: 105 Community posts, 45 Profile posts 
 
 :white_check_mark: **Verification is included in sql files so will run after data is populated.** 
 
 ## :camera: Image Upload
 
-UniConn uses [Cloudinary](https://cloudinary.com/) for image storage and processing. Profile pictures for both users and communities are uploaded to Cloudinary and served via CDN.
+> [!WARNING]
+> :bangbang: Include local image upload feature.
 
-### How it works
-Image upload is a two-step process:
 
-1. Upload the image — send the file to the upload endpoint, receive a Cloudinary URL back
-2. Save the URL — include the returned URL in the profile or community update request
 
-This keeps file handling separate from business logic and ensures images are always served from a fast, reliable CDN rather than the application server.
-### Image requirements
-
-* Accepted formats: JPEG, PNG, WebP
-* Maximum file size: 2MB
-* All uploaded images are automatically cropped to a square and resized to 256×256 pixels
-
-### Endpoints
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/api/upload/user` | Upload a user profile picture |
-| `POST` | `/api/upload/community` | Upload a community profile picture |
-| `PATCH` | `/api/users/me/picture` | Save profile picture URL to user account |
-| `PATCH` | `/api/community/{communityId}/picture` | Save picture URL to community |
-
-All endpoints require authentication via `Authorization: Bearer <token>` header.
-
-## :computer: Front-end (Hanna)
 
 ## :woman_technologist: User Management System (Lily)
+| Feature | Description | 
+|---|---|
+| **User Authentication** 🔐 | JWT-based login, registration, password reset via secret question |
+| etc | |
 
-## :two_women_holding_hands: Connection Between Users&Communities (Daria)
 
 ## :joystick: Interactive Systems (Abi)
+| Feature | Description | 
+|---|---|
+| **Feed** 👣 | Personalized feed |
+| etc | |
 
-## :pencil: Post Management System (Supti)
 
-## :bell: Notification System (Hanna)
+## :bell: Notification System (Supti)
+| Feature | Description | 
+|---|---|
+| **New Follower** 👤 | ... |
+| etc | |
 
 ## ⚠️ Important
 
-> [!CAUTION]
-> _**Do not edit**_ any entities/composite keys
-- If any changes needed, tell the person whose code it is, and leave comments in code if needed, but _**don't change**_ someone's code
+- If any code changes needed, tell the person whose code it is, and leave comments in code if needed, but _**don't change**_ someone's code
 - Commit changes to your own separate branch (e.g. `feature/name-of-the-feature`)
-- Use [conventional commit messages](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13) and [PR templates](https://axolo.co/blog/p/part-3-github-pull-request-template) to keep backlog clean and clear
-- <ins>I'll be reviewing pull requests</ins> and merging to `main` branch (except front end, html/css -> `src/resources/static`)
-- `README` is only for essential development notes (e.g. changes needed for system files, additional setup required, test data/guide etc.)
-> [!NOTE]
-> Add testing guide for your feature to README, to test in Postman or in browser (add sections before **⚠️Important** section).
-> 
-> GitHub syntax resources:
-> - [General](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-> - [Code styling](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks)
+- Use [conventional commit messages](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13) and fill out provided template on PR creation to keep backlog clean and clear
 
-## :gear: Configurations
-
-- All student emails must end with `@my.csun.edu`
-- Passwords are stored as BCrypt hashes (password for all test users: `Password123!`)
-> [!IMPORTANT]
-> `spring.jpa.hibernate.ddl-auto` set to `update` — Hibernate will run entities and create tables in database
-> 
-> After first run:
-> - Verify all tables were created in database properly and test if data was populated
-> - Switch `spring.jpa.hibernate.ddl-auto` to `validate` — Hibernate will be checking entity/schema alignment on startup but will not modify the database
-
-```properties
-spring.application.name=UniConn
-
-# Database connection
-spring.datasource.url=jdbc:mysql://localhost:3306/uni_conn
-spring.datasource.username=root
-spring.datasource.password=YOUR_DB_PASSWORD
-
-## Hibernate properties
-spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.open-in-view=false
-```
+> [!CAUTION]
+> ### ❌ Do NOT edit any of the following
+>
+> These files are owned by the project lead.
+>
+> | File / Folder | Reason |
+> |---|---|
+> | `src/main/java/.../entities/` | Shared data model — breaks everyone's code |
+> | `src/main/java/.../composite-keys/` | Shared join table keys |
+> | `.gitignore` | Tracks what stays out of version control |
+> | `pom.xml` | Dependency config — coordinate with project lead |
+> | `dependency-versions.properties` | Version pinning |
+> | `application.properties` (template in repo) | Shared config template |
+>
+> If you think a change is needed, **leave a comment in the code** and message the owner — do not edit directly.
 
 ## 🗒️ Notes
 
-- All entities are available 
-- Add classes to corresponding packages (e.g. `package com.uniconn.backend.services;`)
-- sql uses `snake_case`, in Java `camelCase` (constants `SCREAMING_SNAKE_CASE`), on github `kebab-case`
-- GitHub syntax resources:
-  - [General](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-  - [Code styling](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks)
- 
+> - Add testing guide for your feature to README, to test in Postman or in browser (if applicable) 
+> - sql uses `snake_case`, in Java `camelCase` (constants `SCREAMING_SNAKE_CASE`), on github `kebab-case`
+> - PR template included
+> GitHub syntax resources:
+> - [General](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+> - [Code styling](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks) 

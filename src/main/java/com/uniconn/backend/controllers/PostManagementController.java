@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -67,6 +68,11 @@ public class PostManagementController {
                 e.printStackTrace();
                 return ResponseEntity.badRequest().build();
             }
+    }
+    
+    @GetMapping("/feed/{userId}/type")
+    public ResponseEntity<Map<String, String>> getFeedType(@PathVariable Integer userId) {
+        return ResponseEntity.ok(Map.of("type", postManagementService.getFeedType(userId)));
     }
 
     // ---------------------------------------------------------------

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.uniconn.backend.composite_keys.UserFollowId;
 import com.uniconn.backend.dtos.UserSummaryDTO;
 import com.uniconn.backend.entities.*;
+import com.uniconn.backend.entities.Notification.NotificationType;
 import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserFollowService extends BaseService {
 	private final UserRepository userRepository;
 	private final UserFollowRepository userFollowRepository;
-	
-	public UserFollowService(UserRepository userRepository, 
-			UserFollowRepository userFollowRepository) {
+	private final NotificationService notificationService;
+
+	public UserFollowService(UserRepository userRepository,
+			UserFollowRepository userFollowRepository,
+			NotificationService notificationService) {
 		this.userRepository = userRepository;
 		this.userFollowRepository = userFollowRepository;
+		this.notificationService = notificationService;
 	}
 	
 	// ---------------------------------------------------------------
@@ -58,7 +62,11 @@ public class UserFollowService extends BaseService {
 		
 		following.setFollowerCount(following.getFollowerCount() + 1);
 		userRepository.save(following);
-		
+
+		// Notify the user that someone started following them
+		notificationService.createNotification(
+			following, currentUser, NotificationType.FOLLOW, null, null);
+
 		return "Followed user successfully!";
 	}
 	

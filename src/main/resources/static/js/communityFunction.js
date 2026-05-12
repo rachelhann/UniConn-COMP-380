@@ -1,6 +1,11 @@
 // handles create community modal: field validation, tag input, and form submission.
 // loaded on all pages that include the create community-modal on sidenav
 const communityNameInput     = document.getElementById('community-name-input');
+communityNameInput.addEventListener('input', () => {
+  const pos = communityNameInput.selectionStart;
+  communityNameInput.value = communityNameInput.value.toLowerCase().replace(/\s/g, '');
+  communityNameInput.setSelectionRange(pos, pos);
+});
 const communityDescInput     = document.getElementById('community-desc-input');
 const communityCategoryInput = document.getElementById('community-category-input');
 

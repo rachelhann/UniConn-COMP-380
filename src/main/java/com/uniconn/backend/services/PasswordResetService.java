@@ -12,7 +12,7 @@ import com.uniconn.backend.exception.ResourceNotFoundException;
 import com.uniconn.backend.exception.UnauthorizedException;
 import com.uniconn.backend.repositories.PasswordResetRepository;
 import com.uniconn.backend.repositories.UserRepository;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

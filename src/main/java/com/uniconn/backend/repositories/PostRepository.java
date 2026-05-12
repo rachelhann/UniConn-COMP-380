@@ -49,7 +49,26 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
         ORDER BY p.createdAt DESC
     """)
     List<Post> findFeedPostsForUser(@Param("userId") Integer userId);
-
+    
+ // ---------------------------------------------------------------
+ // FEED ALGORITHM 1: posts that have any of the given trending tags
+ // newest first, not deleted
+ // ---------------------------------------------------------------
+ @Query("""
+     SELECT DISTINCT p FROM Post p
+     LEFT JOIN FETCH p.author
+     LEFT JOIN FETCH p.community
+     LEFT JOIN FETCH p.tags pt
+     LEFT JOIN FETCH pt.tag
+     WHERE p.isDeleted = false
+       AND EXISTS (
+           SELECT 1 FROM PostTag ptx
+           JOIN ptx.tag tx
+           WHERE ptx.post = p AND tx.name IN :tagNames
+       )
+     ORDER BY p.createdAt DESC
+ """)
+ List<Post> findPostsByTrendingTags(@Param("tagNames") List<String> tagNames);
 
     // ---------------------------------------------------------------
     // TRENDING TAGS: top tags by distinct post count, last 30 days

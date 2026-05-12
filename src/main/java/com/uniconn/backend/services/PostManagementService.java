@@ -4,8 +4,10 @@ import com.uniconn.backend.composite_keys.CommunityMemberId;
 import com.uniconn.backend.composite_keys.PostLikeId;
 import com.uniconn.backend.dtos.*;
 import com.uniconn.backend.entities.*;
+import com.uniconn.backend.events.PostCreatedEvent;
 import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +23,23 @@ public class PostManagementService extends BaseService {
     private final CommunityMemberRepository communityMemberRepository;
     private final PostTagService postTagService;
     private final PostLikeRepository postLikeRepository;
+    private final UserFollowRepository userFollowRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public PostManagementService(PostRepository postRepository,
                                  CommunityRepository communityRepository,
                                  CommunityMemberRepository communityMemberRepository,
                                  PostTagService postTagService,
-                                 PostLikeRepository postLikeRepository) {
+                                 PostLikeRepository postLikeRepository,
+                                 UserFollowRepository userFollowRepository,
+                                 ApplicationEventPublisher eventPublisher) {
         this.postRepository = postRepository;
         this.communityRepository = communityRepository;
         this.communityMemberRepository = communityMemberRepository;
         this.postTagService = postTagService;
         this.postLikeRepository = postLikeRepository;
+        this.userFollowRepository = userFollowRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     // ---------------------------------------------------------------
@@ -67,6 +75,15 @@ public class PostManagementService extends BaseService {
 
         Post saved = postRepository.save(post);
         List<String> tagNames = postTagService.saveTags(saved, dto.getTags());
+
+        // Publish a domain event so listeners (e.g. NotificationEventListener) can react
+        // without this service knowing about notifications. The actual handler runs after
+        // this transaction commits, on a separate thread.
+        eventPublisher.publishEvent(new PostCreatedEvent(
+                this,
+                saved.getPostId(),
+                saved.getCommunity() != null ? saved.getCommunity().getCommunityId() : null,
+                currentUser.getUserId()));
 
         // freshly created post: not liked yet, author can always delete own post
         return mapToSummaryDTO(saved, tagNames, currentUser.getUserId());
@@ -119,17 +136,56 @@ public class PostManagementService extends BaseService {
     }
 
     // ---------------------------------------------------------------
-    // FEED
+    // FEED — auto-selects algorithm based on user activity
     // ---------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<PostSummaryDTO> getFeedForUser(Integer userId) {
-        User currentUser = getAuthenticatedUser();
-        return postRepository.findFeedPostsForUser(userId)
-                .stream()
-                .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
-                .collect(Collectors.toList());
+    	User currentUser = getAuthenticatedUser();
+
+    	boolean hasFollows = !userFollowRepository
+             .findByFollower_UserId(userId).isEmpty();
+    	boolean hasCommunities = !communityMemberRepository
+             .findByUser_UserId(userId).isEmpty();
+
+    	if (!hasFollows && !hasCommunities) {
+    		return getTrendingFeed(currentUser);
+    	}
+    	return getPersonalizedFeed(currentUser);
     }
 
+    // ALGORITHM 1 — new/inactive user: posts from trending tags
+    private List<PostSummaryDTO> getTrendingFeed(User currentUser) {
+    	LocalDateTime since = LocalDateTime.now().minusDays(30);
+    	List<String> trendingTagNames = postRepository.findTrendingTagsRaw(since)
+             .stream()
+             .map(row -> (String) row[0])
+             .collect(Collectors.toList());
+
+    	if (trendingTagNames.isEmpty()) {
+    		return List.of(); // no trending tags yet, feed is empty
+     }
+
+     return postRepository.findPostsByTrendingTags(trendingTagNames)
+             .stream()
+             .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
+             .collect(Collectors.toList());
+ }
+
+ // ALGORITHM 2 — active user: posts from followed users + joined communities
+ private List<PostSummaryDTO> getPersonalizedFeed(User currentUser) {
+     return postRepository.findFeedPostsForUser(currentUser.getUserId())
+             .stream()
+             .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
+             .collect(Collectors.toList());
+ }
+ 	// FED TYPE
+ 	@Transactional(readOnly = true)
+ 	public String getFeedType(Integer userId) {
+ 		boolean hasFollows = !userFollowRepository.findByFollower_UserId(userId).isEmpty();
+ 		boolean hasCommunities = !communityMemberRepository.findByUser_UserId(userId).isEmpty();
+ 		return (!hasFollows && !hasCommunities) ? "suggested" : "feed";
+ 	}
+ 	
     // ---------------------------------------------------------------
     // TRENDING TAGS (last 30 days)
     // ---------------------------------------------------------------
