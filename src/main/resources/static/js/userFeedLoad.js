@@ -41,7 +41,7 @@
 		
 		// ── feed posts ────────────────────────────────────────────────
 		      Promise.all([
-		        fetch(`/api/posts/feed/${currentUserId}`, { headers }).then(r => r.ok ? r.json() : []),
+		        fetch(`/api/posts/feed/${currentUserId}?page=0&size=20`, { headers }).then(r => r.ok ? r.json() : []),
 		        fetch(`/api/posts/feed/${currentUserId}/type`, { headers }).then(r => r.ok ? r.json() : { type: 'feed' })
 		      ])
 			  .then(([posts, { type }]) => {
@@ -53,6 +53,9 @@
 			      posts.forEach(p => p.suggested = true);
 			    }
 			    renderPostList(posts, 'feed-posts-list');
+			    requestAnimationFrame(() => {
+			      window.dispatchEvent(new CustomEvent('feedPage0Loaded'));
+			    });
 			  })
 		      .catch(() => renderPostList([], 'feed-posts-list'));
 
