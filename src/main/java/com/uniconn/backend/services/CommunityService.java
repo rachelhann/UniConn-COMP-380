@@ -6,6 +6,7 @@ import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -139,22 +140,22 @@ public class CommunityService extends BaseService {
     // EXPLORE - all communities (no auth required)
     // ---------------------------------------------------------------
 	@Transactional(readOnly = true)
-    public List<CommunityResponseDTO> getAllCommunities() {
-        return communityRepository.findAll()
-                .stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
-    }
+	public List<CommunityResponseDTO> getAllCommunities() {
+	    return communityRepository.findAllByOrderByCreatedAtDesc()
+	            .stream()
+	            .map(this::mapToResponseDTO)
+	            .collect(Collectors.toList());
+	}
  
     // Explore filtered by category - e.g. /explore-communities/academics
 	@Transactional(readOnly = true)
-    public List<CommunityResponseDTO> getCommunitiesByCategory(String categoryParam) {
-        CommunityCategory category = parseCategoryOrThrow(categoryParam);
-        return communityRepository.findByCategory(category)
-                .stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
-    }
+	public List<CommunityResponseDTO> getCommunitiesByCategory(String categoryParam) {
+	    CommunityCategory category = parseCategoryOrThrow(categoryParam);
+	    return communityRepository.findByCategoryOrderByCreatedAtDesc(category)
+	            .stream()
+	            .map(this::mapToResponseDTO)
+	            .collect(Collectors.toList());
+	}
 	
  
     // ---------------------------------------------------------------
@@ -163,13 +164,19 @@ public class CommunityService extends BaseService {
  
     // All communities the user has any membership in
 	@Transactional(readOnly = true)
-    public List<CommunityResponseDTO> getMyCommunities() {
-        User currentUser = getAuthenticatedUser();
-        return communityMemberRepository.findByUser_UserId(currentUser.getUserId())
-                .stream()
-                .map(member -> mapToResponseDTO(member.getCommunity()))
-                .collect(Collectors.toList());
-    }
+	public List<CommunityResponseDTO> getMyCommunities() {
+	    User currentUser = getAuthenticatedUser();
+	    Integer userId = currentUser.getUserId();
+	    
+	    return communityMemberRepository.findByUser_UserId(userId)
+	            .stream()
+	            .sorted(Comparator
+	                .comparing((CommunityMember m) -> 
+	                    m.getCommunity().getCreatedBy().getUserId().equals(userId) ? 0 : 1)
+	                .thenComparing(CommunityMember::getJoinedAt, Comparator.reverseOrder()))
+	            .map(member -> mapToResponseDTO(member.getCommunity()))
+	            .collect(Collectors.toList());
+	}
 
     @Transactional(readOnly = true)
     public List<CommunityResponseDTO> getCommunitiesByUserId(Integer userId) {
@@ -192,14 +199,15 @@ public class CommunityService extends BaseService {
     // Communities where user is a member but NOT the creator
     // (REGULAR_MEMBER or MODERATOR role)
 	@Transactional(readOnly = true)
-    public List<CommunityResponseDTO> getCommunitiesIJoined() {
-        User currentUser = getAuthenticatedUser();
-        return communityMemberRepository.findByUser_UserId(currentUser.getUserId())
-                .stream()
-                .filter(m -> m.getRole() != CommunityMemberRole.ADMIN)
-                .map(member -> mapToResponseDTO(member.getCommunity()))
-                .collect(Collectors.toList());
-    }
+	public List<CommunityResponseDTO> getCommunitiesIJoined() {
+	    User currentUser = getAuthenticatedUser();
+	    return communityMemberRepository.findByUser_UserId(currentUser.getUserId())
+	            .stream()
+	            .filter(m -> m.getRole() != CommunityMemberRole.ADMIN)
+	            .sorted(Comparator.comparing(CommunityMember::getJoinedAt, Comparator.reverseOrder()))
+	            .map(member -> mapToResponseDTO(member.getCommunity()))
+	            .collect(Collectors.toList());
+	}
 	
  
     // ---------------------------------------------------------------

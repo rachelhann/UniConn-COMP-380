@@ -7,9 +7,22 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Integer> {
-
+	
+	@Query("""
+		    SELECT p FROM Post p
+		    LEFT JOIN FETCH p.author
+		    LEFT JOIN FETCH p.community
+		    LEFT JOIN FETCH p.tags pt
+		    LEFT JOIN FETCH pt.tag
+		    WHERE p.postId = :postId
+		      AND p.isDeleted = false
+		""")
+		Optional<Post> findByIdWithTags(@Param("postId") Integer postId);
+	
+	
     // ---------------------------------------------------------------
     // FEED: posts from communities the user is a member of
     //       + posts from users the user follows
@@ -36,7 +49,26 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
         ORDER BY p.createdAt DESC
     """)
     List<Post> findFeedPostsForUser(@Param("userId") Integer userId);
-
+    
+ // ---------------------------------------------------------------
+ // FEED ALGORITHM 1: posts that have any of the given trending tags
+ // newest first, not deleted
+ // ---------------------------------------------------------------
+ @Query("""
+     SELECT DISTINCT p FROM Post p
+     LEFT JOIN FETCH p.author
+     LEFT JOIN FETCH p.community
+     LEFT JOIN FETCH p.tags pt
+     LEFT JOIN FETCH pt.tag
+     WHERE p.isDeleted = false
+       AND EXISTS (
+           SELECT 1 FROM PostTag ptx
+           JOIN ptx.tag tx
+           WHERE ptx.post = p AND tx.name IN :tagNames
+       )
+     ORDER BY p.createdAt DESC
+ """)
+ List<Post> findPostsByTrendingTags(@Param("tagNames") List<String> tagNames);
 
     // ---------------------------------------------------------------
     // TRENDING TAGS: top tags by distinct post count, last 30 days
@@ -129,7 +161,24 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
         ORDER BY p.createdAt DESC
     """)
     List<Post> findCommunityPostsByUser(@Param("userId") Integer userId);
-
+    
+    // ---------------------------------------------------------------
+    // POSTS USER LIKED
+    // ---------------------------------------------------------------
+    @Query("""
+    	    SELECT DISTINCT p FROM Post p
+    	    LEFT JOIN FETCH p.author
+    	    LEFT JOIN FETCH p.community
+    	    LEFT JOIN FETCH p.tags pt
+    	    LEFT JOIN FETCH pt.tag
+    	    WHERE p.isDeleted = false
+    	      AND EXISTS (
+    	          SELECT 1 FROM PostLike pl
+    	          WHERE pl.post = p AND pl.user.userId = :userId
+    	      )
+    	    ORDER BY p.createdAt DESC
+    	""")
+    	List<Post> findPostsLikedByUser(@Param("userId") Integer userId);
 
     // ---------------------------------------------------------------
     // ALL POSTS IN A COMMUNITY

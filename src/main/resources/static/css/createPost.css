@@ -33,6 +33,60 @@
   color: #666;
 }
 
+.post-btn-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.post-btn-column .gif-trigger-btn {
+  padding: 5px 8px;
+  width: 100%;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.create-post-gif-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.gif-trigger-btn {
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center;
+  padding: 5px 14px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.82em;
+  font-weight: 600;
+  color: #555;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.gif-trigger-btn:hover {
+  background: #d6ecf7;
+  border-color: #83b5d6;
+  color: #2a7aa8;
+}
+
+.comment-gif-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 /*@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..900;1,300..900&display=swap');
 :root {
   --clr-bg: #ffffff;
@@ -49,7 +103,7 @@
 html {
   align-items: center;
   overflow-y: scroll;
-  scrollbar-color: #242424;
+  scrollbar-color: #c0cdd6 #f0f2f5;
   scrollbar-width: thin; 
 }*/
 

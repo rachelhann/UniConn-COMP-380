@@ -8,7 +8,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const password = document.querySelector('input[name="password"]').value;
   const errorEl  = document.getElementById('login-error');
 
-  errorEl.style.display = 'none'; // hides any previous error
+  errorEl.textContent = ''; // hides any previous error
 
   try {
     const response = await fetch('/api/auth/login', {
@@ -33,9 +33,9 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
       } catch {}
       window.location.href = '/feed';
     } else {
-      errorEl.style.display = 'block'; 
+      errorEl.textContent = 'Invalid email or password.';
     }
   } catch {
-    errorEl.style.display = 'block';
+    errorEl.textContent = 'Invalid email or password.';
   }
 });

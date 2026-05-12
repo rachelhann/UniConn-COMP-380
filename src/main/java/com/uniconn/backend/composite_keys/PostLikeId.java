@@ -16,7 +16,7 @@ public class PostLikeId implements Serializable {
 		this.postId = postId;
 	}
 	
-	// getters&setters
+	// getters & setters
 	public Integer getUserId() {
 		return userId;
 	}

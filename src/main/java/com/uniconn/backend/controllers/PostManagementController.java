@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -37,6 +38,13 @@ public class PostManagementController {
         postManagementService.deletePost(postId);
         return ResponseEntity.noContent().build();
     }
+    
+    // GET /api/posts/{postId}
+    // Fetch a single post by ID (used to refresh modal state)
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostSummaryDTO> getPost(@PathVariable Integer postId) {
+    	return ResponseEntity.ok(postManagementService.getPost(postId));
+    }
 
     // ---------------------------------------------------------------
     // GET /api/posts/feed/{userId}
@@ -45,6 +53,11 @@ public class PostManagementController {
     @GetMapping("/feed/{userId}")
     public ResponseEntity<List<PostSummaryDTO>> getFeed(@PathVariable Integer userId) {
         return ResponseEntity.ok(postManagementService.getFeedForUser(userId));
+    }
+    
+    @GetMapping("/feed/{userId}/type")
+    public ResponseEntity<Map<String, String>> getFeedType(@PathVariable Integer userId) {
+        return ResponseEntity.ok(Map.of("type", postManagementService.getFeedType(userId)));
     }
 
     // ---------------------------------------------------------------
@@ -102,6 +115,13 @@ public class PostManagementController {
     @GetMapping("/user/{userId}/community")
     public ResponseEntity<List<PostSummaryDTO>> getCommunityPostsByUser(@PathVariable Integer userId) {
         return ResponseEntity.ok(postManagementService.getCommunityPostsByUser(userId));
+    }
+    
+    // GET /api/posts/liked-by/{userId}
+    // Posts user liked
+    @GetMapping("/liked-by/{userId}")
+    public ResponseEntity<List<PostSummaryDTO>> getPostsLikedByUser(@PathVariable Integer userId) {
+        return ResponseEntity.ok(postManagementService.getPostsLikedByUser(userId));
     }
 
     // ---------------------------------------------------------------

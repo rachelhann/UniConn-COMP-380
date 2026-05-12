@@ -50,4 +50,18 @@ public class PostInteractionController {
     public ResponseEntity<List<CommentSummaryDTO>> getComments(@PathVariable Integer postId) {
         return ResponseEntity.ok(postInteractionService.getCommentsForPost(postId));
     }
+    
+    // POST /api/posts/comments/{commentId}/like
+    @PostMapping("/comments/{commentId}/like")
+    public ResponseEntity<Void> likeComment(@PathVariable Integer commentId) {
+        postInteractionService.likeComment(commentId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // DELETE /api/posts/comments/{commentId}/like
+    @DeleteMapping("/comments/{commentId}/like")
+    public ResponseEntity<Void> unlikeComment(@PathVariable Integer commentId) {
+        postInteractionService.unlikeComment(commentId);
+        return ResponseEntity.noContent().build();
+    }
 }

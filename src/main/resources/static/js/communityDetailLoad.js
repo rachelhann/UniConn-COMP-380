@@ -3,6 +3,18 @@
   const token = localStorage.getItem('token');
   const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
 
+  if (typeof initPostViewModal === 'function') initPostViewModal();
+
+  function openPendingPostModal() {
+    const raw = sessionStorage.getItem('pendingPostModal');
+    if (!raw) return;
+    sessionStorage.removeItem('pendingPostModal');
+    try {
+      const post = JSON.parse(raw);
+      if (typeof openPostViewModal === 'function') openPostViewModal(post);
+    } catch {}
+  }
+
   const fmt = s => s ? s.toLowerCase().replace(/_/g, ' ') : '';
 
   const currentUsername = localStorage.getItem('currentUsername') || '';
@@ -21,7 +33,7 @@
     if (descEl) descEl.textContent = community.description || '';
 
     const createdByEl = document.getElementById('community-created-by');
-    if (createdByEl) createdByEl.textContent = 'u/' + (community.createdByUsername || '');
+    if (createdByEl) createdByEl.innerHTML = `<a href="/profile/${community.createdByUsername || ''}" class="post-username-link">u/${community.createdByUsername || ''}</a>`;
 
     const tagsEl = document.getElementById('community-tags');
     if (tagsEl && Array.isArray(community.tags) && community.tags.length > 0) {
@@ -172,38 +184,10 @@
     }
   }
 
-  function formatDate(iso) {
-    const d = new Date(iso);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-      + ' · '
-      + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-  }
-
   function renderCommunityPosts(posts) {
-    const section = document.querySelector('.community-posts-section');
     const placeholder = document.getElementById('community-posts-placeholder');
-    if (!section) return;
-
-    if (!posts || posts.length === 0) {
-      if (placeholder) placeholder.style.display = 'block';
-      return;
-    }
-
     if (placeholder) placeholder.style.display = 'none';
-
-    posts.forEach(post => {
-      const card = document.createElement('div');
-      card.className = 'community-post-card';
-      card.innerHTML = `
-        <div class="community-post-header">
-          <span class="community-post-username">u/${post.authorUsername}</span>
-          <span class="community-post-date">${formatDate(post.createdAt)}</span>
-        </div>
-        ${post.title ? `<p class="community-post-title">${post.title}</p>` : ''}
-        <p class="community-post-body">${post.contentText}</p>
-      `;
-      section.appendChild(card);
-    });
+    renderPostList(posts, 'community-posts-container');
   }
 
   function renderTrending(tags) {
@@ -218,7 +202,7 @@
       const li = document.createElement('li');
       li.className = 'trending-tag-item';
       li.innerHTML = `<span class="trending-tag-rank">#${i + 1}</span><span class="trending-tag-name">${tag}</span>`;
-      li.addEventListener('click', () => { window.location.href = '/communities?tag=' + encodeURIComponent(tag); });
+      li.addEventListener('click', () => openTagPostsModal(tag));
       trendingList.appendChild(li);
     });
   }
@@ -240,7 +224,10 @@
 
     return fetch(`/api/posts/community/${community.communityId}`, { headers });
   }).then(res => res.ok ? res.json() : [])
-    .then(renderCommunityPosts)
+    .then(posts => {
+      renderCommunityPosts(posts);
+      openPendingPostModal();
+    })
     .catch(() => {
       const raw = sessionStorage.getItem('communityDetail');
       if (!raw) return;

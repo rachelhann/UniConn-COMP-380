@@ -55,7 +55,6 @@ public class SearchResultDTO {
         private String description;
         private int memberCount;
         private String communityPicture;
-
         public CommunityResult(Community c) {
             this.communityId = c.getCommunityId();
             this.communityName = c.getCommunityName();
