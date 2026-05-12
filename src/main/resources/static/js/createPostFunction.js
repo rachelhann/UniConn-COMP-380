@@ -202,3 +202,18 @@ initGifPicker({
     selectedGifUrl = url;
   }
 });
+
+// Stack GIF button below emoji trigger in a side column.
+// Must run inside DOMContentLoaded so emojiPicker.js has already attached.
+document.addEventListener('DOMContentLoaded', () => {
+  const emojiWrap    = document.querySelector('#create-post-modal .uc-emoji-wrap');
+  const emojiTrigger = emojiWrap?.querySelector('.uc-emoji-trigger');
+  const gifBtn       = document.getElementById('post-gif-btn');
+  if (emojiWrap && emojiTrigger && gifBtn) {
+    const col = document.createElement('div');
+    col.className = 'post-btn-column';
+    emojiWrap.insertBefore(col, emojiTrigger);
+    col.appendChild(emojiTrigger);
+    col.appendChild(gifBtn);
+  }
+});

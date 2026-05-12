@@ -99,8 +99,56 @@
 .search-result-empty { list-style: none; color: #999; font-size: 0.9em; padding: 12px 4px; }
 
 /* NOTIFICATIONS */
-.notif-unread { border-left: 3px solid #4a90d9; background: #f5f9ff; }
-.notif-unread:hover { background: #eaf3fb; }
+.search-result-card { background: #fff; }
+.notif-unread { border-left: 3px solid #4a90d9; background: #e7f0fc; }
+.notif-unread:hover { background: #d6e6f7; }
+
+/* Bell badge (red circle in top-right of the bell icon) */
+#notification-toggle { position: relative; }
+
+.notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: #e53935;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 9px;
+  border: 2px solid #fff;
+  box-sizing: content-box;
+  display: none;            
+  pointer-events: none;
+}
+
+/*  Compact notification toolbar: two dropdowns side by side */
+.notif-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 8px 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #eee;
+}
+
+#notif-type-filter,
+#notif-date-filter,
+#notif-mark-all {
+  padding: 3px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.85em;
+  background: #fff;
+  cursor: pointer;
+}
+
+/*  "Mark all as..." dropdown */
+#notif-mark-all { margin-left: auto; }
 
 .notification-list {
   list-style: none; margin: 12px 0 0 0; padding: 0;

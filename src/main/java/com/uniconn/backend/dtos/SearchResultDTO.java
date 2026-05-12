@@ -4,6 +4,7 @@ import com.uniconn.backend.entities.Community;
 import com.uniconn.backend.entities.Post;
 import com.uniconn.backend.entities.User;
 import java.util.List;
+import com.uniconn.backend.entities.Tag;
 
 public class SearchResultDTO {
 
@@ -54,7 +55,6 @@ public class SearchResultDTO {
         private String description;
         private int memberCount;
         private String communityPicture;
-
         public CommunityResult(Community c) {
             this.communityId = c.getCommunityId();
             this.communityName = c.getCommunityName();
@@ -94,5 +94,19 @@ public class SearchResultDTO {
         public int getLikeCount() { return likeCount; }
         public int getCommentCount() { return commentCount; }
         public String getAuthorUsername() { return authorUsername; }
+    }
+
+    // Nested DTO for Tag
+    public static class TagResult {
+        private Integer tagId;
+        private String name;
+
+        public TagResult(Tag t) {
+            this.tagId = t.getTagId();
+            this.name = t.getName();
+        }
+
+        public Integer getTagId() { return tagId; }
+        public String getName() { return name; }
     }
 }

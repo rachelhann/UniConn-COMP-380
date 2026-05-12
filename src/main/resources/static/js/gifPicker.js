@@ -69,7 +69,7 @@ function initGifPicker({ triggerBtnId, previewContainerId, onSelect }) {
 
   async function fetchGifs(query) {
       try {
-        const res = await fetch(`/api/giphy/search?q=${encodeURIComponent(query)}&limit=12`, {
+        const res = await fetch(`/api/giphy/search?q=${encodeURIComponent(query)}&limit=40`, {
           headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
         });
         if (!res.ok) throw new Error();

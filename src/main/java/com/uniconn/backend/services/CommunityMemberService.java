@@ -12,11 +12,14 @@ import com.uniconn.backend.composite_keys.CommunityMemberId;
 public class CommunityMemberService extends BaseService {
 	private final CommunityMemberRepository communityMemberRepository;
 	private final CommunityRepository communityRepository;
-	
+	private final NotificationService notificationService;
+
 	public CommunityMemberService(CommunityMemberRepository communityMemberRepository,
-            CommunityRepository communityRepository) {
+            CommunityRepository communityRepository,
+            NotificationService notificationService) {
         this.communityMemberRepository = communityMemberRepository;
         this.communityRepository = communityRepository;
+        this.notificationService = notificationService;
     }
 	
 	@Transactional
@@ -34,6 +37,15 @@ public class CommunityMemberService extends BaseService {
 
 	    communityMemberRepository.save(new CommunityMember(community, currentUser, CommunityMemberRole.REGULAR_MEMBER));
         adjustMembershipCounts(community, currentUser, +1);
+
+        // Notify the community admin (creator) that a new user joined.
+        // Placed last so the notification only fires if the join itself succeeded.
+        notificationService.createCommunityJoinNotification(
+            community.getCreatedBy(),
+            currentUser,
+            communityId,
+            community.getCommunityName()
+        );
 
         return "Joined community successfully";
 	}

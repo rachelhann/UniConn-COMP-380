@@ -1,0 +1,270 @@
+
+.
+  .classpath
+  .factorypath
+  .gitattributes
+  .gitignore
+
+./.mvn/wrapper
+  maven-wrapper.properties
+
+.
+  .project
+
+./.settings
+  org.eclipse.core.resources.prefs
+  org.eclipse.jdt.apt.core.prefs
+  org.eclipse.jdt.core.prefs
+  org.springframework.ide.eclipse.prefs
+
+.
+  CLEAN_START.md
+  COMMUNITY.md
+  EXCEPTIONS.md
+  PULL_REQUEST_TEMPLATE.md
+  README.md
+  dependency-versions.properties
+  mvnw
+  mvnw.cmd
+  pom.xml
+
+./src/main/java/com/uniconn/backend
+  UniConnApplication.java
+
+./src/main/java/com/uniconn/backend/composite_keys
+  CommentLikeId.java
+  CommunityMemberId.java
+  CommunityTagId.java
+  PostLikeId.java
+  PostTagId.java
+  UserFollowId.java
+
+./src/main/java/com/uniconn/backend/config
+  CloudinaryConfig.java
+  JwtAuthEntryPoint.java
+  JwtAuthFilter.java
+  SecurityConfig.java
+  UserDetailsServiceImpl.java
+
+./src/main/java/com/uniconn/backend/controllers
+  AuthController.java
+  CommunityController.java
+  CommunityMemberController.java
+  GiphyController.java
+  ImageUploadController.java
+  NotificationController.java
+  PageController.java
+  PostInteractionController.java
+  PostManagementController.java
+  ProfileController.java
+  SearchController.java
+  UserFollowController.java
+
+./src/main/java/com/uniconn/backend/dtos
+  AuthResponse.java
+  CommentCreateDTO.java
+  CommentSummaryDTO.java
+  CommunityDTO.java
+  CommunityResponseDTO.java
+  CommunityUpdateDTO.java
+  CreatePostRequest.java
+  ForgotPasswordRequest.java
+  LoginRequest.java
+  NotificationResponseDTO.java
+  PostCreateDTO.java
+  PostSummaryDTO.java
+  ProfileData.java
+  ProfileUpdateRequest.java
+  RegisterRequest.java
+  ResetPasswordRequest.java
+  SearchResultDTO.java
+  TrendingTagDTO.java
+  UserSummaryDTO.java
+
+./src/main/java/com/uniconn/backend/entities
+  Comment.java
+  CommentLike.java
+  Community.java
+  CommunityCategory.java
+  CommunityMember.java
+  CommunityMemberRole.java
+  CommunityTag.java
+  Notification.java
+  PasswordReset.java
+  Post.java
+  PostLike.java
+  PostTag.java
+  Tag.java
+  User.java
+  UserFollow.java
+
+./src/main/java/com/uniconn/backend/events
+  PostCreatedEvent.java
+
+./src/main/java/com/uniconn/backend/exception
+  GlobalExceptionHandler.java
+  InvalidInputException.java
+  ResourceAlreadyExistsException.java
+  ResourceNotFoundException.java
+  UnauthorizedException.java
+
+./src/main/java/com/uniconn/backend/listeners
+  NotificationEventListener.java
+
+./src/main/java/com/uniconn/backend/repositories
+  CommentLikeRepository.java
+  CommentRepository.java
+  CommunityMemberRepository.java
+  CommunityRepository.java
+  CommunityTagRepository.java
+  NotificationRepository.java
+  PasswordResetRepository.java
+  PostLikeRepository.java
+  PostRepository.java
+  PostTagRepository.java
+  SearchRepository.java
+  TagRepository.java
+  UserFollowRepository.java
+  UserRepository.java
+
+./src/main/java/com/uniconn/backend/services
+  AuthService.java
+  BaseService.java
+  CommunityMemberService.java
+  CommunityService.java
+  CommunityTagService.java
+  FeedAlgorithmService.java
+  GiphyService.java
+  ImageUploadService.java
+  NotificationService.java
+  PasswordResetService.java
+  PostInteractionService.java
+  PostManagementService.java
+  PostTagService.java
+  ProfileService.java
+  SearchService.java
+  TagService.java
+  UserFollowService.java
+  UserService.java
+
+./src/main/java/com/uniconn/backend/utils
+  JwtUtil.java
+
+./src/main/java/com/uniconn/backend/validation
+  ValidTag.java
+  ValidTagValidator.java
+
+./src/main/resources
+  application-local.properties
+  application.properties.template
+
+./src/main/resources/db
+  comments_test_data.sql
+  community_test_data.sql
+  post_likes_test_data.sql
+  posts_test_data.sql
+  user_follows_test_data.sql
+  users_test_data.sql
+
+./src/main/resources/static
+  auth-guard.html
+
+./src/main/resources/static/css
+  base.css
+  communities.css
+  createPost.css
+  dark-mode.css
+  followButton.css
+  forgotPassword.css
+  layout.css
+  login.css
+  modals.css
+  navbar.css
+  postCards.css
+  profile.css
+  register.css
+  tagInput.css
+  userFeed.css
+
+./src/main/resources/static/js
+  auth-guard.js
+  communitiesLoad.js
+  communityDetailLoad.js
+  communityFunction.js
+  createPostFunction.js
+  darkMode.js
+  editProfileFunction.js
+  emojiPicker.js
+  feedPagination.js
+  forgotPassword.js
+  gifPicker.js
+  login.js
+  modalManager.js
+  myCommunitiesLoad.js
+  navbarPfp.js
+  notificationFunction.js
+  passwordToggle.js
+  postCardRenderer.js
+  postDetailLoad.js
+  profileLoad.js
+  profilePostsLoad.js
+  register.js
+  searchFunction.js
+  tagInput.js
+  tagPostsModal.js
+  userFeedLoad.js
+  userProfileLoad.js
+
+./src/main/resources/static/uploads
+  ecf05e3a-2fdf-43dd-ad99-14abb4c8bf26.png
+
+./src/main/resources/static/vector-logos
+  addPost.svg
+  addPostWhite.svg
+  clubLogo.svg
+  commentCloud.svg
+  deleteTrashBin.svg
+  emailLogo.svg
+  feedLogo.svg
+  heartBlue.svg
+  heartOutline.svg
+  magnifyGlass.svg
+  notifLogo.svg
+  passwordSignIn.svg
+  profilePicLogo.svg
+  sparkleLogo.svg
+  unicornLogo.png
+  unicornLogo.svg
+  usernameSignIn.svg
+
+./src/main/resources/templates/communities
+  communities.html
+  communityDetail.html
+  myCommunities.html
+
+./src/main/resources/templates/login
+  forgotPassword.html
+  login.html
+  register.html
+
+./src/main/resources/templates/post
+  createPost.html
+  postDetail.html
+
+./src/main/resources/templates/profile
+  profile.html
+  userProfile.html
+
+./src/main/resources/templates/userFeed
+  userFeed.html
+
+./src/test/java/com/uniconn/backend
+  CommunityMemberServiceTest.java
+  SearchControllerTest.java
+  UniConnApplicationTests.java
+
+./src/test/java/com/uniconn/backend/services
+  ProfileServiceTest.java
+
+.
+  structuredev.txt
