@@ -50,6 +50,10 @@ public class UserService extends BaseService {
             throw new InvalidInputException("Username is required");
         }
 
+        if (request.getUsername().contains(" ")) {
+            throw new InvalidInputException("Username cannot contain spaces");
+        }
+
         // validate password
         if (request.getPassword() == null || request.getPassword().isBlank()) {
             throw new InvalidInputException("Password is required");

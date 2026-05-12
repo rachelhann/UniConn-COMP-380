@@ -1,5 +1,5 @@
 // intercepts register form submission, sends new account details to backend API.
-// successs: stores returned JWT in localStorage and redirects to the feed.
+// success: stores returned JWT in localStorage and redirects to the feed.
 // failure: shows error message below
 const usernameInput = document.querySelector('input[name="username"]');
 usernameInput.addEventListener('input', () => {
@@ -9,12 +9,14 @@ usernameInput.addEventListener('input', () => {
 });
 
 document.getElementById('register-form').addEventListener('submit', async (e) => {
-  e.preventDefault(); 
+  e.preventDefault();
 
-  const username = document.querySelector('input[name="username"]').value.trim();
-  const email    = document.querySelector('input[name="email"]').value.trim();
-  const password = document.querySelector('input[name="password"]').value;
-  const errorEl  = document.getElementById('register-error');
+  const username       = document.querySelector('input[name="username"]').value.trim();
+  const email          = document.querySelector('input[name="email"]').value.trim();
+  const password       = document.querySelector('input[name="password"]').value;
+  const secretQuestion = document.querySelector('select[name="secretQuestion"]').value.trim();
+  const secretAnswer   = document.querySelector('input[name="secretAnswer"]').value.trim();
+  const errorEl        = document.getElementById('register-error');
 
   errorEl.textContent = '';
 
@@ -23,7 +25,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       // backend expects csunEmail, not email
-      body: JSON.stringify({ username, csunEmail: email, password })
+      body: JSON.stringify({ username, csunEmail: email, password, secretQuestion, secretAnswer })
     });
 
     if (response.ok) {
@@ -32,7 +34,12 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
       window.location.href = '/feed';
     } else {
       const msg = await response.text();
-      errorEl.textContent = msg || 'Registration failed. Please try again.';
+      try {
+        const json = JSON.parse(msg);
+        errorEl.textContent = json.error || json.message || 'Registration failed. Please try again.';
+      } catch {
+        errorEl.textContent = msg || 'Registration failed. Please try again.';
+      }
     }
   } catch {
     errorEl.textContent = 'Something went wrong. Please try again.';
