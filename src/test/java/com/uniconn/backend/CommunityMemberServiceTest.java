@@ -5,6 +5,7 @@ import com.uniconn.backend.entities.*;
 import com.uniconn.backend.repositories.*;
 import com.uniconn.backend.services.BaseService;
 import com.uniconn.backend.services.CommunityMemberService;
+import com.uniconn.backend.services.NotificationService;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class CommunityMemberServiceTest {
@@ -22,6 +24,7 @@ class CommunityMemberServiceTest {
     @Mock private CommunityMemberRepository communityMemberRepository;
     @Mock private CommunityRepository communityRepository;
     @Mock private UserRepository userRepository;
+    @Mock private NotificationService notificationService;
 
     private CommunityMemberService communityMemberService;
 
@@ -34,8 +37,8 @@ class CommunityMemberServiceTest {
 
         // Manually construct service so all constructor args are injected
         communityMemberService = new CommunityMemberService(
-            communityMemberRepository, communityRepository
-        );
+    communityMemberRepository, communityRepository, notificationService
+);
 
         // Inject userRepository into BaseService parent field (not reached by constructor)
         try {

@@ -4,6 +4,7 @@ import com.uniconn.backend.composite_keys.CommentLikeId;
 import com.uniconn.backend.composite_keys.PostLikeId;
 import com.uniconn.backend.dtos.*;
 import com.uniconn.backend.entities.*;
+import com.uniconn.backend.entities.Notification.NotificationType;
 import com.uniconn.backend.exception.*;
 import com.uniconn.backend.repositories.*;
 import org.springframework.stereotype.Service;
@@ -20,17 +21,20 @@ public class PostInteractionService extends BaseService {
     private final CommentRepository commentRepository;
     private final CommunityMemberRepository communityMemberRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final NotificationService notificationService;
 
     public PostInteractionService(PostRepository postRepository,
                                   PostLikeRepository postLikeRepository,
                                   CommentRepository commentRepository,
                                   CommunityMemberRepository communityMemberRepository,
-                                  CommentLikeRepository commentLikeRepository) {
+                                  CommentLikeRepository commentLikeRepository,
+                                  NotificationService notificationService) {
         this.postRepository = postRepository;
         this.postLikeRepository = postLikeRepository;
         this.commentRepository = commentRepository;
         this.communityMemberRepository = communityMemberRepository;
         this.commentLikeRepository = commentLikeRepository;
+        this.notificationService = notificationService;
     }
 
     // ---------------------------------------------------------------
@@ -61,6 +65,10 @@ public class PostInteractionService extends BaseService {
 
         post.setLikeCount(post.getLikeCount() + 1);
         postRepository.save(post);
+
+        // Notify the post's author that someone liked their post
+        notificationService.createNotification(
+            post.getAuthor(), currentUser, NotificationType.LIKE, postId, null);
     }
 
     // ---------------------------------------------------------------
@@ -118,6 +126,11 @@ public class PostInteractionService extends BaseService {
 
         post.setCommentCount(post.getCommentCount() + 1);
         postRepository.save(post);
+
+        // Notify the post's author that someone commented on their post
+        notificationService.createNotification(
+            post.getAuthor(), currentUser, NotificationType.COMMENT,
+            post.getPostId(), saved.getCommentId());
 
         return mapToDTO(saved);
     }
