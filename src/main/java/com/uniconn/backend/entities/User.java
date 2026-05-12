@@ -9,7 +9,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-@Table(name = "users")
+@Table(name = "users",
+		indexes = {
+			@Index(name = "idx_user_username", columnList = "username"),
+			@Index(name = "idx_user_email", columnList = "email"),
+			@Index(name = "idx_user_is_active", columnList = "isActive")
+		}
+)
 @Entity
 public class User {
 	@Id
