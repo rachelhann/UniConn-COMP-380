@@ -17,8 +17,8 @@ public class PostSummaryDTO {
     private List<String> tags;
     private boolean isLikedByCurrentUser;
     private boolean canDelete;
-    
     private String gifUrl;
+    private boolean isSuggested;
 
     public PostSummaryDTO() {}
 
@@ -27,7 +27,8 @@ public class PostSummaryDTO {
                           String title, String contentText,
                           int likeCount, int commentCount,
                           LocalDateTime createdAt, List<String> tags,
-                          boolean isLikedByCurrentUser, boolean canDelete, String gifUrl) {
+                          boolean isLikedByCurrentUser, boolean canDelete,
+                          String gifUrl, boolean isSuggested) {
         this.postId = postId;
         this.authorUsername = authorUsername;
         this.authorId = authorId;
@@ -42,63 +43,69 @@ public class PostSummaryDTO {
         this.isLikedByCurrentUser = isLikedByCurrentUser;
         this.canDelete = canDelete;
         this.gifUrl = gifUrl;
+        this.isSuggested = isSuggested;
     }
-    
-    // getters
-	public Integer getPostId() {
-		return postId;
-	}
 
-	public String getAuthorUsername() {
-		return authorUsername;
-	}
+    // ---------------------------------------------------------------
+    // GETTERS
+    // ---------------------------------------------------------------
+    public Integer getPostId() {
+        return postId;
+    }
 
-	public Integer getAuthorId() {
-		return authorId;
-	}
+    public String getAuthorUsername() {
+        return authorUsername;
+    }
 
-	public String getCommunityName() {
-		return communityName;
-	}
+    public Integer getAuthorId() {
+        return authorId;
+    }
 
-	public Integer getCommunityId() {
-		return communityId;
-	}
+    public String getCommunityName() {
+        return communityName;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public Integer getCommunityId() {
+        return communityId;
+    }
 
-	public String getContentText() {
-		return contentText;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public int getLikeCount() {
-		return likeCount;
-	}
+    public String getContentText() {
+        return contentText;
+    }
 
-	public int getCommentCount() {
-		return commentCount;
-	}
+    public int getLikeCount() {
+        return likeCount;
+    }
 
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
+    public int getCommentCount() {
+        return commentCount;
+    }
 
-	public List<String> getTags() {
-		return tags;
-	}
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-	public boolean isLikedByCurrentUser() {
-		return isLikedByCurrentUser;
-	}
+    public List<String> getTags() {
+        return tags;
+    }
 
-	public boolean isCanDelete() {
-		return canDelete;
-	}
-	
-	public String getGifUrl() {
-		return gifUrl;
-	} 
-    
+    public boolean isLikedByCurrentUser() {
+        return isLikedByCurrentUser;
+    }
+
+    public boolean isCanDelete() {
+        return canDelete;
+    }
+
+    public String getGifUrl() {
+        return gifUrl;
+    }
+
+    public boolean isSuggested() {
+        return isSuggested;
+    }
 }

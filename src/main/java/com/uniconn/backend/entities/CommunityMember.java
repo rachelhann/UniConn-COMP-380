@@ -5,7 +5,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import com.uniconn.backend.composite_keys.CommunityMemberId;
 
-@Table(name = "community_member")
+@Table(name = "community_member",
+	 indexes = {
+		@Index(name = "idx_community_member_user_id", columnList = "user_id"),
+		@Index(name = "idx_community_member_community_id", columnList = "community_id"),
+		@Index(name = "idx_community_member_role", columnList = "role")
+	}
+)
 @Entity
 public class CommunityMember {
 	@EmbeddedId

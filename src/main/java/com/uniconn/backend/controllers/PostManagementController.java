@@ -1,7 +1,9 @@
 package com.uniconn.backend.controllers;
 
 import com.uniconn.backend.dtos.*;
+import com.uniconn.backend.services.FeedAlgorithmService;
 import com.uniconn.backend.services.PostManagementService;
+import com.uniconn.backend.services.FeedAlgorithmService;
 
 import jakarta.validation.Valid;
 
@@ -14,10 +16,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/posts")
 public class PostManagementController {
-    private final PostManagementService postManagementService;
 
-    public PostManagementController(PostManagementService postManagementService) {
+
+    private final PostManagementService postManagementService;
+    private final FeedAlgorithmService feedAlgorithmService;
+
+    public PostManagementController(PostManagementService postManagementService, FeedAlgorithmService feedAlgorithmService) {
         this.postManagementService = postManagementService;
+        this.feedAlgorithmService = feedAlgorithmService;
     }
 
     // ---------------------------------------------------------------
@@ -51,8 +57,17 @@ public class PostManagementController {
     // User feed: posts from followed users + member communities
     // ---------------------------------------------------------------
     @GetMapping("/feed/{userId}")
-    public ResponseEntity<List<PostSummaryDTO>> getFeed(@PathVariable Integer userId) {
-        return ResponseEntity.ok(postManagementService.getFeedForUser(userId));
+    public ResponseEntity<List<PostSummaryDTO>> getFeed(
+            @PathVariable Integer userId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        try {
+            List<PostSummaryDTO> feed = feedAlgorithmService.getFeed(userId, page, size);
+            return ResponseEntity.ok(feed);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.badRequest().build();
+            }
     }
     
     @GetMapping("/feed/{userId}/type")

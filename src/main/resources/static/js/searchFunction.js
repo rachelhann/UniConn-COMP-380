@@ -8,68 +8,87 @@ document.addEventListener('DOMContentLoaded', () => {
       const results = document.getElementById('search-results');
       input.value       = '';
       results.innerHTML = '';
+      // reset filter to All on open
+      document.querySelectorAll('.mc-filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+      document.querySelector('.mc-filter-btn[data-filter="all"]')?.classList.add('active');
+      activeFilter = 'all';
       input.focus();
     }
   });
 
-  const fmt = s => s ? s.toLowerCase().replace(/_/g, ' ') : '';
-  const token = localStorage.getItem('token');
-  const authHeaders = token ? { 'Authorization': 'Bearer ' + token } : {};
-  const currentUsername = localStorage.getItem('currentUsername') || '';
+const fmt = s => s ? s.toLowerCase().replace(/_/g, ' ') : '';
+const token = localStorage.getItem('token');
+const authHeaders = token ? { 'Authorization': 'Bearer ' + token } : {};
+const currentUsername = localStorage.getItem('currentUsername') || '';
 
-  function debounce(fn, delay) {
-    let timer;
-    return function(...args) {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn.apply(this, args), delay);
-    };
-  }
+function sectionLabel(text) {
+  const li = document.createElement('li');
+  li.style.cssText = 'list-style:none;padding:8px 4px 2px;font-size:0.78em;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.05em;border-top:1px solid #eee;margin-top:4px';
+  li.textContent = text;
+  return li;
+}
 
-  async function performSearch(query) {
-    const results = document.getElementById('search-results');
-    if (!query || query.length === 0) {
-      results.innerHTML = '';
+// filter button state
+let activeFilter = 'all';
+document.querySelectorAll('.mc-filter-btn[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mc-filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.dataset.filter;
+    // re-run search with current query and new filter
+    document.getElementById('search-input').dispatchEvent(new Event('input'));
+  });
+});
+
+let _searchTimer = null;
+document.getElementById('search-input').addEventListener('input', function() {
+  clearTimeout(_searchTimer);
+  const input = this;
+  _searchTimer = setTimeout(async function() {
+  const query = input.value.trim();
+  if (!query) { document.getElementById('search-results').innerHTML = ''; return; }
+
+  const results = document.getElementById('search-results');
+  results.innerHTML = '<li class="search-result-empty">Searching...</li>';
+
+  try {
+    const currentUserId = localStorage.getItem('currentUserId');
+    const [data, followingIds, tagPosts, memberCommunities] = await Promise.all([
+      fetch(`/api/search?q=${encodeURIComponent(query)}`, { headers: authHeaders }).then(r => r.json()),
+      token
+        ? fetch('/api/users/following/ids', { headers: authHeaders }).then(r => r.ok ? r.json() : [])
+        : Promise.resolve([]),
+      fetch(`/api/posts/search?q=${encodeURIComponent(query)}`, { headers: authHeaders }).then(r => r.ok ? r.json() : []),
+      token && currentUserId
+        ? fetch(`/api/community/user/${currentUserId}/communities`, { headers: authHeaders }).then(r => r.ok ? r.json() : [])
+        : Promise.resolve([])
+    ]);
+
+    results.innerHTML = '';
+
+    const existingPostIds = new Set((data.posts || []).map(p => p.postId));
+    const dedupedTagPosts = tagPosts.filter(p => !existingPostIds.has(p.postId));
+
+    const showUsers       = activeFilter === 'all' || activeFilter === 'users';
+    const showCommunities = activeFilter === 'all' || activeFilter === 'communities';
+    const showPosts       = activeFilter === 'all' || activeFilter === 'posts';
+
+    const hasResults = (showUsers && data.users.length > 0)
+      || (showCommunities && data.communities.length > 0)
+      || (showPosts && (data.posts.length > 0 || dedupedTagPosts.length > 0));
+
+    if (!hasResults) {
+      results.innerHTML = `<li class="search-result-empty">No results found for "${query}"</li>`;
       return;
     }
 
-    results.innerHTML = '<li class="search-result-empty">Searching...</li>';
+    const followingSet = new Set(followingIds);
+    const joinedSet = new Set(memberCommunities.map(c => c.communityId));
 
-    try {
-      const activeFilter = document.querySelector('.search-filter-btn.active')?.dataset.filter || 'all';
-
-      const [data, followingIds] = await Promise.all([
-        fetch(`/api/search?q=${encodeURIComponent(query)}`, { headers: authHeaders }).then(r => r.json()),
-        token
-          ? fetch('/api/users/following/ids', { headers: authHeaders }).then(r => r.ok ? r.json() : [])
-          : Promise.resolve([])
-      ]);
-
-      let users = data.users || [];
-      let communities = data.communities || [];
-      let posts = data.posts || [];
-      let tags = [];
-
-      if (activeFilter === 'users') { communities = []; posts = []; }
-      if (activeFilter === 'communities') { users = []; posts = []; }
-      if (activeFilter === 'posts') { users = []; communities = []; }
-
-      if (activeFilter === 'all' || activeFilter === 'tags') {
-        const res = await fetch(`/api/search/tags?q=${encodeURIComponent(query)}`, { headers: authHeaders });
-        tags = await res.json();
-        if (activeFilter === 'tags') { users = []; communities = []; posts = []; }
-      }
-
-      results.innerHTML = '';
-      const hasResults = users.length > 0 || communities.length > 0 || posts.length > 0 || tags.length > 0;
-
-      if (!hasResults) {
-        results.innerHTML = `<li class="search-result-empty">No results found for "${query}"</li>`;
-        return;
-      }
-
-      const followingSet = new Set(followingIds);
-
-      users.forEach(u => {
+    // --- Users ---
+    if (showUsers && data.users.length > 0) {
+      results.appendChild(sectionLabel('Users'));
+      data.users.forEach(u => {
         const isSelf = u.username === currentUsername;
         const isFollowing = followingSet.has(u.userId);
         const li = document.createElement('li');
@@ -86,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
         `;
-
         if (!isSelf) {
           const btn = li.querySelector('.follow-btn');
           btn.addEventListener('click', async (e) => {
@@ -99,18 +117,24 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
               btn.textContent = following ? 'Follow' : 'Unfollow';
               btn.classList.toggle('unfollow-btn', !following);
+              const followingEl = document.getElementById('following-count');
+              if (followingEl) followingEl.textContent = parseInt(followingEl.textContent) + (following ? -1 : 1);
             }
           });
         }
-
         li.addEventListener('click', (e) => {
           if (e.target.closest('.follow-btn')) return;
           window.location.href = '/profile/' + u.username;
         });
         results.appendChild(li);
       });
+    }
 
-      communities.forEach(c => {
+    // --- Communities ---
+    if (showCommunities && data.communities.length > 0) {
+      results.appendChild(sectionLabel('Communities'));
+      data.communities.forEach(c => {
+        const isMember = joinedSet.has(c.communityId);
         const li = document.createElement('li');
         li.className = 'search-result-card';
         li.innerHTML = `
@@ -120,131 +144,89 @@ document.addEventListener('DOMContentLoaded', () => {
               <div class="src-card-header">
                 <span class="src-card-name">c/${c.communityName}</span>
                 ${c.category ? `<span class="mc-card-category">${fmt(c.category)}</span>` : ''}
+                ${token ? `<button class="follow-btn ${isMember ? 'unfollow-btn' : ''}" data-cid="${c.communityId}">${isMember ? 'Leave' : 'Join'}</button>` : ''}
               </div>
               <span class="src-card-members">${c.memberCount ?? 0} members</span>
               ${c.description ? `<p class="src-card-desc">${c.description}</p>` : ''}
             </div>
           </div>
         `;
-        li.style.cursor = 'pointer';
-        li.addEventListener('click', () => window.location.href = '/community/' + c.communityName);
+        if (token) {
+          const btn = li.querySelector('.follow-btn');
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const leaving = btn.classList.contains('unfollow-btn');
+            const res = await fetch(`/api/community/${c.communityId}/${leaving ? 'leave' : 'join'}`, {
+              method: leaving ? 'DELETE' : 'POST',
+              headers: authHeaders
+            });
+            if (res.ok) {
+              btn.textContent = leaving ? 'Join' : 'Leave';
+              btn.classList.toggle('unfollow-btn', !leaving);
+              const communityEl = document.getElementById('community-count');
+              if (communityEl) communityEl.textContent = parseInt(communityEl.textContent) + (leaving ? -1 : 1);
+            }
+          });
+        }
+        li.addEventListener('click', (e) => {
+          if (e.target.closest('.follow-btn')) return;
+          window.location.href = '/community/' + c.communityName;
+        });
         results.appendChild(li);
       });
+    }
 
-      posts.forEach(p => {
+    // --- Posts (title/content match) ---
+    if (showPosts && data.posts.length > 0) {
+      results.appendChild(sectionLabel('Posts'));
+      data.posts.forEach(p => {
         const li = document.createElement('li');
         li.className = 'search-result-card';
         li.innerHTML = `
           <div class="src-card-header">
-            <span class="src-card-name">${p.title || p.contentText || ''}</span>
+            <span class="src-card-name">${p.title || ''}</span>
+            <a href="/profile/${p.authorUsername}" class="src-card-members post-username-link" onclick="event.stopPropagation()">u/${p.authorUsername}</a>
           </div>
-          <span class="src-card-members">u/${p.authorUsername}</span>
           ${p.contentText ? `<p class="src-card-desc">${p.contentText}</p>` : ''}
         `;
+        li.addEventListener('click', () => {
+          sessionStorage.setItem('pendingPostDetail', JSON.stringify(p));
+          window.location.href = '/post/' + p.postId;
+        });
         results.appendChild(li);
       });
+    }
 
-      tags.forEach(t => {
+    // --- Posts by tag (tag contains match) ---
+    if (showPosts && dedupedTagPosts.length > 0) {
+      results.appendChild(sectionLabel('Posts by tag'));
+      dedupedTagPosts.forEach(p => {
         const li = document.createElement('li');
         li.className = 'search-result-card';
+        const meta = `<a href="/profile/${p.authorUsername}" class="post-username-link" onclick="event.stopPropagation()">u/${p.authorUsername}</a>`
+          + (p.communityName ? ' · c/' + p.communityName : '');
+        const tagsHtml = Array.isArray(p.tags) && p.tags.length
+          ? '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">'
+            + p.tags.map(t => `<span style="background:#f0f0f0;border-radius:20px;padding:2px 8px;font-size:0.78em;color:#555">#${t}</span>`).join('')
+            + '</div>'
+          : '';
         li.innerHTML = `
-          <div class="src-card-row">
-            <div class="src-card-body">
-              <div class="src-card-header">
-                <span class="src-card-name">#${t.name}</span>
-              </div>
-            </div>
-          </div>
+          <span class="src-card-members">${meta}</span>
+          ${p.title ? `<p class="src-card-name" style="margin:4px 0 2px">${p.title}</p>` : ''}
+          <p class="src-card-desc">${p.contentText}</p>
+          ${tagsHtml}
         `;
-        li.style.cursor = 'pointer';
-        li.addEventListener('click', () => window.location.href = '/communities?tag=' + t.name);
+        li.addEventListener('click', () => {
+          sessionStorage.setItem('pendingPostDetail', JSON.stringify(p));
+          window.location.href = '/post/' + p.postId;
+        });
         results.appendChild(li);
       });
-
-    } catch (err) {
-      results.innerHTML = '<li class="search-result-empty">Could not connect to server.</li>';
     }
+
+  } catch (err) {
+    results.innerHTML = '<li class="search-result-empty">Could not connect to server.</li>';
   }
-
-  const debouncedSearch = debounce(function() {
-    const query = document.getElementById('search-input').value.trim();
-    performSearch(query);
-  }, 300);
-
-  document.getElementById('search-input').addEventListener('input', debouncedSearch);
-  document.getElementById('search-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') performSearch(this.value.trim());
-  });
-
-  const modal = document.querySelector('.search-modal');
-  if (!modal) return;
-
-  const filterBar = document.createElement('div');
-  filterBar.className = 'search-filter-bar';
-  filterBar.innerHTML = `
-    <button class="search-filter-btn active" data-filter="all">All</button>
-    <button class="search-filter-btn" data-filter="users">Users</button>
-    <button class="search-filter-btn" data-filter="communities">Communities</button>
-    <button class="search-filter-btn" data-filter="posts">Posts</button>
-    <button class="search-filter-btn" data-filter="tags">Tags</button>
-  `;
-
-  const input = modal.querySelector('.search-modal-input');
-  if (input) input.insertAdjacentElement('afterend', filterBar);
-
-  filterBar.addEventListener('click', function(e) {
-    if (!e.target.classList.contains('search-filter-btn')) return;
-    document.querySelectorAll('.search-filter-btn').forEach(b => b.classList.remove('active'));
-    e.target.classList.add('active');
-    const query = document.getElementById('search-input').value.trim();
-    if (query) performSearch(query);
-  });
-
-  const style = document.createElement('style');
-  style.textContent = `
-    .search-filter-bar {
-      display: flex;
-      gap: 6px;
-      padding: 6px 0;
-      flex-wrap: wrap;
-    }
-    .search-filter-btn {
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid #a0b4c8;
-      background: white;
-      color: #2E75B6;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .search-filter-btn.active {
-      background: #2E75B6;
-      color: white;
-      border-color: #2E75B6;
-    }
-    .search-filter-btn:hover {
-      background: #2E75B6;
-      color: white;
-    }
-  `;
-  document.head.appendChild(style);
-
-  const modalStyle = document.createElement('style');
-  modalStyle.textContent = `
-    .search-modal {
-      display: flex;
-      flex-direction: column;
-      max-height: 80vh;
-      overflow: hidden;
-    }
-    .search-results-list {
-      overflow-y: auto;
-      max-height: 50vh;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-  `;
-  document.head.appendChild(modalStyle);
+  }, 100);
+});
 });
