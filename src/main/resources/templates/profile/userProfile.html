@@ -149,7 +149,7 @@
       <button class="search-modal-close" id="create-community-close" aria-label="Close">&times;</button>
       <div class="create-post-title-wrap">
         <input type="text" id="community-name-input" class="create-post-title-input" placeholder="Community name*" required>
-        <span class="community-name-hint">Lowercase letters, numbers, dots, and underscores only (e.g. my_community)</span>
+        
       </div>
       <div class="create-post-field">
         <textarea id="community-desc-input" class="create-post-body" placeholder="Description*" required></textarea>
@@ -300,6 +300,7 @@
 
   </div>
 
+<script src="/js/auth-guard.js"></script>
 <script th:src="@{/js/darkMode.js}" defer></script>
 <script th:src="@{/js/navbarPfp.js}" defer></script>
 <script th:src="@{/js/gifPicker.js}" defer></script>
@@ -307,7 +308,9 @@
 <script th:src="@{/js/tagPostsModal.js}" defer></script>
 <script th:src="@{/js/postCardRenderer.js}" defer></script>
 <script th:src="@{/js/userProfileLoad.js}" defer></script>
-<script th:src="@{/js/modalManager.js}" defer></script><script th:src="@{/js/notificationFunction.js}" defer></script><script th:src="@{/js/searchFunction.js}" defer></script>
+<script th:src="@{/js/modalManager.js}" defer></script>
+<script th:src="@{/js/notificationFunction.js}" defer></script>
+<script th:src="@{/js/searchFunction.js}" defer></script>
 <script th:src="@{/js/tagInput.js}" defer></script>
 <script th:src="@{/js/communityFunction.js}" defer></script>
 <script th:src="@{/js/createPostFunction.js}" defer></script>

@@ -1,6 +1,13 @@
 // intercepts register form submission, sends new account details to backend API.
 // successs: stores returned JWT in localStorage and redirects to the feed.
 // failure: shows error message below
+const usernameInput = document.querySelector('input[name="username"]');
+usernameInput.addEventListener('input', () => {
+  const pos = usernameInput.selectionStart;
+  usernameInput.value = usernameInput.value.toLowerCase().replace(/\s/g, '');
+  usernameInput.setSelectionRange(pos, pos);
+});
+
 document.getElementById('register-form').addEventListener('submit', async (e) => {
   e.preventDefault(); 
 

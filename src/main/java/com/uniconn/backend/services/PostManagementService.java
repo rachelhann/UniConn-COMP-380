@@ -23,6 +23,7 @@ public class PostManagementService extends BaseService {
     private final CommunityMemberRepository communityMemberRepository;
     private final PostTagService postTagService;
     private final PostLikeRepository postLikeRepository;
+    private final UserFollowRepository userFollowRepository;
     private final ApplicationEventPublisher eventPublisher;
 
     public PostManagementService(PostRepository postRepository,
@@ -30,12 +31,14 @@ public class PostManagementService extends BaseService {
                                  CommunityMemberRepository communityMemberRepository,
                                  PostTagService postTagService,
                                  PostLikeRepository postLikeRepository,
+                                 UserFollowRepository userFollowRepository,
                                  ApplicationEventPublisher eventPublisher) {
         this.postRepository = postRepository;
         this.communityRepository = communityRepository;
         this.communityMemberRepository = communityMemberRepository;
         this.postTagService = postTagService;
         this.postLikeRepository = postLikeRepository;
+        this.userFollowRepository = userFollowRepository;
         this.eventPublisher = eventPublisher;
     }
 
@@ -133,17 +136,56 @@ public class PostManagementService extends BaseService {
     }
 
     // ---------------------------------------------------------------
-    // FEED
+    // FEED — auto-selects algorithm based on user activity
     // ---------------------------------------------------------------
     @Transactional(readOnly = true)
     public List<PostSummaryDTO> getFeedForUser(Integer userId) {
-        User currentUser = getAuthenticatedUser();
-        return postRepository.findFeedPostsForUser(userId)
-                .stream()
-                .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
-                .collect(Collectors.toList());
+    	User currentUser = getAuthenticatedUser();
+
+    	boolean hasFollows = !userFollowRepository
+             .findByFollower_UserId(userId).isEmpty();
+    	boolean hasCommunities = !communityMemberRepository
+             .findByUser_UserId(userId).isEmpty();
+
+    	if (!hasFollows && !hasCommunities) {
+    		return getTrendingFeed(currentUser);
+    	}
+    	return getPersonalizedFeed(currentUser);
     }
 
+    // ALGORITHM 1 — new/inactive user: posts from trending tags
+    private List<PostSummaryDTO> getTrendingFeed(User currentUser) {
+    	LocalDateTime since = LocalDateTime.now().minusDays(30);
+    	List<String> trendingTagNames = postRepository.findTrendingTagsRaw(since)
+             .stream()
+             .map(row -> (String) row[0])
+             .collect(Collectors.toList());
+
+    	if (trendingTagNames.isEmpty()) {
+    		return List.of(); // no trending tags yet, feed is empty
+     }
+
+     return postRepository.findPostsByTrendingTags(trendingTagNames)
+             .stream()
+             .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
+             .collect(Collectors.toList());
+ }
+
+ // ALGORITHM 2 — active user: posts from followed users + joined communities
+ private List<PostSummaryDTO> getPersonalizedFeed(User currentUser) {
+     return postRepository.findFeedPostsForUser(currentUser.getUserId())
+             .stream()
+             .map(p -> mapToSummaryDTO(p, currentUser.getUserId()))
+             .collect(Collectors.toList());
+ }
+ 	// FED TYPE
+ 	@Transactional(readOnly = true)
+ 	public String getFeedType(Integer userId) {
+ 		boolean hasFollows = !userFollowRepository.findByFollower_UserId(userId).isEmpty();
+ 		boolean hasCommunities = !communityMemberRepository.findByUser_UserId(userId).isEmpty();
+ 		return (!hasFollows && !hasCommunities) ? "suggested" : "feed";
+ 	}
+ 	
     // ---------------------------------------------------------------
     // TRENDING TAGS (last 30 days)
     // ---------------------------------------------------------------

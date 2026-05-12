@@ -99,7 +99,7 @@
 
     <div class="create-post-title-wrap">
       <input type="text" id="community-name-input" class="create-post-title-input" placeholder="Community name*" required>
-      <span class="community-name-hint">Lowercase letters, numbers, dots, and underscores only (e.g. my_community)</span>
+      
     </div>
 
     <div class="create-post-field">
@@ -189,11 +189,12 @@
 
   <div class="wrap">
 
-<!-- left container: main user feed-->
-    <div class="left-container">
-        <div class="header-left"><h3>For You</h3></div>
-        <div class="feed-posts-list" id="feed-posts-list"></div>
-    </div>
+	<!-- left container: main user feed-->
+	<div class="left-container">
+  		<div class="header-left"><h3 id="feed-header-title">For You</h3></div>
+  		<p id="feed-section-label" style="font-size:0.85em; color:#888; margin: -8px 0 8px 4px;"></p>
+  		<div class="feed-posts-list" id="feed-posts-list"></div>
+	</div>
 
   <div class="right-wrap">
     <div class="right-container">
@@ -271,7 +272,7 @@
   </div>
 </div>
 
-
+<script src="/js/auth-guard.js"></script>
 <script>document.addEventListener('DOMContentLoaded', () => document.getElementById('for-you-btn')?.classList.add('active'));</script>
 <script th:src="@{/js/darkMode.js}" defer></script>
 <script th:src="@{/js/navbarPfp.js}" defer></script>

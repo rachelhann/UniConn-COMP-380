@@ -184,6 +184,11 @@
   padding: 2px 10px;
   font-size: 0.8em;
   color: #444;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.mc-tag:hover {
+  background: #d6ecf7;
 }
 
 /* ── COMMUNITY DETAIL PAGE ───────────────────────────────────────────────── */
@@ -275,6 +280,12 @@
   padding: 2px 10px;
   font-size: 0.78em;
   color: #555;
+  cursor: pointer;
+    transition: background 0.15s;
+}
+
+.community-tag:hover {
+  background: #d6ecf7;
 }
 
 /* Created by */

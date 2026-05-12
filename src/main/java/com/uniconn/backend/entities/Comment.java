@@ -21,7 +21,7 @@ public class Comment {
     @JoinColumn(name = "author_id", referencedColumnName = "user_id", nullable = false)
     private User author;
 
-    @Column(length = 1000, nullable = false)
+    @Column(length = 1000, nullable = true)
     private String contentText;
     
     @Column(name = "gif_url")

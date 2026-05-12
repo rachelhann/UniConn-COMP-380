@@ -7,7 +7,9 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.*;
 
-@Table(name = "post")
+@Table(name = "post", indexes = {
+	    @Index(name = "idx_post_created_at", columnList = "is_deleted, created_at DESC")
+	})
 @Entity
 public class Post {
 	@Id

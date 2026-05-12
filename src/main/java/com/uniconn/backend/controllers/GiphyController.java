@@ -15,7 +15,7 @@ public class GiphyController {
     @GetMapping("/search")
     public ResponseEntity<String> searchGifs(
             @RequestParam String q,
-            @RequestParam(defaultValue = "12") int limit) {
+            @RequestParam(defaultValue = "40") int limit) {
 
         String result = giphyService.searchGifs(q, limit);
         return ResponseEntity.ok(result);
