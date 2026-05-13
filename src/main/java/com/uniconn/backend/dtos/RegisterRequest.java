@@ -1,18 +1,40 @@
-//Lillian Foster - Register Request
+// Lillian Foster - Register Request
 package com.uniconn.backend.dtos;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 /**
  * This is a DTO that carries registration form data from the frontend to the backend.
  * The fields need to match the registration form inputs submitted by a new user.
+ * Validation annotations catch invalid input before it reaches the service layer.
  */
 public class RegisterRequest {
 
-    private String username;       // chosen display name
-    private String fullName;       // user's real name
-    private String csunEmail;      // must end in @my.csun.edu
-    private String password;       // will be hashed before saving
-    private String secretQuestion; // used for forgot password flow
-    private String secretAnswer;   // answer to the secret question
+    // only letters, numbers, underscores, hyphens — no spaces or special chars
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 30, message = "Username must be between 3 and 30 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_-]+$", message = "Username can only contain letters, numbers, underscores, and hyphens")
+    private String username;
+
+    private String fullName;
+
+    // must be a valid CSUN email address
+    @NotBlank(message = "Email is required")
+    @Pattern(regexp = "^[^@\\s]+@my\\.csun\\.edu$", message = "Email must be a valid @my.csun.edu address")
+    private String csunEmail;
+
+    // minimum 8 characters
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    private String password;
+
+    @NotBlank(message = "Security question is required")
+    private String secretQuestion;
+
+    @NotBlank(message = "Security answer is required")
+    private String secretAnswer;
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }

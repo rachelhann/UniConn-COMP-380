@@ -1,6 +1,7 @@
 // Lillian Foster
 // AuthController.java - handles login, registration, and forgot password endpoints
 // no try/catch needed - GlobalExceptionHandler catches everything automatically
+// @Valid triggers DTO validation annotations before hitting service layer
 
 package com.uniconn.backend.controllers;
 
@@ -10,6 +11,7 @@ import com.uniconn.backend.dtos.RegisterRequest;
 import com.uniconn.backend.dtos.ResetPasswordRequest;
 import com.uniconn.backend.services.AuthService;
 import com.uniconn.backend.services.PasswordResetService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,14 +29,14 @@ public class AuthController {
 
     // POST /api/auth/register
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.ok(response);
     }
 
     // POST /api/auth/login
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }
@@ -65,3 +67,4 @@ public class AuthController {
         return ResponseEntity.ok("Password reset successfully");
     }
 }
+ 
