@@ -1,4 +1,6 @@
 # UniConn-COMP-380 :unicorn: 
+> [!NOTE]
+> ***Author: Daria Taradina***
 
 **A (Uni)versity (Conn)ection platform for CSUN students.**  
 Discover communities, spark conversations, and stay in the loop with everything campus.
@@ -125,7 +127,9 @@ Open `src/main/resources/db/posts_test_data.sql` in Workbench and execute.
 ## :camera: Image Upload
 
 > [!WARNING]
-> :bangbang: Include local image upload feature.
+> :bangbang: Include local image upload feature
+> 
+> ***(guide wasn't included)*** 
 
 
 
@@ -133,22 +137,19 @@ Open `src/main/resources/db/posts_test_data.sql` in Workbench and execute.
 ## :woman_technologist: User Management System (Lily)
 | Feature | Description | 
 |---|---|
-| **User Authentication** 🔐 | JWT-based login, registration, password reset via secret question |
-| etc | |
+|  |  |
 
 
 ## :joystick: Interactive Systems (Abi)
 | Feature | Description | 
 |---|---|
-| **Feed** 👣 | Personalized feed |
-| etc | |
+|  | |
 
 
 ## :bell: Notification System (Supti)
 | Feature | Description | 
 |---|---|
-| **New Follower** 👤 | ... |
-| etc | |
+|  |  |
 
 ## ⚠️ Important
 
